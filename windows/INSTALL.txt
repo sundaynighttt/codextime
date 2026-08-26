@@ -1,25 +1,25 @@
-CodexTime for Windows
+CodexTime Windows 설치
 =====================
 
-Requirements:
-- Windows 10 or 11
-- Codex CLI installed and signed in
+필요한 환경
+- Windows 10 또는 11
+- Codex CLI 설치 및 로그인
 
-Install:
-1. Extract this ZIP file.
-2. Open Windows PowerShell in the extracted folder.
-3. Run:
+설치
+1. ZIP 파일의 압축을 풉니다.
+2. 해당 폴더에서 PowerShell을 엽니다.
+3. 다음 명령을 실행합니다.
 
    powershell -ExecutionPolicy Bypass -File .\install.ps1 -EnableStartup
 
-CodexTime is installed at:
+설치 위치
 
    %LOCALAPPDATA%\CodexUsageMonitor\CodexTime.exe
 
-The default view is a compact label beside the notification area. Right-click
-the label or tray icon to switch to the draggable top-right mini widget.
+기본 화면은 오른쪽 알림 영역 옆에 표시됩니다. 오른쪽 클릭 메뉴에서
+우상단 미니 위젯으로 전환할 수 있습니다.
 
-Click the label or widget for details. Right-click for refresh, display mode,
-startup, or exit.
+표시를 클릭하면 상세 사용량을 볼 수 있습니다. 오른쪽 클릭 메뉴에서는
+새로고침, 표시 위치, 자동 실행, 종료를 선택할 수 있습니다.
 
-Project: https://github.com/sundaynighttt/codextime
+프로젝트: https://github.com/sundaynighttt/codextime
