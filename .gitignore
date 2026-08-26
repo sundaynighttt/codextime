@@ -3,3 +3,5 @@ macos/.build/
 macos/dist/
 dist/
 *.xcuserstate
+windows/**/bin/
+windows/**/obj/
