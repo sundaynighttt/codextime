@@ -34,7 +34,7 @@ The current implementation has been tested against Codex CLI `0.144.3` and the `
 
 Download `CodexTime-macOS-<version>.dmg` from the [latest release](https://github.com/sundaynighttt/codextime/releases/latest), open it, and drag **Codex Usage Monitor** to Applications.
 
-The current public DMG is ad-hoc signed but not Apple-notarized. macOS may block its first launch; if so, build from source below, or explicitly allow the app in **System Settings → Privacy & Security** only after confirming that it came from this repository. Release assets include `SHA256SUMS.txt` for integrity checks.
+The macOS DMG in `v0.1.1` and later is signed with a Developer ID certificate and notarized by Apple. Gatekeeper can therefore verify the downloaded app without requiring an **Open Anyway** override. Release assets also include `SHA256SUMS.txt` for integrity checks.
 
 To build from source instead:
 
@@ -54,7 +54,7 @@ The app is built, ad-hoc signed, and installed at:
 
 Open the menu-bar item and enable **Launch at Login** if desired. The app uses Apple's standard login-item API and macOS may ask you to approve it in System Settings.
 
-Maintainers can connect a Developer ID certificate and Apple notarization credentials to the release workflow. Until those credentials are configured, the downloadable artifact remains non-notarized.
+The GitHub release workflow signs and notarizes public macOS artifacts. Local source builds remain ad-hoc signed because the maintainer's Developer ID credentials are never included in the repository.
 
 ## Install on Windows
 
