@@ -1,40 +1,147 @@
-# Codex Usage Monitor
+# CodexTime
 
-Codex의 남은 사용량과 리셋까지 남은 시간을 메뉴바 또는 시스템 트레이에서 바로 보여주는 개인용 유틸리티입니다.
+[![CI](https://github.com/sundaynighttt/codextime/actions/workflows/ci.yml/badge.svg)](https://github.com/sundaynighttt/codextime/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-- macOS: 메뉴바에 `Codex 96% (6d 16h)` 형태로 표시
-- Windows: 트레이 아이콘에 잔여 퍼센트, 툴팁과 메뉴에 전체 상태 표시
-- 별도 OpenAI API 키 불필요
-- 브라우저 쿠키나 인증 토큰을 직접 읽지 않음
-- 설치된 Codex CLI의 `app-server` 프로토콜과 현재 로그인 상태 사용
+See your remaining Codex allowance and reset countdown without opening the usage settings page.
 
-## 요구 사항
+- **macOS:** `Codex 95% (6d 16h)` in the menu bar
+- **Windows:** remaining percentage inside a system-tray icon, with the full countdown in its tooltip and menu
+- Refreshes the Codex allowance every 10 minutes and updates the local countdown every minute
+- Uses your existing Codex CLI login; no separate OpenAI API key is required
+- Does not read browser cookies or authentication-token files directly
 
-- Codex CLI가 설치되어 있고 ChatGPT 계정으로 로그인되어 있어야 합니다.
-- 현재 구현은 Codex CLI `0.144.3`의 `account/rateLimits/read` 응답으로 검증했습니다.
-- 이 프로토콜은 experimental이므로 Codex 업데이트 후 호환성 확인이 필요할 수 있습니다.
+> [!IMPORTANT]
+> CodexTime is an unofficial community project and is not affiliated with or endorsed by OpenAI. It relies on the experimental Codex `app-server` protocol, which may change in a future Codex release.
 
-## macOS
+## Requirements
+
+- Codex CLI installed and signed in with a ChatGPT account
+- macOS 13 or newer for the menu-bar app
+- Windows 10/11 with Windows PowerShell 5.1 or newer for the tray app
+- Swift 6 toolchain only when building the macOS app from source
+
+The current implementation has been tested against Codex CLI `0.144.3` and the `account/rateLimits/read` method.
+
+## Install on macOS
+
+Clone the repository and run the installer:
 
 ```bash
-cd macos
+git clone https://github.com/sundaynighttt/codextime.git
+cd codextime/macos
 ./scripts/install-macos.sh
 ```
 
-기본 설치 위치는 `~/Applications/Codex Usage Monitor.app`입니다. 앱 메뉴에서 로그인 시 자동 실행을 켤 수 있습니다.
+The app is built, ad-hoc signed, and installed at:
 
-## Windows
+```text
+~/Applications/Codex Usage Monitor.app
+```
 
-PowerShell에서 저장소의 `windows` 폴더로 이동한 뒤 실행합니다.
+Open the menu-bar item and enable **Launch at Login** if desired. The app uses Apple's standard login-item API and macOS may ask you to approve it in System Settings.
+
+The project does not currently distribute a Developer ID-notarized binary. Building locally avoids presenting an unsigned binary from an unknown third party as a trusted release.
+
+## Install on Windows
+
+Download the repository ZIP from GitHub or clone it, open PowerShell in the `windows` directory, and run:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\install.ps1 -EnableStartup
 ```
 
-기본 설치 위치는 `%LOCALAPPDATA%\CodexUsageMonitor`입니다. Windows는 macOS처럼 트레이에 임의 문자열을 계속 표시할 수 없으므로 아이콘 안에 잔여 퍼센트를 그리고, 마우스를 올리거나 메뉴를 열면 리셋 시간을 보여줍니다.
+The installer copies the tray app to:
 
-제거할 때는 먼저 트레이 메뉴에서 앱을 종료한 뒤 설치 폴더의 `uninstall.ps1`을 실행합니다.
+```text
+%LOCALAPPDATA%\CodexUsageMonitor
+```
 
-## 데이터 해석
+Windows does not provide a macOS-style text slot in the notification area. CodexTime therefore draws the remaining percentage inside the tray icon. Hover over the icon or right-click it to see the reset countdown, refresh immediately, open Codex usage settings, toggle startup, or quit.
 
-Codex 응답의 `usedPercent`를 `100 - usedPercent`로 바꿔 남은 퍼센트를 표시합니다. 기본 메뉴바 값은 `limitId == "codex"`인 메인 주간 버킷을 사용하며, Spark 같은 별도 버킷은 상세 메뉴에 함께 표시합니다.
+To uninstall, quit CodexTime from its tray menu and run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\CodexUsageMonitor\uninstall.ps1"
+```
+
+## How it works
+
+CodexTime starts `codex app-server` as a short-lived child process and exchanges JSONL messages:
+
+1. `initialize`
+2. `initialized`
+3. `account/rateLimits/read`
+
+It converts `usedPercent` into a remaining value with `100 - usedPercent`, and converts the Unix `resetsAt` value into a local countdown. The main display prefers the bucket whose `limitId` is `codex`; model-specific buckets such as Spark appear in the detail menu.
+
+See [docs/protocol.md](docs/protocol.md) for the fields CodexTime consumes.
+
+## Privacy and security
+
+- CodexTime delegates authentication to the installed Codex CLI.
+- It does not parse `auth.json`, browser cookies, access tokens, or refresh tokens.
+- Rate-limit data stays on the local machine.
+- No analytics or telemetry are included.
+- The child `app-server` process is terminated after each refresh.
+
+Please do not attach Codex authentication files or tokens to bug reports. See [SECURITY.md](SECURITY.md) for reporting security issues.
+
+## Configuration
+
+GUI applications can have a smaller `PATH` than your terminal. CodexTime checks common Codex locations automatically. To use a custom executable, set:
+
+```text
+CODEX_CLI_PATH=/absolute/path/to/codex
+```
+
+On Windows this may point to `codex.exe`, `codex.cmd`, `codex.bat`, or `codex.ps1`.
+
+## Troubleshooting
+
+### Codex CLI not found
+
+Confirm that `codex --version` works in a terminal, then restart CodexTime. If Codex is installed in a custom location, set `CODEX_CLI_PATH`.
+
+### Usage lookup fails after a Codex update
+
+Run `codex app-server --help`. If the command or `account/rateLimits/read` protocol changed, open an issue with the Codex CLI version and the error message. Never include authentication files.
+
+### Windows icon is hidden
+
+Open the `^` hidden-icons area and drag the CodexTime icon onto the visible notification area, or change the taskbar notification-area settings.
+
+## Development
+
+macOS tests and build:
+
+```bash
+swift test --package-path macos
+./macos/scripts/build-macos.sh
+```
+
+Optional live integration test using your current Codex login:
+
+```bash
+CODEX_LIVE_TEST=1 swift test --package-path macos --filter fetchesLiveCodexUsageWhenEnabled
+```
+
+Windows parser tests:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\windows\test-parser.ps1
+```
+
+## 한국어 요약
+
+CodexTime은 Codex의 남은 사용량과 리셋까지 남은 시간을 macOS 메뉴바 또는 Windows 시스템 트레이에 표시합니다.
+
+- macOS 설치: `macos/scripts/install-macos.sh`
+- Windows 설치: `windows/install.ps1 -EnableStartup`
+- 별도 API 키 불필요
+- Codex 인증 파일과 브라우저 쿠키를 직접 읽지 않음
+- Codex의 experimental `app-server` 프로토콜 변경 시 호환성 수정이 필요할 수 있음
+
+## License
+
+[MIT](LICENSE)

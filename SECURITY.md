@@ -1,0 +1,19 @@
+# Security policy
+
+## Reporting a vulnerability
+
+Please use GitHub's private vulnerability reporting feature for this repository when available. If it is unavailable, open a minimal issue asking for a private contact channel without publishing exploit details.
+
+Do not include any of the following in an issue, pull request, screenshot, or log attachment:
+
+- Codex or ChatGPT authentication files
+- access tokens, refresh tokens, session cookies, or API keys
+- complete home-directory paths when they reveal private account names
+
+## Supported version
+
+The latest commit on `main` is the supported development version. CodexTime depends on an experimental Codex protocol, so compatibility fixes may follow Codex CLI releases rather than a fixed long-term support schedule.
+
+## Security model
+
+CodexTime invokes the locally installed Codex CLI and asks its app server for rate-limit metadata. It does not read or store Codex credential files directly and does not send analytics.
