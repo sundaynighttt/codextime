@@ -3,7 +3,6 @@ CodexTime for Windows
 
 Requirements:
 - Windows 10 or 11
-- Windows PowerShell 5.1 or newer
 - Codex CLI installed and signed in
 
 Install:
@@ -13,8 +12,14 @@ Install:
 
    powershell -ExecutionPolicy Bypass -File .\install.ps1 -EnableStartup
 
-CodexTime will appear in the notification area at the right side of the taskbar.
-Right-click its percentage icon to refresh, open usage settings, change startup,
-or quit.
+CodexTime is installed at:
+
+   %LOCALAPPDATA%\CodexUsageMonitor\CodexTime.exe
+
+The default view is a compact label beside the notification area. Right-click
+the label or tray icon to switch to the draggable top-right mini widget.
+
+Click the label or widget for details. Right-click for refresh, display mode,
+startup, or exit.
 
 Project: https://github.com/sundaynighttt/codextime

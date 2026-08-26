@@ -1,0 +1,82 @@
+<Window x:Class="CodexTime.WinApp.DetailsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="CodexTime"
+        Width="340"
+        Height="300"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Topmost="True">
+    <Border Margin="8"
+            Padding="18"
+            CornerRadius="16"
+            Background="#FA1C1C1F"
+            BorderBrush="#38FFFFFF"
+            BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="CodexTime"
+                               Foreground="#F5F5F6"
+                               FontFamily="Segoe UI"
+                               FontSize="15"
+                               FontWeight="SemiBold" />
+                    <TextBlock x:Name="StatusText"
+                               Text="로컬 Codex 사용량"
+                               Margin="0,2,0,0"
+                               Foreground="#9FA0A8"
+                               FontSize="11.5" />
+                </StackPanel>
+                <Button Grid.Column="1"
+                        Width="28"
+                        Height="28"
+                        Content="×"
+                        Foreground="#C8C8CD"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        FontSize="18"
+                        Cursor="Hand"
+                        Click="CloseButton_OnClick" />
+            </Grid>
+
+            <StackPanel Grid.Row="1" Margin="0,15,0,12">
+                <TextBlock x:Name="MainPercentText"
+                           Text="--%"
+                           Foreground="#FFFFFF"
+                           FontFamily="Segoe UI"
+                           FontSize="34"
+                           FontWeight="SemiBold" />
+                <TextBlock x:Name="MainResetText"
+                           Text="사용량 확인 중"
+                           Margin="1,-2,0,0"
+                           Foreground="#B9BAC1"
+                           FontSize="12" />
+            </StackPanel>
+
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                <StackPanel x:Name="RowsPanel" />
+            </ScrollViewer>
+
+            <TextBlock x:Name="UpdatedText"
+                       Grid.Row="3"
+                       Margin="0,12,0,0"
+                       Padding="0,10,0,0"
+                       Foreground="#777982"
+                       FontSize="10.5" />
+        </Grid>
+    </Border>
+</Window>

@@ -7,7 +7,7 @@
 See your remaining Codex allowance and reset countdown without opening the usage settings page.
 
 - **macOS:** `Codex 95% (6d 16h)` in the menu bar
-- **Windows:** remaining percentage inside a system-tray icon, with the full countdown in its tooltip and menu
+- **Windows:** `Codex 95% · 6d 16h` beside the notification area, or in an optional draggable top-right mini widget
 - Refreshes the Codex allowance every 10 minutes and updates the local countdown every minute
 - Uses your existing Codex CLI login; no separate OpenAI API key is required
 - Does not read browser cookies or authentication-token files directly
@@ -25,10 +25,10 @@ The preview uses sample values so a contributor's private allowance is never pub
 
 - Codex CLI installed and signed in with a ChatGPT account
 - macOS 13 or newer for the menu-bar app
-- Windows 10/11 with Windows PowerShell 5.1 or newer for the tray app
+- Windows 10/11; the release executable is self-contained, with Windows PowerShell 5.1 used only by the installer
 - Swift 6 toolchain only when building the macOS app from source
 
-The current implementation has been tested against Codex CLI `0.144.3` and the `account/rateLimits/read` method.
+The current implementation has been tested against Codex CLI `0.144.3` and `0.150.0-alpha.8` using the `account/rateLimits/read` method.
 
 ## Install on macOS
 
@@ -64,23 +64,24 @@ Download `CodexTime-Windows-<version>.zip` from the [latest release](https://git
 powershell -ExecutionPolicy Bypass -File .\install.ps1 -EnableStartup
 ```
 
-The PowerShell scripts are currently not Authenticode-signed. Inspect them in this public repository before running them if your environment requires signed code.
+The Windows executable and PowerShell installer are currently not code-signed. Inspect them in this public repository and verify the release checksum if your environment requires signed code.
 
-To install from the repository instead:
-
-Download the repository ZIP from GitHub or clone it, open PowerShell in the `windows` directory, and run:
+To build and install from the repository, install the .NET 8 SDK and run:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\install.ps1 -EnableStartup
+.\windows\test-parser.ps1
+.\windows\package-windows.ps1 -Version 0.2.0
+Expand-Archive .\dist\CodexTime-Windows-0.2.0.zip .\dist\install
+powershell -ExecutionPolicy Bypass -File .\dist\install\CodexTime-Windows-0.2.0\install.ps1 -EnableStartup
 ```
 
-The installer copies the tray app to:
+The installer copies the self-contained app to:
 
 ```text
-%LOCALAPPDATA%\CodexUsageMonitor
+%LOCALAPPDATA%\CodexUsageMonitor\CodexTime.exe
 ```
 
-Windows does not provide a macOS-style text slot in the notification area. CodexTime therefore draws the remaining percentage inside the tray icon. Hover over the icon or right-click it to see the reset countdown, refresh immediately, open Codex usage settings, toggle startup, or quit.
+By default, CodexTime places a compact text label immediately to the left of the Windows notification area. It stays out of Alt+Tab, does not take keyboard focus, tracks taskbar movement, and hides with an auto-hidden taskbar or a fullscreen app. Click it for details. Right-click it to refresh, switch to the draggable top-right mini widget, toggle startup, or quit. A tray icon remains available as a fallback control surface.
 
 To uninstall, quit CodexTime from its tray menu and run:
 
@@ -130,9 +131,9 @@ Confirm that `codex --version` works in a terminal, then restart CodexTime. If C
 
 Run `codex app-server --help`. If the command or `account/rateLimits/read` protocol changed, open an issue with the Codex CLI version and the error message. Never include authentication files.
 
-### Windows icon is hidden
+### Windows label is hidden
 
-Open the `^` hidden-icons area and drag the CodexTime icon onto the visible notification area, or change the taskbar notification-area settings.
+The taskbar label intentionally hides while the taskbar is auto-hidden or another app is fullscreen on the same monitor. The tray icon remains available under `^`; right-click it to switch to the top-right mini widget if preferred.
 
 ## Development
 
@@ -149,7 +150,7 @@ Optional live integration test using your current Codex login:
 CODEX_LIVE_TEST=1 swift test --package-path macos --filter fetchesLiveCodexUsageWhenEnabled
 ```
 
-Windows parser tests:
+Windows build and parser tests require the .NET 8 SDK:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\windows\test-parser.ps1
@@ -162,14 +163,14 @@ Build release packages locally:
 ```
 
 ```powershell
-.\windows\package-windows.ps1 -Version 0.1.0
+.\windows\package-windows.ps1 -Version 0.2.0
 ```
 
 Pushing a `v*` tag runs [.github/workflows/release.yml](.github/workflows/release.yml), attaches both packages and `SHA256SUMS.txt` to a GitHub Release, and generates release notes. Optional macOS signing uses the repository secrets documented in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## 한국어 요약
 
-CodexTime은 Codex의 남은 사용량과 리셋까지 남은 시간을 macOS 메뉴바 또는 Windows 시스템 트레이에 표시합니다.
+CodexTime은 Codex의 남은 사용량과 리셋까지 남은 시간을 macOS 메뉴바 또는 Windows 작업표시줄 라벨에 표시합니다. Windows에서는 우상단 미니 위젯 모드로 전환할 수도 있습니다.
 
 - macOS 설치: `macos/scripts/install-macos.sh`
 - Windows 설치: `windows/install.ps1 -EnableStartup`
