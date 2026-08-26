@@ -1,0 +1,30 @@
+import Foundation
+import Testing
+@testable import CodexUsageMonitor
+
+@Test func parsesMainAndSparkBuckets() throws {
+    let json = #"{"id":2,"result":{"rateLimits":{"limitId":"codex","primary":{"usedPercent":4,"windowDurationMins":10080,"resetsAt":1788283270},"secondary":null,"planType":"pro"},"rateLimitsByLimitId":{"codex":{"limitId":"codex","primary":{"usedPercent":4,"windowDurationMins":10080,"resetsAt":1788283270},"secondary":null,"planType":"pro"},"codex_spark":{"limitId":"codex_spark","limitName":"Spark","primary":{"usedPercent":21,"windowDurationMins":300,"resetsAt":1787721941},"secondary":null,"planType":"pro"}}}}"#
+
+    let parsed = try RateLimitParser.parse(line: Data(json.utf8))
+    let report = try #require(parsed)
+    #expect(report.main?.remainingPercent == 96)
+    #expect(report.buckets.map(\.name) == ["Codex", "Spark"])
+}
+
+@Test func ignoresInitializeResponse() throws {
+    let json = #"{"id":1,"result":{"userAgent":"Codex Desktop"}}"#
+    #expect(try RateLimitParser.parse(line: Data(json.utf8)) == nil)
+}
+
+@Test func formatsCountdown() {
+    let now = Date(timeIntervalSince1970: 1_000)
+    let reset = now.addingTimeInterval((3 * 86_400) + (17 * 3_600))
+    #expect(UsageFormatter.remainingTime(until: reset, now: now) == "3d 17h")
+}
+
+@Test func fetchesLiveCodexUsageWhenEnabled() async throws {
+    guard ProcessInfo.processInfo.environment["CODEX_LIVE_TEST"] == "1" else { return }
+    let report = try await CodexAppServerClient().fetchRateLimits()
+    #expect(report.main != nil)
+    #expect((0...100).contains(report.main?.remainingPercent ?? -1))
+}
