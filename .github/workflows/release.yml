@@ -9,7 +9,7 @@ on:
       version:
         description: Version without the v prefix
         required: true
-        default: 0.1.0
+        default: 0.2.0
 
 permissions:
   contents: write
@@ -88,6 +88,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
       - name: Resolve version
         id: version
         shell: bash
@@ -98,7 +102,7 @@ jobs:
             echo "value=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Run parser tests
+      - name: Build and run parser tests
         run: .\windows\test-parser.ps1
 
       - name: Package ZIP
@@ -109,6 +113,9 @@ jobs:
           Expand-Archive -Path 'dist\CodexTime-Windows-${{ steps.version.outputs.value }}.zip' -DestinationPath "$env:RUNNER_TEMP\codextime-release"
           if (-not (Test-Path "$env:RUNNER_TEMP\codextime-release\CodexTime-Windows-${{ steps.version.outputs.value }}\install.ps1")) {
             throw 'install.ps1 is missing from the Windows release package.'
+          }
+          if (-not (Test-Path "$env:RUNNER_TEMP\codextime-release\CodexTime-Windows-${{ steps.version.outputs.value }}\CodexTime.exe")) {
+            throw 'CodexTime.exe is missing from the Windows release package.'
           }
 
       - uses: actions/upload-artifact@v4

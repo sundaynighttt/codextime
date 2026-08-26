@@ -29,7 +29,7 @@ jobs:
         run: codesign --verify --deep --strict "macos/dist/Codex Usage Monitor.app"
 
   windows:
-    name: Windows PowerShell
+    name: Windows WPF
     runs-on: windows-latest
     defaults:
       run:
@@ -38,5 +38,10 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Run parser tests
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build and run parser tests
         run: .\windows\test-parser.ps1
