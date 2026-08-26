@@ -120,9 +120,15 @@ enum UsageFormatter {
         return "\(max(1, minutes))m"
     }
 
-    static func compactTitle(for bucket: UsageBucket?, now: Date = Date()) -> String {
+    static func compactTitle(
+        for bucket: UsageBucket?,
+        now: Date = Date(),
+        showResetTime: Bool = true
+    ) -> String {
         guard let bucket else { return "Codex …" }
-        return "Codex \(bucket.remainingPercent)% (\(remainingTime(until: bucket.resetDate, now: now)))"
+        let usage = "Codex \(bucket.remainingPercent)%"
+        guard showResetTime else { return usage }
+        return "\(usage) (\(remainingTime(until: bucket.resetDate, now: now)))"
     }
 
     static func detail(for bucket: UsageBucket, now: Date = Date()) -> String {
