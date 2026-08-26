@@ -22,6 +22,25 @@ import Testing
     #expect(UsageFormatter.remainingTime(until: reset, now: now) == "3d 17h")
 }
 
+@Test func formatsCompactTitleWithOptionalResetTime() {
+    let now = Date(timeIntervalSince1970: 1_000)
+    let reset = now.addingTimeInterval((3 * 86_400) + (17 * 3_600))
+    let bucket = UsageBucket(
+        id: "codex",
+        name: "Codex",
+        primary: RateLimitWindow(
+            usedPercent: 4,
+            windowDurationMins: 10_080,
+            resetsAt: Int64(reset.timeIntervalSince1970)
+        ),
+        secondary: nil,
+        planType: "pro"
+    )
+
+    #expect(UsageFormatter.compactTitle(for: bucket, now: now) == "Codex 96% (3d 17h)")
+    #expect(UsageFormatter.compactTitle(for: bucket, now: now, showResetTime: false) == "Codex 96%")
+}
+
 @Test func fetchesLiveCodexUsageWhenEnabled() async throws {
     guard ProcessInfo.processInfo.environment["CODEX_LIVE_TEST"] == "1" else { return }
     let report = try await CodexAppServerClient().fetchRateLimits()

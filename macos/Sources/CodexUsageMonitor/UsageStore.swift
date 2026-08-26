@@ -19,8 +19,8 @@ final class UsageStore: ObservableObject {
         }
     }
 
-    var menuTitle: String {
-        UsageFormatter.compactTitle(for: report?.main, now: now)
+    func menuTitle(showResetTime: Bool) -> String {
+        UsageFormatter.compactTitle(for: report?.main, now: now, showResetTime: showResetTime)
     }
 
     func start() {

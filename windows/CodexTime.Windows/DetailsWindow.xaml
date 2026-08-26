@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="CodexTime"
         Width="340"
-        Height="300"
+        SizeToContent="Height"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
@@ -20,7 +20,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
@@ -67,9 +67,7 @@
                            FontSize="12" />
             </StackPanel>
 
-            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
-                <StackPanel x:Name="RowsPanel" />
-            </ScrollViewer>
+            <StackPanel x:Name="RowsPanel" Grid.Row="2" />
 
             <TextBlock x:Name="UpdatedText"
                        Grid.Row="3"

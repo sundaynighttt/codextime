@@ -4,15 +4,16 @@ import SwiftUI
 @main
 struct CodexUsageMonitorApp: App {
     @StateObject private var store = UsageStore()
+    @AppStorage("showResetTimeInMenuBar") private var showResetTimeInMenuBar = true
 
     var body: some Scene {
         MenuBarExtra {
-            StatusMenu(store: store)
+            StatusMenu(store: store, showResetTimeInMenuBar: $showResetTimeInMenuBar)
         } label: {
-            Text(store.menuTitle)
+            Text(store.menuTitle(showResetTime: showResetTimeInMenuBar))
                 .monospacedDigit()
                 .fixedSize(horizontal: true, vertical: false)
-                .accessibilityLabel("Codex 남은 사용량 \(store.menuTitle)")
+                .accessibilityLabel("Codex 남은 사용량 \(store.menuTitle(showResetTime: showResetTimeInMenuBar))")
         }
         .menuBarExtraStyle(.menu)
     }
@@ -20,6 +21,7 @@ struct CodexUsageMonitorApp: App {
 
 private struct StatusMenu: View {
     @ObservedObject var store: UsageStore
+    @Binding var showResetTimeInMenuBar: Bool
     @State private var launchAtLogin = LoginItemManager.isEnabled
     @State private var loginItemError: String?
 
@@ -56,6 +58,8 @@ private struct StatusMenu: View {
                 Label(store.isRefreshing ? "새로고침 중…" : "지금 새로고침", systemImage: "arrow.clockwise")
             }
             .disabled(store.isRefreshing)
+
+            Toggle("메뉴바에 리셋 시간 표시", isOn: $showResetTimeInMenuBar)
 
             Toggle("로그인 시 자동 실행", isOn: Binding(
                 get: { launchAtLogin },

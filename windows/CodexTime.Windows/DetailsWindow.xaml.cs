@@ -56,7 +56,8 @@ public partial class DetailsWindow : Window
             Show();
         }
         Activate();
-        NativeMethods.PositionPopup(_windowHandle, anchor, Width, Height);
+        UpdateLayout();
+        NativeMethods.PositionPopup(_windowHandle, anchor, ActualWidth, ActualHeight);
     }
 
     private void AddRow(string name, LimitWindow window)
