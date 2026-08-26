@@ -41,6 +41,19 @@ import Testing
     #expect(UsageFormatter.compactTitle(for: bucket, now: now, showResetTime: false) == "Codex 96%")
 }
 
+@Test func defaultsToCompactMenuBarTitleAndPreservesUserChoice() throws {
+    let suiteName = "com.sundaynighttt.codex-usage-monitor.tests.\(UUID().uuidString)"
+    let defaults = try #require(UserDefaults(suiteName: suiteName))
+    defer { defaults.removePersistentDomain(forName: suiteName) }
+
+    MenuBarPreferences.registerDefaults(in: defaults)
+    #expect(defaults.bool(forKey: MenuBarPreferences.showResetTimeKey) == false)
+
+    defaults.set(true, forKey: MenuBarPreferences.showResetTimeKey)
+    MenuBarPreferences.registerDefaults(in: defaults)
+    #expect(defaults.bool(forKey: MenuBarPreferences.showResetTimeKey) == true)
+}
+
 @Test func fetchesLiveCodexUsageWhenEnabled() async throws {
     guard ProcessInfo.processInfo.environment["CODEX_LIVE_TEST"] == "1" else { return }
     let report = try await CodexAppServerClient().fetchRateLimits()
