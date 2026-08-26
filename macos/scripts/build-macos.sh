@@ -19,9 +19,11 @@ fi
 
 mkdir -p "$contents_dir/MacOS" "$contents_dir/Resources"
 cp "$macos_dir/.build/release/CodexUsageMonitor" "$contents_dir/MacOS/CodexUsageMonitor"
+cp "$macos_dir/Resources/AppIcon.icns" "$contents_dir/Resources/AppIcon.icns"
 
 /usr/libexec/PlistBuddy -c 'Add :CFBundleDisplayName string Codex Usage Monitor' "$contents_dir/Info.plist"
 /usr/libexec/PlistBuddy -c 'Add :CFBundleExecutable string CodexUsageMonitor' "$contents_dir/Info.plist"
+/usr/libexec/PlistBuddy -c 'Add :CFBundleIconFile string AppIcon.icns' "$contents_dir/Info.plist"
 /usr/libexec/PlistBuddy -c 'Add :CFBundleIdentifier string com.sundaynighttt.codex-usage-monitor' "$contents_dir/Info.plist"
 /usr/libexec/PlistBuddy -c 'Add :CFBundleInfoDictionaryVersion string 6.0' "$contents_dir/Info.plist"
 /usr/libexec/PlistBuddy -c 'Add :CFBundleName string CodexUsageMonitor' "$contents_dir/Info.plist"
