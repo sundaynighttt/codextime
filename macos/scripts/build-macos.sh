@@ -6,6 +6,8 @@ macos_dir=${script_dir:h}
 app_name='Codex Usage Monitor'
 bundle_dir="$macos_dir/dist/$app_name.app"
 contents_dir="$bundle_dir/Contents"
+version=${CODEXTIME_VERSION:-0.1.0}
+build_number=${CODEXTIME_BUILD_NUMBER:-1}
 
 cd "$macos_dir"
 swift build -c release
@@ -24,10 +26,14 @@ cp "$macos_dir/.build/release/CodexUsageMonitor" "$contents_dir/MacOS/CodexUsage
 /usr/libexec/PlistBuddy -c 'Add :CFBundleInfoDictionaryVersion string 6.0' "$contents_dir/Info.plist"
 /usr/libexec/PlistBuddy -c 'Add :CFBundleName string CodexUsageMonitor' "$contents_dir/Info.plist"
 /usr/libexec/PlistBuddy -c 'Add :CFBundlePackageType string APPL' "$contents_dir/Info.plist"
-/usr/libexec/PlistBuddy -c 'Add :CFBundleShortVersionString string 0.1.0' "$contents_dir/Info.plist"
-/usr/libexec/PlistBuddy -c 'Add :CFBundleVersion string 1' "$contents_dir/Info.plist"
+/usr/libexec/PlistBuddy -c "Add :CFBundleShortVersionString string $version" "$contents_dir/Info.plist"
+/usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $build_number" "$contents_dir/Info.plist"
 /usr/libexec/PlistBuddy -c 'Add :LSMinimumSystemVersion string 13.0' "$contents_dir/Info.plist"
 /usr/libexec/PlistBuddy -c 'Add :LSUIElement bool true' "$contents_dir/Info.plist"
-/usr/bin/codesign --force --deep --sign - "$bundle_dir"
+if [[ -n ${CODEXTIME_SIGN_IDENTITY:-} ]]; then
+  /usr/bin/codesign --force --deep --options runtime --timestamp --sign "$CODEXTIME_SIGN_IDENTITY" "$bundle_dir"
+else
+  /usr/bin/codesign --force --deep --sign - "$bundle_dir"
+fi
 
 echo "$bundle_dir"

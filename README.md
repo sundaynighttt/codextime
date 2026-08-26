@@ -1,6 +1,7 @@
 # CodexTime
 
 [![CI](https://github.com/sundaynighttt/codextime/actions/workflows/ci.yml/badge.svg)](https://github.com/sundaynighttt/codextime/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/sundaynighttt/codextime?display_name=tag)](https://github.com/sundaynighttt/codextime/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 See your remaining Codex allowance and reset countdown without opening the usage settings page.
@@ -14,6 +15,12 @@ See your remaining Codex allowance and reset countdown without opening the usage
 > [!IMPORTANT]
 > CodexTime is an unofficial community project and is not affiliated with or endorsed by OpenAI. It relies on the experimental Codex `app-server` protocol, which may change in a future Codex release.
 
+## Preview
+
+![CodexTime macOS menu preview](docs/screenshots/macos-menu-preview.jpg)
+
+The preview uses sample values so a contributor's private allowance is never published.
+
 ## Requirements
 
 - Codex CLI installed and signed in with a ChatGPT account
@@ -24,6 +31,12 @@ See your remaining Codex allowance and reset countdown without opening the usage
 The current implementation has been tested against Codex CLI `0.144.3` and the `account/rateLimits/read` method.
 
 ## Install on macOS
+
+Download `CodexTime-macOS-<version>.dmg` from the [latest release](https://github.com/sundaynighttt/codextime/releases/latest), open it, and drag **Codex Usage Monitor** to Applications.
+
+The current public DMG is ad-hoc signed but not Apple-notarized. macOS may block its first launch; if so, build from source below, or explicitly allow the app in **System Settings → Privacy & Security** only after confirming that it came from this repository. Release assets include `SHA256SUMS.txt` for integrity checks.
+
+To build from source instead:
 
 Clone the repository and run the installer:
 
@@ -41,9 +54,19 @@ The app is built, ad-hoc signed, and installed at:
 
 Open the menu-bar item and enable **Launch at Login** if desired. The app uses Apple's standard login-item API and macOS may ask you to approve it in System Settings.
 
-The project does not currently distribute a Developer ID-notarized binary. Building locally avoids presenting an unsigned binary from an unknown third party as a trusted release.
+Maintainers can connect a Developer ID certificate and Apple notarization credentials to the release workflow. Until those credentials are configured, the downloadable artifact remains non-notarized.
 
 ## Install on Windows
+
+Download `CodexTime-Windows-<version>.zip` from the [latest release](https://github.com/sundaynighttt/codextime/releases/latest), extract it, open PowerShell in the extracted folder, and run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install.ps1 -EnableStartup
+```
+
+The PowerShell scripts are currently not Authenticode-signed. Inspect them in this public repository before running them if your environment requires signed code.
+
+To install from the repository instead:
 
 Download the repository ZIP from GitHub or clone it, open PowerShell in the `windows` directory, and run:
 
@@ -132,12 +155,25 @@ Windows parser tests:
 powershell -ExecutionPolicy Bypass -File .\windows\test-parser.ps1
 ```
 
+Build release packages locally:
+
+```bash
+./macos/scripts/package-macos.sh 0.1.0
+```
+
+```powershell
+.\windows\package-windows.ps1 -Version 0.1.0
+```
+
+Pushing a `v*` tag runs [.github/workflows/release.yml](.github/workflows/release.yml), attaches both packages and `SHA256SUMS.txt` to a GitHub Release, and generates release notes. Optional macOS signing uses the repository secrets documented in [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## 한국어 요약
 
 CodexTime은 Codex의 남은 사용량과 리셋까지 남은 시간을 macOS 메뉴바 또는 Windows 시스템 트레이에 표시합니다.
 
 - macOS 설치: `macos/scripts/install-macos.sh`
 - Windows 설치: `windows/install.ps1 -EnableStartup`
+- 최신 DMG/ZIP: [GitHub Releases](https://github.com/sundaynighttt/codextime/releases/latest)
 - 별도 API 키 불필요
 - Codex 인증 파일과 브라우저 쿠키를 직접 읽지 않음
 - Codex의 experimental `app-server` 프로토콜 변경 시 호환성 수정이 필요할 수 있음

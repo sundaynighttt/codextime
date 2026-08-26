@@ -8,10 +8,12 @@ let package = Package(
         .macOS(.v13)
     ],
     products: [
-        .executable(name: "CodexUsageMonitor", targets: ["CodexUsageMonitor"])
+        .executable(name: "CodexUsageMonitor", targets: ["CodexUsageMonitor"]),
+        .executable(name: "CodexTimeScreenshotPreview", targets: ["CodexTimeScreenshotPreview"])
     ],
     targets: [
         .executableTarget(name: "CodexUsageMonitor"),
+        .executableTarget(name: "CodexTimeScreenshotPreview"),
         .testTarget(
             name: "CodexUsageMonitorTests",
             dependencies: ["CodexUsageMonitor"]

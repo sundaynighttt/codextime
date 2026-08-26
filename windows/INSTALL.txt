@@ -1,0 +1,20 @@
+CodexTime for Windows
+=====================
+
+Requirements:
+- Windows 10 or 11
+- Windows PowerShell 5.1 or newer
+- Codex CLI installed and signed in
+
+Install:
+1. Extract this ZIP file.
+2. Open Windows PowerShell in the extracted folder.
+3. Run:
+
+   powershell -ExecutionPolicy Bypass -File .\install.ps1 -EnableStartup
+
+CodexTime will appear in the notification area at the right side of the taskbar.
+Right-click its percentage icon to refresh, open usage settings, change startup,
+or quit.
+
+Project: https://github.com/sundaynighttt/codextime
