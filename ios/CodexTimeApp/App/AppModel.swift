@@ -57,6 +57,10 @@ final class AppModel {
             } catch is CancellationError {
                 state = .signedOut
             } catch {
+                guard !Task.isCancelled else {
+                    state = .signedOut
+                    return
+                }
                 state = .failed(error.localizedDescription)
             }
         }

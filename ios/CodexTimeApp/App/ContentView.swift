@@ -4,6 +4,7 @@ import UIKit
 struct ContentView: View {
     let model: AppModel
     @Environment(\.openURL) private var openURL
+    @State private var copiedUserCode: String?
 
     var body: some View {
         ZStack {
@@ -80,7 +81,7 @@ struct ContentView: View {
                 .font(.headline)
 
             Button {
-                UIPasteboard.general.string = authorization.userCode
+                copyUserCode(authorization.userCode)
             } label: {
                 Text(authorization.userCode)
                     .font(.system(.title2, design: .monospaced, weight: .bold))
@@ -93,7 +94,19 @@ struct ContentView: View {
             .accessibilityLabel("로그인 코드 \(authorization.userCode), 탭하여 복사")
             .accessibilityIdentifier("device-code")
 
+            Button {
+                copyUserCode(authorization.userCode)
+            } label: {
+                Label(
+                    copiedUserCode == authorization.userCode ? "복사됨" : "코드 복사",
+                    systemImage: copiedUserCode == authorization.userCode ? "checkmark" : "doc.on.doc"
+                )
+            }
+            .buttonStyle(.bordered)
+            .accessibilityIdentifier("copy-device-code")
+
             Button("ChatGPT 열기") {
+                copyUserCode(authorization.userCode)
                 openURL(authorization.verificationURL)
             }
             .buttonStyle(.borderedProminent)
@@ -111,6 +124,17 @@ struct ContentView: View {
                 model.cancelSignIn()
             }
             .accessibilityIdentifier("cancel-signin")
+        }
+    }
+
+    private func copyUserCode(_ code: String) {
+        UIPasteboard.general.string = code
+        copiedUserCode = code
+
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
+            guard copiedUserCode == code else { return }
+            copiedUserCode = nil
         }
     }
 
