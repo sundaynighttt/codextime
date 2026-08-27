@@ -16,9 +16,13 @@ Issues and focused pull requests are welcome, especially for Codex protocol comp
    powershell -ExecutionPolicy Bypass -File .\windows\test-parser.ps1
    ```
 
+   ```bash
+   ./ios/scripts/test-ios.sh
+   ```
+
 4. Describe the operating system, Codex CLI version, expected behavior, and observed behavior.
 
-Live integration tests are optional because they require a local signed-in Codex installation. Do not expose live response payloads if they contain account-specific metadata.
+Live integration tests are optional because desktop tests require a local signed-in Codex installation and iPhone tests require device-login approval. Do not expose live response payloads, device codes, or account-specific metadata.
 
 ## Release maintainers
 

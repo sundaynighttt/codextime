@@ -12,6 +12,7 @@ CodexTime은 Codex의 남은 사용량과 리셋까지 남은 시간을 항상 �
 
 - **macOS:** 상단 메뉴바에 `Codex 95%` 표시, 필요하면 리셋 시간도 함께 표시
 - **Windows:** 작업표시줄에 `Codex 95% · 6d 16h` 표시
+- **iPhone 알파:** 홈 화면 소형 위젯에 `Codex / 95% / 3d 17h` 표시
 - Windows에서는 우상단 미니 위젯으로 전환 가능
 - 별도 OpenAI API 키 불필요
 - 광고·분석·텔레메트리 없음
@@ -20,7 +21,13 @@ CodexTime은 Codex의 남은 사용량과 리셋까지 남은 시간을 항상 �
 
 ## 화면
 
+macOS 메뉴바:
+
 ![CodexTime macOS 메뉴바](docs/screenshots/macos-menu-preview.jpg)
+
+iPhone 소형 위젯:
+
+<img src="docs/screenshots/ios-widget-preview.jpg" width="160" alt="CodexTime iPhone 소형 위젯">
 
 화면의 수치는 개인정보 노출을 막기 위한 예시 값이며, macOS 화면은 리셋 시간 표시를 켠 상태입니다.
 
@@ -39,6 +46,8 @@ CodexTime은 Codex의 남은 사용량과 리셋까지 남은 시간을 항상 �
 codex --version
 codex login status
 ```
+
+iPhone 버전은 현재 소스 공개 및 TestFlight 검증 전 알파 단계입니다. Codex CLI나 켜져 있는 Mac 없이 iPhone에서 ChatGPT에 직접 연결하며, 자세한 빌드 방법과 보안 범위는 [iPhone 알파 안내](ios/README.md)를 참고하세요.
 
 ## macOS 설치
 
@@ -70,8 +79,9 @@ powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\CodexUsageMonitor\un
 
 ## 개인정보와 보안
 
-- 설치된 Codex CLI의 기존 로그인을 사용합니다.
-- `auth.json`, 브라우저 쿠키, 액세스 토큰을 직접 읽지 않습니다.
+- macOS와 Windows는 설치된 Codex CLI의 기존 로그인을 사용합니다.
+- macOS와 Windows는 `auth.json`, 브라우저 쿠키, 액세스 토큰을 직접 읽지 않습니다.
+- iPhone 알파는 공식 기기 로그인으로 받은 토큰을 동기화되지 않는 iOS Keychain에 저장합니다.
 - CodexTime이 읽은 사용량 데이터를 별도 서버로 전송하지 않습니다.
 - 광고·사용자 분석·텔레메트리가 없습니다.
 - 소스 코드와 빌드 과정이 모두 공개되어 있습니다.
@@ -96,7 +106,15 @@ powershell -ExecutionPolicy Bypass -File .\windows\test-parser.ps1
 .\windows\package-windows.ps1 -Version 0.2.0
 ```
 
-CodexTime은 `codex app-server`를 짧게 실행해 `account/rateLimits/read` 결과만 읽습니다. 사용한 비율을 남은 비율로 바꾸고, 리셋 시각을 남은 시간으로 표시합니다. 자세한 필드와 통신 순서는 [docs/protocol.md](docs/protocol.md)에 정리되어 있습니다.
+iPhone(Xcode와 XcodeGen 필요):
+
+```bash
+cd ios
+xcodegen generate
+xcodebuild -project CodexTime.xcodeproj -scheme CodexTime -sdk iphonesimulator build CODE_SIGNING_ALLOWED=NO
+```
+
+macOS와 Windows는 `codex app-server`를 짧게 실행해 `account/rateLimits/read` 결과만 읽습니다. iPhone 알파는 기기 로그인 후 ChatGPT 사용량 엔드포인트에서 같은 메타데이터를 직접 읽습니다. 모두 사용한 비율을 남은 비율로 바꾸고, 리셋 시각을 남은 시간으로 표시합니다. 자세한 필드와 통신 순서는 [docs/protocol.md](docs/protocol.md)에 정리되어 있습니다.
 
 기여 방법은 [CONTRIBUTING.md](CONTRIBUTING.md), 전체 라이선스는 [MIT License](LICENSE)를 참고하세요.
 
