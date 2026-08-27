@@ -47,7 +47,7 @@ codex --version
 codex login status
 ```
 
-iPhone 버전은 현재 소스 공개 및 TestFlight 검증 전 알파 단계입니다. Codex CLI나 켜져 있는 Mac 없이 iPhone에서 ChatGPT에 직접 연결하며, 자세한 빌드 방법과 보안 범위는 [iPhone 알파 안내](ios/README.md)를 참고하세요.
+iPhone 버전은 TestFlight 내부 테스트 검증을 마친 알파 단계입니다. 소스는 공개되어 누구나 직접 빌드할 수 있으며, TestFlight 배포는 현재 내부 테스트로 제한됩니다. Codex CLI나 켜져 있는 Mac 없이 iPhone에서 ChatGPT에 직접 연결하며, 자세한 빌드 방법과 보안 범위는 [iPhone 알파 안내](ios/README.md)를 참고하세요.
 
 ## macOS 설치
 
@@ -120,4 +120,4 @@ macOS와 Windows는 `codex app-server`를 짧게 실행해 `account/rateLimits/r
 
 ## English
 
-CodexTime is a free, open-source macOS menu-bar and Windows taskbar app that shows your remaining Codex allowance and reset countdown. Download the latest DMG or ZIP from [GitHub Releases](https://github.com/sundaynighttt/codextime/releases/latest). It uses your existing Codex CLI login and includes no analytics or telemetry.
+CodexTime is a free, open-source app for macOS, Windows, and iPhone that shows your remaining Codex allowance and reset countdown. Download the latest desktop DMG or ZIP from [GitHub Releases](https://github.com/sundaynighttt/codextime/releases/latest). The iPhone alpha source and build guide are included in this repository. CodexTime includes no analytics or telemetry.
