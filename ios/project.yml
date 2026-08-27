@@ -24,6 +24,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.sundaynighttt.codextime.ios
         PRODUCT_NAME: CodexTime
+        TARGETED_DEVICE_FAMILY: "1"
         GENERATE_INFOPLIST_FILE: NO
         INFOPLIST_FILE: Config/App-Info.plist
         CODE_SIGN_ENTITLEMENTS: Config/App.entitlements
@@ -40,6 +41,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.sundaynighttt.codextime.ios.widget
         PRODUCT_NAME: CodexTimeWidget
+        TARGETED_DEVICE_FAMILY: "1"
         GENERATE_INFOPLIST_FILE: NO
         INFOPLIST_FILE: Config/Widget-Info.plist
         CODE_SIGN_ENTITLEMENTS: Config/Widget.entitlements
