@@ -1,0 +1,596 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1799CD2D8738A06EB3FE03CD /* CodexTimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D964DE06E623122334DE0DEB /* CodexTimeTests.swift */; };
+		209F90734B6EA47CD166F6D6 /* CodexAccountClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4168AAEC9B883FD8837BAED5 /* CodexAccountClient.swift */; };
+		3207E1012EE13C7B623F3FC6 /* CodexConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74A4F755B919C6E725E7DF8C /* CodexConfiguration.swift */; };
+		32FC5D5FC1FFD624EFF16FB9 /* KeychainTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B923D0890D464850C53031E8 /* KeychainTokenStore.swift */; };
+		3925A6CFB07A68F4F70BB302 /* AuthModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40B1A7E35D926B525420C522 /* AuthModels.swift */; };
+		4B9C9937B187E8B27A7931AE /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 457D81058899C9B8057C34A1 /* AppModel.swift */; };
+		53923D61905BF2CAA351812F /* AuthModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40B1A7E35D926B525420C522 /* AuthModels.swift */; };
+		5E4B21E8B96F0EFBE8BE46C2 /* CodexTimeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A50F486C17482AB8795D65 /* CodexTimeApp.swift */; };
+		61E07CBF037F29CA5B5EA46B /* UsageModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D8DE89F8301DF38FF6C519 /* UsageModels.swift */; };
+		896E52D214C09A89BC396E1E /* CodexTimeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8469A2B105882F57CE07469C /* CodexTimeWidget.swift */; };
+		97ADC604913462A1042DBA51 /* CodexAccountClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4168AAEC9B883FD8837BAED5 /* CodexAccountClient.swift */; };
+		A6210FCCD9A98AC8E822E4D5 /* CodexTimeWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5DFD0E37BF09910D8A4F3664 /* CodexTimeWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C4C398561BEF4A6A23E5AA6C /* SharedUsageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362FBC4F7FF8C360488A9168 /* SharedUsageStore.swift */; };
+		C6B51D0DF8D2F42545F5AF9A /* KeychainTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B923D0890D464850C53031E8 /* KeychainTokenStore.swift */; };
+		C7E8264D40D345CEBA95DC0E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13499CB51DA85D68AA484DF1 /* Assets.xcassets */; };
+		CE693044E1C6B81334B08F6A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA1DCCA3F9D4FE716EA2799A /* ContentView.swift */; };
+		CF5D8BBB5AF899949400CE16 /* UsageModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D8DE89F8301DF38FF6C519 /* UsageModels.swift */; };
+		D256B89816B0D0E547422224 /* CodexConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74A4F755B919C6E725E7DF8C /* CodexConfiguration.swift */; };
+		FD525D0D52A04DA5F7BAE3D0 /* SharedUsageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362FBC4F7FF8C360488A9168 /* SharedUsageStore.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3484A02E9D267D2A54CE4D33 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5D9FF77AEF79D5A5E77294A7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9893A51D03D72F9688FA77AD;
+			remoteInfo = CodexTime;
+		};
+		97BB455EDA18DB1A4CF5C890 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5D9FF77AEF79D5A5E77294A7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E8EEA31A8BF25159E5C9CECF;
+			remoteInfo = CodexTimeWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		36F15C55502EBD8BFAC83BB7 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A6210FCCD9A98AC8E822E4D5 /* CodexTimeWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		12D8DE89F8301DF38FF6C519 /* UsageModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageModels.swift; sourceTree = "<group>"; };
+		13499CB51DA85D68AA484DF1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		362FBC4F7FF8C360488A9168 /* SharedUsageStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedUsageStore.swift; sourceTree = "<group>"; };
+		40B1A7E35D926B525420C522 /* AuthModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthModels.swift; sourceTree = "<group>"; };
+		4168AAEC9B883FD8837BAED5 /* CodexAccountClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexAccountClient.swift; sourceTree = "<group>"; };
+		457D81058899C9B8057C34A1 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		59055CF5479E67957B0F93C8 /* CodexTimeTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = CodexTimeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5DFD0E37BF09910D8A4F3664 /* CodexTimeWidgetExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = CodexTimeWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		74A4F755B919C6E725E7DF8C /* CodexConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexConfiguration.swift; sourceTree = "<group>"; };
+		8469A2B105882F57CE07469C /* CodexTimeWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexTimeWidget.swift; sourceTree = "<group>"; };
+		A1A50F486C17482AB8795D65 /* CodexTimeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexTimeApp.swift; sourceTree = "<group>"; };
+		B0833964EC2977FEBCE5B62C /* CodexTime.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CodexTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B923D0890D464850C53031E8 /* KeychainTokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainTokenStore.swift; sourceTree = "<group>"; };
+		BA1DCCA3F9D4FE716EA2799A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		D964DE06E623122334DE0DEB /* CodexTimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexTimeTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		07AF8C61E520C971140023D2 = {
+			isa = PBXGroup;
+			children = (
+				ACEF26C24792D526D4BE4653 /* CodexTimeApp */,
+				924C0A2F2C77BCB3C6DDE553 /* CodexTimeTests */,
+				478643AEDD873E19FC82D6E7 /* CodexTimeWidget */,
+				60F8F9C43C42F585452C76EE /* Shared */,
+				C586479649E59748AFDABA2B /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		478643AEDD873E19FC82D6E7 /* CodexTimeWidget */ = {
+			isa = PBXGroup;
+			children = (
+				8469A2B105882F57CE07469C /* CodexTimeWidget.swift */,
+			);
+			path = CodexTimeWidget;
+			sourceTree = "<group>";
+		};
+		60F8F9C43C42F585452C76EE /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				40B1A7E35D926B525420C522 /* AuthModels.swift */,
+				4168AAEC9B883FD8837BAED5 /* CodexAccountClient.swift */,
+				74A4F755B919C6E725E7DF8C /* CodexConfiguration.swift */,
+				B923D0890D464850C53031E8 /* KeychainTokenStore.swift */,
+				362FBC4F7FF8C360488A9168 /* SharedUsageStore.swift */,
+				12D8DE89F8301DF38FF6C519 /* UsageModels.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		924C0A2F2C77BCB3C6DDE553 /* CodexTimeTests */ = {
+			isa = PBXGroup;
+			children = (
+				D964DE06E623122334DE0DEB /* CodexTimeTests.swift */,
+			);
+			path = CodexTimeTests;
+			sourceTree = "<group>";
+		};
+		ACEF26C24792D526D4BE4653 /* CodexTimeApp */ = {
+			isa = PBXGroup;
+			children = (
+				13499CB51DA85D68AA484DF1 /* Assets.xcassets */,
+				F5E2F92E2E05E300E51D1CFE /* App */,
+			);
+			path = CodexTimeApp;
+			sourceTree = "<group>";
+		};
+		C586479649E59748AFDABA2B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B0833964EC2977FEBCE5B62C /* CodexTime.app */,
+				59055CF5479E67957B0F93C8 /* CodexTimeTests.xctest */,
+				5DFD0E37BF09910D8A4F3664 /* CodexTimeWidgetExtension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F5E2F92E2E05E300E51D1CFE /* App */ = {
+			isa = PBXGroup;
+			children = (
+				457D81058899C9B8057C34A1 /* AppModel.swift */,
+				A1A50F486C17482AB8795D65 /* CodexTimeApp.swift */,
+				BA1DCCA3F9D4FE716EA2799A /* ContentView.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		2BF253A7A534DF1FCB71B13C /* CodexTimeTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 941BDA122D9883576DF94B6D /* Build configuration list for PBXNativeTarget "CodexTimeTests" */;
+			buildPhases = (
+				96E0A41EAEC258A606331B98 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				209E61E6F661D0C30BC60473 /* PBXTargetDependency */,
+			);
+			name = CodexTimeTests;
+			packageProductDependencies = (
+			);
+			productName = CodexTimeTests;
+			productReference = 59055CF5479E67957B0F93C8 /* CodexTimeTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		9893A51D03D72F9688FA77AD /* CodexTime */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 61372493EEC8A19FE434A3B7 /* Build configuration list for PBXNativeTarget "CodexTime" */;
+			buildPhases = (
+				A3C45D5E801F03390661C661 /* Sources */,
+				DDC64F7B5973C7559B8CC272 /* Resources */,
+				36F15C55502EBD8BFAC83BB7 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7CBA1E61B6EDB63604F21063 /* PBXTargetDependency */,
+			);
+			name = CodexTime;
+			packageProductDependencies = (
+			);
+			productName = CodexTime;
+			productReference = B0833964EC2977FEBCE5B62C /* CodexTime.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E8EEA31A8BF25159E5C9CECF /* CodexTimeWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1814A10AFD742065CFB4F030 /* Build configuration list for PBXNativeTarget "CodexTimeWidgetExtension" */;
+			buildPhases = (
+				927D59D8EA5311CB813A4065 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CodexTimeWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = CodexTimeWidgetExtension;
+			productReference = 5DFD0E37BF09910D8A4F3664 /* CodexTimeWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		5D9FF77AEF79D5A5E77294A7 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 2600;
+				TargetAttributes = {
+					2BF253A7A534DF1FCB71B13C = {
+						ProvisioningStyle = Automatic;
+					};
+					9893A51D03D72F9688FA77AD = {
+						ProvisioningStyle = Automatic;
+					};
+					E8EEA31A8BF25159E5C9CECF = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = EC910BB374F74A1A3C561B5A /* Build configuration list for PBXProject "CodexTime" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 07AF8C61E520C971140023D2;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = C586479649E59748AFDABA2B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9893A51D03D72F9688FA77AD /* CodexTime */,
+				E8EEA31A8BF25159E5C9CECF /* CodexTimeWidgetExtension */,
+				2BF253A7A534DF1FCB71B13C /* CodexTimeTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		DDC64F7B5973C7559B8CC272 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C7E8264D40D345CEBA95DC0E /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		927D59D8EA5311CB813A4065 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				53923D61905BF2CAA351812F /* AuthModels.swift in Sources */,
+				209F90734B6EA47CD166F6D6 /* CodexAccountClient.swift in Sources */,
+				D256B89816B0D0E547422224 /* CodexConfiguration.swift in Sources */,
+				896E52D214C09A89BC396E1E /* CodexTimeWidget.swift in Sources */,
+				32FC5D5FC1FFD624EFF16FB9 /* KeychainTokenStore.swift in Sources */,
+				C4C398561BEF4A6A23E5AA6C /* SharedUsageStore.swift in Sources */,
+				CF5D8BBB5AF899949400CE16 /* UsageModels.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96E0A41EAEC258A606331B98 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1799CD2D8738A06EB3FE03CD /* CodexTimeTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A3C45D5E801F03390661C661 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B9C9937B187E8B27A7931AE /* AppModel.swift in Sources */,
+				3925A6CFB07A68F4F70BB302 /* AuthModels.swift in Sources */,
+				97ADC604913462A1042DBA51 /* CodexAccountClient.swift in Sources */,
+				3207E1012EE13C7B623F3FC6 /* CodexConfiguration.swift in Sources */,
+				5E4B21E8B96F0EFBE8BE46C2 /* CodexTimeApp.swift in Sources */,
+				CE693044E1C6B81334B08F6A /* ContentView.swift in Sources */,
+				C6B51D0DF8D2F42545F5AF9A /* KeychainTokenStore.swift in Sources */,
+				FD525D0D52A04DA5F7BAE3D0 /* SharedUsageStore.swift in Sources */,
+				61E07CBF037F29CA5B5EA46B /* UsageModels.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		209E61E6F661D0C30BC60473 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9893A51D03D72F9688FA77AD /* CodexTime */;
+			targetProxy = 3484A02E9D267D2A54CE4D33 /* PBXContainerItemProxy */;
+		};
+		7CBA1E61B6EDB63604F21063 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E8EEA31A8BF25159E5C9CECF /* CodexTimeWidgetExtension */;
+			targetProxy = 97BB455EDA18DB1A4CF5C890 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		089AE38AB8C9524EBC109101 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Config/App.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Config/App-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.sundaynighttt.codextime.ios;
+				PRODUCT_NAME = CodexTime;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		29C67BA00FACEC93D3AAE5A2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 0.3.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		4A3F81A259642D809E524EFA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Config/Widget.entitlements;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Config/Widget-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.sundaynighttt.codextime.ios.widget;
+				PRODUCT_NAME = CodexTimeWidget;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		55C6BC88152465182E91C3A1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Config/App.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Config/App-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.sundaynighttt.codextime.ios;
+				PRODUCT_NAME = CodexTime;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		5C9F16D939808960CA4A384F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Config/Widget.entitlements;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Config/Widget-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.sundaynighttt.codextime.ios.widget;
+				PRODUCT_NAME = CodexTimeWidget;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		69ACC0CDE5E6E9C34583D205 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.sundaynighttt.codextime.ios.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CodexTime.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CodexTime";
+			};
+			name = Release;
+		};
+		B61C3DC227DB2E5EDB73BFF7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.sundaynighttt.codextime.ios.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CodexTime.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CodexTime";
+			};
+			name = Debug;
+		};
+		FF7684B788539318612829ED /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 0.3.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1814A10AFD742065CFB4F030 /* Build configuration list for PBXNativeTarget "CodexTimeWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5C9F16D939808960CA4A384F /* Debug */,
+				4A3F81A259642D809E524EFA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		61372493EEC8A19FE434A3B7 /* Build configuration list for PBXNativeTarget "CodexTime" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				55C6BC88152465182E91C3A1 /* Debug */,
+				089AE38AB8C9524EBC109101 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		941BDA122D9883576DF94B6D /* Build configuration list for PBXNativeTarget "CodexTimeTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B61C3DC227DB2E5EDB73BFF7 /* Debug */,
+				69ACC0CDE5E6E9C34583D205 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		EC910BB374F74A1A3C561B5A /* Build configuration list for PBXProject "CodexTime" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF7684B788539318612829ED /* Debug */,
+				29C67BA00FACEC93D3AAE5A2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 5D9FF77AEF79D5A5E77294A7 /* Project object */;
+}

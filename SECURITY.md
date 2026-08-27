@@ -16,4 +16,6 @@ The latest commit on `main` is the supported development version. CodexTime depe
 
 ## Security model
 
-CodexTime invokes the locally installed Codex CLI and asks its app server for rate-limit metadata. It does not read or store Codex credential files directly and does not send analytics.
+The macOS and Windows apps invoke the locally installed Codex CLI and ask its app server for rate-limit metadata. They do not read or store Codex credential files directly.
+
+The iPhone alpha uses OpenAI's device-login flow. It stores access and refresh tokens in a non-synchronizing iOS Keychain item shared only by the signed app and widget extension. The usage snapshot is stored in their App Group container. No CodexTime version sends analytics or forwards usage data through a CodexTime-operated server.
