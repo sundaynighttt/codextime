@@ -24,6 +24,12 @@ enum UsageFormatter {
         if hours > 0 { return "\(hours)h \(minutes)m" }
         return "\(max(1, minutes))m"
     }
+
+    static func updateTime(_ date: Date, calendar: Calendar = .autoupdatingCurrent) -> String {
+        let hour = calendar.component(.hour, from: date)
+        let minute = calendar.component(.minute, from: date)
+        return String(format: "%02d:%02d", hour, minute)
+    }
 }
 
 struct UsagePayload: Decodable {
