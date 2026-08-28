@@ -58,27 +58,46 @@ struct CodexTimeWidgetView: View {
     let entry: UsageEntry
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Codex")
-                .font(.headline)
-                .foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: 0) {
+            HStack {
+                Text("Codex")
+                    .font(.headline)
+                    .foregroundStyle(.secondary)
+                    .accessibilityHidden(true)
+
+                Spacer(minLength: 8)
+
+                Button(intent: RefreshUsageIntent()) {
+                    Image(systemName: "arrow.clockwise")
+                        .font(.system(size: 13, weight: .semibold))
+                        .frame(width: 30, height: 30)
+                        .background(.quaternary, in: Circle())
+                }
+                .buttonStyle(.plain)
+                .tint(.secondary)
+                .accessibilityLabel("Codex 사용량 새로고침")
+            }
 
             Spacer(minLength: 0)
 
-            Text(percentText)
-                .font(.system(size: 42, weight: .bold, design: .rounded))
-                .minimumScaleFactor(0.7)
-                .lineLimit(1)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(percentText)
+                    .font(.system(size: 50, weight: .bold, design: .default))
+                    .minimumScaleFactor(0.65)
+                    .lineLimit(1)
+                    .invalidatableContent()
 
-            Text(resetText)
-                .font(.system(.headline, design: .rounded, weight: .semibold))
-                .foregroundStyle(.blue)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                Text(resetText)
+                    .font(.system(.headline, design: .default, weight: .semibold))
+                    .foregroundStyle(.blue)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .invalidatableContent()
+            }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(accessibilityText)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(accessibilityText)
     }
 
     private var percentText: String {
