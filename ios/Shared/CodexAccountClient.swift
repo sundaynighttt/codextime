@@ -201,17 +201,56 @@ actor CodexAccountClient {
             throw CodexClientError.missingAccount
         }
 
-        var request = URLRequest(url: CodexConfiguration.usageURL)
+        async let usagePayload = requestUsagePayload(tokens: tokens, accountID: accountID)
+        async let profilePayload = requestProfilePayload(tokens: tokens, accountID: accountID)
+
+        let payload = try await usagePayload
+        let previousLifetimeTokens = usageStore.load()?.lifetimeTokens
+        let lifetimeTokens = (try? await profilePayload)?.stats?.lifetimeTokens
+            ?? previousLifetimeTokens
+        let snapshot = try payload.snapshot(lifetimeTokens: lifetimeTokens)
+        usageStore.save(snapshot)
+        return snapshot
+    }
+
+    private func requestUsagePayload(
+        tokens: AuthTokens,
+        accountID: String
+    ) async throws -> UsagePayload {
+        let request = authenticatedRequest(
+            url: CodexConfiguration.usageURL,
+            tokens: tokens,
+            accountID: accountID
+        )
+        let (data, response) = try await session.data(for: request)
+        try validate(response)
+        return try JSONDecoder().decode(UsagePayload.self, from: data)
+    }
+
+    private func requestProfilePayload(
+        tokens: AuthTokens,
+        accountID: String
+    ) async throws -> ProfilePayload {
+        let request = authenticatedRequest(
+            url: CodexConfiguration.profileURL,
+            tokens: tokens,
+            accountID: accountID
+        )
+        let (data, response) = try await session.data(for: request)
+        try validate(response)
+        return try JSONDecoder().decode(ProfilePayload.self, from: data)
+    }
+
+    private func authenticatedRequest(
+        url: URL,
+        tokens: AuthTokens,
+        accountID: String
+    ) -> URLRequest {
+        var request = URLRequest(url: url)
         request.setValue("Bearer \(tokens.accessToken)", forHTTPHeaderField: "Authorization")
         request.setValue(accountID, forHTTPHeaderField: "ChatGPT-Account-Id")
         request.setValue("codextime-ios/0.3.0-alpha.1", forHTTPHeaderField: "User-Agent")
-
-        let (data, response) = try await session.data(for: request)
-        try validate(response)
-        let payload = try JSONDecoder().decode(UsagePayload.self, from: data)
-        let snapshot = try payload.snapshot()
-        usageStore.save(snapshot)
-        return snapshot
+        return request
     }
 
     private func validate(_ response: URLResponse) throws {

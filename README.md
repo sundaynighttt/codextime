@@ -12,7 +12,7 @@ CodexTime은 Codex의 남은 사용량과 리셋까지 남은 시간을 항상 �
 
 - **macOS:** 상단 메뉴바에 `Codex 95%` 표시, 필요하면 리셋 시간도 함께 표시
 - **Windows:** 작업표시줄에 `Codex 95% · 6d 16h` 표시
-- **iPhone 알파:** 홈 화면 소형 위젯에 `Codex / 95% / 3d 17h` 표시
+- **iPhone 알파:** 홈 화면 소형 위젯에 `Codex / 95% / 3d 17h / 누적 토큰` 표시
 - Windows에서는 우상단 미니 위젯으로 전환 가능
 - 별도 OpenAI API 키 불필요
 - 광고·분석·텔레메트리 없음
@@ -47,7 +47,7 @@ codex --version
 codex login status
 ```
 
-iPhone 버전은 TestFlight 내부 테스트 검증을 마친 알파 단계입니다. 소스는 공개되어 누구나 직접 빌드할 수 있으며, TestFlight 배포는 현재 내부 테스트로 제한됩니다. Codex CLI나 켜져 있는 Mac 없이 iPhone에서 ChatGPT에 직접 연결하며, 자세한 빌드 방법과 보안 범위는 [iPhone 알파 안내](ios/README.md)를 참고하세요.
+iPhone 버전은 TestFlight 내부 테스트 검증을 마친 알파 단계입니다. 소스는 공개되어 누구나 직접 빌드할 수 있으며, TestFlight 배포는 현재 내부 테스트로 제한됩니다. Codex CLI나 켜져 있는 Mac 없이 iPhone에서 ChatGPT에 직접 연결해 남은 사용량과 누적 토큰을 표시하며, 자세한 빌드 방법과 보안 범위는 [iPhone 알파 안내](ios/README.md)를 참고하세요.
 
 ## macOS 설치
 

@@ -4,6 +4,7 @@ enum CodexConfiguration {
     static let clientID = "app_EMoamEEZ73f0CkXaXp7hrann"
     static let authBaseURL = URL(string: "https://auth.openai.com")!
     static let usageURL = URL(string: "https://chatgpt.com/backend-api/wham/usage")!
+    static let profileURL = URL(string: "https://chatgpt.com/backend-api/wham/profiles/me")!
     static let appGroupID = "group.com.sundaynighttt.codextime"
     static let keychainGroupSuffix = "com.sundaynighttt.codextime.auth"
     static let keychainService = "com.sundaynighttt.codextime.tokens"
