@@ -36,6 +36,14 @@ final class CodexTimeTests: XCTestCase {
         XCTAssertEqual(UsageFormatter.remainingTime(until: reset, now: now), "3d 17h")
     }
 
+    func testUpdateTimeUsesTwentyFourHourClock() throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try XCTUnwrap(TimeZone(secondsFromGMT: 9 * 3_600))
+        let date = Date(timeIntervalSince1970: 0)
+
+        XCTAssertEqual(UsageFormatter.updateTime(date, calendar: calendar), "09:00")
+    }
+
     func testJWTClaimsReadsChatGPTAccountAndExpiration() throws {
         let expiration: TimeInterval = 2_000_000_000
         let token = try fakeJWT(payload: [

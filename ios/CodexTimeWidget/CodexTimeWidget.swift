@@ -59,11 +59,19 @@ struct CodexTimeWidgetView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack {
-                Text("Codex")
-                    .font(.headline)
-                    .foregroundStyle(.secondary)
-                    .accessibilityHidden(true)
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Codex")
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
+
+                    Text(updateTimeText)
+                        .font(.system(size: 10, weight: .medium, design: .default))
+                        .monospacedDigit()
+                        .foregroundStyle(.tertiary)
+                }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(updateTimeAccessibilityText)
 
                 Spacer(minLength: 8)
 
@@ -108,6 +116,16 @@ struct CodexTimeWidgetView: View {
     private var resetText: String {
         guard let snapshot = entry.snapshot else { return "연결 필요" }
         return UsageFormatter.remainingTime(until: snapshot.resetAt, now: entry.date)
+    }
+
+    private var updateTimeText: String {
+        guard let snapshot = entry.snapshot else { return "--:--" }
+        return UsageFormatter.updateTime(snapshot.updatedAt)
+    }
+
+    private var updateTimeAccessibilityText: String {
+        guard entry.snapshot != nil else { return "Codex, 업데이트 시간 없음" }
+        return "Codex, 마지막 업데이트 \(updateTimeText)"
     }
 
     private var accessibilityText: String {
