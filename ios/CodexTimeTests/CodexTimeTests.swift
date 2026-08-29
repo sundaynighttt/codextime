@@ -27,6 +27,53 @@ final class CodexTimeTests: XCTestCase {
         XCTAssertEqual(snapshot.remainingPercent, 73)
         XCTAssertEqual(snapshot.resetAt, Date(timeIntervalSince1970: 2_000_000_000))
         XCTAssertEqual(snapshot.updatedAt, now)
+        XCTAssertNil(snapshot.lifetimeTokens)
+    }
+
+    func testProfilePayloadReadsLifetimeTokens() throws {
+        let data = Data(
+            """
+            {
+              "profile": {
+                "display_name": "ignored"
+              },
+              "stats": {
+                "lifetime_tokens": 37801098536
+              }
+            }
+            """.utf8
+        )
+
+        let payload = try JSONDecoder().decode(ProfilePayload.self, from: data)
+
+        XCTAssertEqual(payload.stats?.lifetimeTokens, 37_801_098_536)
+    }
+
+    func testUsageSnapshotDecodesCacheCreatedBeforeLifetimeTokens() throws {
+        let data = Data(
+            """
+            {
+              "remainingPercent": 73,
+              "resetAt": 2000000000,
+              "updatedAt": 1900000000
+            }
+            """.utf8
+        )
+
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .secondsSince1970
+        let snapshot = try decoder.decode(UsageSnapshot.self, from: data)
+
+        XCTAssertEqual(snapshot.remainingPercent, 73)
+        XCTAssertNil(snapshot.lifetimeTokens)
+    }
+
+    func testCompactTokenCountUsesKoreanUnits() {
+        let locale = Locale(identifier: "ko_KR")
+
+        XCTAssertEqual(UsageFormatter.compactTokenCount(37_801_098_536, locale: locale), "378억")
+        XCTAssertEqual(UsageFormatter.compactTokenCount(155_000_000, locale: locale), "1.6억")
+        XCTAssertEqual(UsageFormatter.compactTokenCount(9_999, locale: locale), "9,999")
     }
 
     func testRemainingTimeUsesCompactDayHourFormat() {

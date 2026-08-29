@@ -30,9 +30,10 @@ The iPhone app cannot run the local Codex CLI. It uses OpenAI's device-login flo
 2. Ask the user to approve that code on OpenAI's official device page.
 3. Exchange and refresh the OAuth tokens with `auth.openai.com`.
 4. Read the primary window's `used_percent` and `reset_at` fields from the ChatGPT usage response.
+5. Read only `stats.lifetime_tokens` from the authenticated ChatGPT profile response.
 
-Tokens stay in the shared iOS Keychain access group. The widget requests a new timeline after 30 minutes, but WidgetKit controls the actual execution time and may use the last cached snapshot.
+The profile response can contain a display name, username, and profile image URL, but CodexTime does not decode or store them. Tokens stay in the shared iOS Keychain access group. The widget requests a new timeline after 30 minutes, but WidgetKit controls the actual execution time and may use the last cached snapshot.
 
 ## Compatibility boundary
 
-`app-server`, `account/rateLimits/read`, and the iPhone usage path are compatibility-sensitive interfaces. CodexTime's desktop parser ignores unrelated JSON-RPC notifications and initialization responses, but a renamed method, authentication change, or materially changed response shape will require a compatibility update.
+`app-server`, `account/rateLimits/read`, and the iPhone usage and profile paths are compatibility-sensitive interfaces. CodexTime's desktop parser ignores unrelated JSON-RPC notifications and initialization responses, but a renamed method, authentication change, or materially changed response shape will require a compatibility update.

@@ -11,7 +11,7 @@ struct CodexTimeWidget: Widget {
                 .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("CodexTime")
-        .description("남은 Codex 사용량과 리셋 시간을 표시합니다.")
+        .description("남은 Codex 사용량, 리셋 시간과 누적 토큰을 표시합니다.")
         .supportedFamilies([.systemSmall])
     }
 }
@@ -101,6 +101,15 @@ struct CodexTimeWidgetView: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
                     .invalidatableContent()
+
+                if let lifetimeTokensText {
+                    Text(lifetimeTokensText)
+                        .font(.system(size: 11, weight: .semibold, design: .default))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                        .invalidatableContent()
+                }
             }
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(accessibilityText)
@@ -128,11 +137,20 @@ struct CodexTimeWidgetView: View {
         return "Codex, 마지막 업데이트 \(updateTimeText)"
     }
 
+    private var lifetimeTokensText: String? {
+        guard let lifetimeTokens = entry.snapshot?.lifetimeTokens else { return nil }
+        return "누적 토큰 \(UsageFormatter.compactTokenCount(lifetimeTokens))"
+    }
+
     private var accessibilityText: String {
         guard let snapshot = entry.snapshot else {
             return "CodexTime, ChatGPT 연결 필요"
         }
-        return "Codex 사용량 \(snapshot.remainingPercent)퍼센트 남음, 리셋까지 \(resetText)"
+        var text = "Codex 사용량 \(snapshot.remainingPercent)퍼센트 남음, 리셋까지 \(resetText)"
+        if let lifetimeTokens = snapshot.lifetimeTokens {
+            text += ", 누적 토큰 \(lifetimeTokens.formatted())"
+        }
+        return text
     }
 }
 
