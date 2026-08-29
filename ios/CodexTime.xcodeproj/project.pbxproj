@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1799CD2D8738A06EB3FE03CD /* CodexTimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D964DE06E623122334DE0DEB /* CodexTimeTests.swift */; };
 		209F90734B6EA47CD166F6D6 /* CodexAccountClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4168AAEC9B883FD8837BAED5 /* CodexAccountClient.swift */; };
+		239DEDB34C5F2DE69B70BB03 /* RefreshUsageIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E417C0A837B96308880FBDC /* RefreshUsageIntent.swift */; };
 		3207E1012EE13C7B623F3FC6 /* CodexConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74A4F755B919C6E725E7DF8C /* CodexConfiguration.swift */; };
 		32FC5D5FC1FFD624EFF16FB9 /* KeychainTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B923D0890D464850C53031E8 /* KeychainTokenStore.swift */; };
 		3925A6CFB07A68F4F70BB302 /* AuthModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40B1A7E35D926B525420C522 /* AuthModels.swift */; };
@@ -19,6 +20,7 @@
 		896E52D214C09A89BC396E1E /* CodexTimeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8469A2B105882F57CE07469C /* CodexTimeWidget.swift */; };
 		97ADC604913462A1042DBA51 /* CodexAccountClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4168AAEC9B883FD8837BAED5 /* CodexAccountClient.swift */; };
 		A6210FCCD9A98AC8E822E4D5 /* CodexTimeWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5DFD0E37BF09910D8A4F3664 /* CodexTimeWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C2FF746346A3E5DDDBE79677 /* RefreshUsageIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E417C0A837B96308880FBDC /* RefreshUsageIntent.swift */; };
 		C4C398561BEF4A6A23E5AA6C /* SharedUsageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362FBC4F7FF8C360488A9168 /* SharedUsageStore.swift */; };
 		C6B51D0DF8D2F42545F5AF9A /* KeychainTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B923D0890D464850C53031E8 /* KeychainTokenStore.swift */; };
 		C7E8264D40D345CEBA95DC0E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13499CB51DA85D68AA484DF1 /* Assets.xcassets */; };
@@ -69,6 +71,7 @@
 		59055CF5479E67957B0F93C8 /* CodexTimeTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = CodexTimeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5DFD0E37BF09910D8A4F3664 /* CodexTimeWidgetExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = CodexTimeWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		74A4F755B919C6E725E7DF8C /* CodexConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexConfiguration.swift; sourceTree = "<group>"; };
+		7E417C0A837B96308880FBDC /* RefreshUsageIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshUsageIntent.swift; sourceTree = "<group>"; };
 		8469A2B105882F57CE07469C /* CodexTimeWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexTimeWidget.swift; sourceTree = "<group>"; };
 		A1A50F486C17482AB8795D65 /* CodexTimeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexTimeApp.swift; sourceTree = "<group>"; };
 		B0833964EC2977FEBCE5B62C /* CodexTime.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CodexTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -104,6 +107,7 @@
 				4168AAEC9B883FD8837BAED5 /* CodexAccountClient.swift */,
 				74A4F755B919C6E725E7DF8C /* CodexConfiguration.swift */,
 				B923D0890D464850C53031E8 /* KeychainTokenStore.swift */,
+				7E417C0A837B96308880FBDC /* RefreshUsageIntent.swift */,
 				362FBC4F7FF8C360488A9168 /* SharedUsageStore.swift */,
 				12D8DE89F8301DF38FF6C519 /* UsageModels.swift */,
 			);
@@ -267,6 +271,7 @@
 				D256B89816B0D0E547422224 /* CodexConfiguration.swift in Sources */,
 				896E52D214C09A89BC396E1E /* CodexTimeWidget.swift in Sources */,
 				32FC5D5FC1FFD624EFF16FB9 /* KeychainTokenStore.swift in Sources */,
+				C2FF746346A3E5DDDBE79677 /* RefreshUsageIntent.swift in Sources */,
 				C4C398561BEF4A6A23E5AA6C /* SharedUsageStore.swift in Sources */,
 				CF5D8BBB5AF899949400CE16 /* UsageModels.swift in Sources */,
 			);
@@ -291,6 +296,7 @@
 				5E4B21E8B96F0EFBE8BE46C2 /* CodexTimeApp.swift in Sources */,
 				CE693044E1C6B81334B08F6A /* ContentView.swift in Sources */,
 				C6B51D0DF8D2F42545F5AF9A /* KeychainTokenStore.swift in Sources */,
+				239DEDB34C5F2DE69B70BB03 /* RefreshUsageIntent.swift in Sources */,
 				FD525D0D52A04DA5F7BAE3D0 /* SharedUsageStore.swift in Sources */,
 				61E07CBF037F29CA5B5EA46B /* UsageModels.swift in Sources */,
 			);
@@ -366,7 +372,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -517,7 +523,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
