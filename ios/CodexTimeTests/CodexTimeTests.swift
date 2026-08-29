@@ -67,6 +67,18 @@ final class CodexTimeTests: XCTestCase {
         XCTAssertEqual(response.interval, 5)
     }
 
+    func testDeviceAuthorizationRetriesURLSessionCancellation() {
+        XCTAssertTrue(
+            DeviceAuthorizationRetryPolicy.shouldRetry(URLError(.cancelled))
+        )
+    }
+
+    func testDeviceAuthorizationDoesNotRetryUnrelatedErrors() {
+        XCTAssertFalse(
+            DeviceAuthorizationRetryPolicy.shouldRetry(CodexClientError.invalidResponse)
+        )
+    }
+
     private func fakeJWT(payload: [String: Any]) throws -> String {
         let header = try JSONSerialization.data(withJSONObject: ["alg": "none"])
         let payload = try JSONSerialization.data(withJSONObject: payload)

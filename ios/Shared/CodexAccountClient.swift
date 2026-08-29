@@ -91,7 +91,22 @@ actor CodexAccountClient {
                 )
             )
 
-            let (data, response) = try await session.data(for: request)
+            let data: Data
+            let response: URLResponse
+            do {
+                (data, response) = try await session.data(for: request)
+            } catch {
+                try Task.checkCancellation()
+                guard DeviceAuthorizationRetryPolicy.shouldRetry(error) else {
+                    throw error
+                }
+                try await waitForNextAuthorizationPoll(
+                    interval: authorization.interval,
+                    deadline: deadline
+                )
+                continue
+            }
+
             guard let http = response as? HTTPURLResponse else {
                 throw CodexClientError.invalidResponse
             }
@@ -103,11 +118,22 @@ actor CodexAccountClient {
                 throw CodexClientError.server(statusCode: http.statusCode)
             }
 
-            let nanoseconds = UInt64(authorization.interval * 1_000_000_000)
-            try await Task.sleep(nanoseconds: nanoseconds)
+            try await waitForNextAuthorizationPoll(
+                interval: authorization.interval,
+                deadline: deadline
+            )
         }
 
         throw CodexClientError.loginExpired
+    }
+
+    private func waitForNextAuthorizationPoll(
+        interval: TimeInterval,
+        deadline: Date
+    ) async throws {
+        let delay = min(interval, max(0, deadline.timeIntervalSinceNow))
+        guard delay > 0 else { return }
+        try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
     }
 
     private func exchange(_ grant: AuthorizationGrant) async throws -> AuthTokens {
@@ -208,6 +234,24 @@ actor CodexAccountClient {
             }
             .joined(separator: "&")
         return Data(body.utf8)
+    }
+}
+
+enum DeviceAuthorizationRetryPolicy {
+    private static let retryableCodes: Set<URLError.Code> = [
+        .cancelled,
+        .timedOut,
+        .cannotFindHost,
+        .cannotConnectToHost,
+        .networkConnectionLost,
+        .dnsLookupFailed,
+        .notConnectedToInternet,
+        .secureConnectionFailed,
+    ]
+
+    static func shouldRetry(_ error: Error) -> Bool {
+        guard let urlError = error as? URLError else { return false }
+        return retryableCodes.contains(urlError.code)
     }
 }
 
