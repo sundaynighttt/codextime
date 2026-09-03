@@ -59,7 +59,7 @@ struct CodexTimeWidgetView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack(alignment: .top) {
+            HStack(alignment: .center) {
                 VStack(alignment: .leading, spacing: 1) {
                     Text("Codex")
                         .font(.headline)
@@ -77,8 +77,8 @@ struct CodexTimeWidgetView: View {
 
                 Button(intent: RefreshUsageIntent()) {
                     Image(systemName: "arrow.clockwise")
-                        .font(.system(size: 13, weight: .semibold))
-                        .frame(width: 30, height: 30)
+                        .font(.system(size: 12, weight: .semibold))
+                        .frame(width: 26, height: 26)
                         .background(.quaternary, in: Circle())
                 }
                 .buttonStyle(.plain)
