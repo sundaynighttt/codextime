@@ -28,8 +28,8 @@ CodexTime은 Codex의 남은 사용량과 리셋까지 남은 시간을 항상 �
 
 | 기준 | 버전 | 단계 | 상태 | 요약 | 근거 |
 | --- | --- | --- | --- | --- | --- |
-| iPhone 최신 후보<br>`latest_candidate` | **`1.0 (9)`** | `local_verified` | `active` | 예시 모드·개인정보·이용 안내, 14개 테스트 및 archive 검증, 업로드 성공; 콘텐츠 이용 권한 확인 및 심사 제출 대기 | [project.yml](ios/project.yml)<br>[submission.md](docs/app-store/submission.md) |
-| Apple 처리 확인 최신<br>`last_external` | **`0.3.0 (8)`** | `external_processed` | `historical` | 위젯 갱신 시각을 제목 오른쪽 괄호로 이동; 2026-09-04 ASC 처리 상태 확인, 설치 수만으로 smoke 통과를 추정하지 않음 | `git:df03b4d`<br>[submission.md](docs/app-store/submission.md) |
+| iPhone 최신 후보<br>`latest_candidate` | **`1.0 (9)`** | `external_processed` | `active` | 예시 모드·개인정보·이용 안내, 14개 테스트 및 CI 통과, Apple 처리·빌드 선택 완료; 콘텐츠 이용 권한 확인 및 심사 제출 대기 | [project.yml](ios/project.yml)<br>[submission.md](docs/app-store/submission.md) |
+| Apple 처리 확인 최신<br>`last_external` | **`1.0 (9)`** | `external_processed` | `active` | 예시 모드·개인정보·이용 안내, 14개 테스트 및 CI 통과, Apple 처리·빌드 선택 완료; 콘텐츠 이용 권한 확인 및 심사 제출 대기 | [project.yml](ios/project.yml)<br>[submission.md](docs/app-store/submission.md) |
 | 데스크톱 공개 최신<br>`latest_desktop_release` | **`v0.2.3`** | `released` | `historical` | macOS 메뉴바 표시 복구 | `git:v0.2.3`<br>[외부 근거](https://github.com/sundaynighttt/codextime/releases/tag/v0.2.3) |
 
 ### 전체 버전 흐름
@@ -51,7 +51,7 @@ CodexTime은 Codex의 남은 사용량과 리셋까지 남은 시간을 항상 �
 | 13 | 2026-08-30 | `0.3.0 (6)` | `external_processed` | `historical` | 위젯 누적 토큰 표시; 2026-09-04 ASC 처리 상태 확인, 설치 수만으로 smoke 통과를 추정하지 않음 | `git:df50a6e`<br>[submission.md](docs/app-store/submission.md) |
 | 14 | 2026-09-03 | `0.3.0 (7)` | `external_processed` | `historical` | 위젯 새로고침 버튼 정렬; 2026-09-04 ASC 처리 상태 확인, 설치 수만으로 smoke 통과를 추정하지 않음 | `git:d9f37ad`<br>[submission.md](docs/app-store/submission.md) |
 | 15 | 2026-09-03 | `0.3.0 (8)` | `external_processed` | `historical` | 위젯 갱신 시각을 제목 오른쪽 괄호로 이동; 2026-09-04 ASC 처리 상태 확인, 설치 수만으로 smoke 통과를 추정하지 않음 | `git:df03b4d`<br>[submission.md](docs/app-store/submission.md) |
-| 16 | 2026-09-04 | `1.0 (9)` | `local_verified` | `active` | 예시 모드·개인정보·이용 안내, 14개 테스트 및 archive 검증, 업로드 성공; 콘텐츠 이용 권한 확인 및 심사 제출 대기 | [project.yml](ios/project.yml)<br>[submission.md](docs/app-store/submission.md) |
+| 16 | 2026-09-04 | `1.0 (9)` | `external_processed` | `active` | 예시 모드·개인정보·이용 안내, 14개 테스트 및 CI 통과, Apple 처리·빌드 선택 완료; 콘텐츠 이용 권한 확인 및 심사 제출 대기 | [project.yml](ios/project.yml)<br>[submission.md](docs/app-store/submission.md) |
 <!-- project-release-ledger:end -->
 
 ## 화면

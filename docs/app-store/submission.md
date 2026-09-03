@@ -4,9 +4,11 @@
 
 - 앱: CodexTime, Apple ID `6805935440`
 - iPhone 전용, iOS 17 이상, 버전 `1.0`, 빌드 `9`
-- 08:37 KST App Store Connect 업로드 성공. 심사 제출·승인·일반 공개와는 구분한다.
-- 스토어 기본 언어 한국어, 유틸리티, 수동 출시 설정. 설명 및 영문 심사 메모 저장 완료.
+- 08:37 KST App Store Connect 업로드 성공. Apple 처리 완료 후 정식 버전에서 빌드 9 선택·저장 확인. 심사 제출·승인·일반 공개와는 구분한다.
+- 한국어, 유틸리티, 연령 등급 4+, 무료, 175개 국가·지역, 수동 출시 설정. Apple Silicon Mac·Vision Pro 호환 배포는 끄고 iPhone만 대상으로 한다.
+- 설명·영문 심사 메모·개인정보 레이블 저장 및 6.9형 실제 스크린샷 2장 등록 완료. 6.5형도 6.9형 이미지를 상속한다.
 - **타사 서비스 이용 권한 근거 확인 전에는 콘텐츠 권한을 임의로 확약하지 않는다.** OpenAI 계정에 직접 접근하므로 ‘타사 콘텐츠에 접근하지 않음’으로 우회하지 않는다.
+- Apple의 ‘심사에 추가’ 사전 검사 결과 남은 필수 항목은 **콘텐츠 권한 정보** 한 개다. 빌드·스크린샷·심사 연락처·개인정보·가격 항목은 추가 오류 없이 검사됐다. 따라서 현재는 심사 대기가 아니라 **제출 준비 중**이다.
 - 이전 TestFlight 0.3.0(1–8)은 내부 테스트 이력이다. 2026-09-04 App Store Connect에서 빌드 1은 내부 테스트 중, 2–8은 제출 준비 완료로 확인했다. 설치 건수만으로 실기기 검증 통과를 추정하지 않는다.
 
 ## 이번 변경
@@ -37,9 +39,22 @@
 - iPhone 17 Pro Max/iOS 26.5 시뮬레이터 앱 실행·예시·새로고침·안내 화면 확인.
 - 시뮬레이터를 entitlement 포함 ad-hoc 서명으로 실행해 App Group을 통한 위젯 `예시 / 73% / 누적 토큰` 전달 확인. 무서명 시뮬레이터 실행은 공유 저장소 확인 근거로 사용하지 않는다.
 - App Store용 archive 및 앱/위젯 코드 서명 검증 통과, 업로드 성공.
+- [GitHub CI](https://github.com/sundaynighttt/codextime/actions/runs/33819164677): macOS Swift, Windows WPF, iPhone widget 모두 성공.
 - 6.9형 1320×2868 PNG: 실제 앱의 예시 사용량 화면, 이용 안내 화면. 실제 계정 데이터나 합성 UI를 사용하지 않는다.
 - 새 빌드의 실기기 실제 계정 로그인은 아직 별도 검증하지 않았다.
+
+## 소스 및 이미지 식별
+
+- 업로드 소스: `a56efb7` (개인정보 방침 고정 커밋 `0405d90` 포함)
+- Apple 처리된 빌드 UUID: `0784ea2e-a387-4a0f-bef5-48025a3cc36f`
+- [PR #13](https://github.com/sundaynighttt/codextime/pull/13)은 기존 위젯 변경 PR #12 위에 쌓은 별도 PR이다. main 병합·데스크톱 태그·새 GitHub Release는 하지 않았다.
+- `01-usage-demo.png` SHA-256: `12dbae73498c4555eaf9ff41d4d0c2e4dca97d123f247d27bdf0c46aad8ab621`
+- `02-guide.png` SHA-256: `84193b8646c13813df7b60efcb8b2db2168807c8a8edebf4b6365e792b75daef`
 
 ## 재현
 
 `ios/project.yml`에서 버전·빌드를 정하고 XcodeGen을 실행한다. App Store export 설정은 `ios/Config/ExportOptions-AppStore.plist`다. 로컬 `dist/`의 archive·배포 로그·스크린샷은 Git에 포함하지 않는다. 업로드 성공 로그만으로 Apple 처리·심사 통과를 주장하지 않는다. [릴리스 원장](../releases/release-ledger.json)과 README의 기준선을 함께 갱신한다.
+
+## 제출 재개 조건
+
+사용자가 해당 계정 로그인·사용량 조회 방식을 독립 앱에서 이용할 수 있는 권한 근거를 확인하면 콘텐츠 권한을 정확히 설정하고 다시 ‘심사에 추가’를 진행한다. 단순 로그인 성공이나 GitHub 소스 공개를 권한 증거로 대체하지 않는다. [Codex 인증 안내](https://learn.chatgpt.com/docs/auth)는 Codex의 기기 인증 방식을 설명하지만 이 앱의 독립 배포에 대한 별도 허락을 확인해 주지는 않는다. [OpenAI 이용약관](https://openai.com/policies/row-terms-of-use/)에는 자동 데이터 추출 제한이 있으므로, 구체적인 적용·허용 범위를 확인해야 한다. 이는 위반을 확정한 판단이 아니라 권한 확약의 근거가 아직 없다는 경계다.
