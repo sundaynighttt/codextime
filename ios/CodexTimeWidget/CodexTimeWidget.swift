@@ -59,13 +59,13 @@ struct CodexTimeWidgetView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 1) {
+            HStack(alignment: .center) {
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
                     Text("Codex")
                         .font(.headline)
                         .foregroundStyle(.secondary)
 
-                    Text(updateTimeText)
+                    Text("(\(updateTimeText))")
                         .font(.system(size: 10, weight: .medium, design: .default))
                         .monospacedDigit()
                         .foregroundStyle(.tertiary)
@@ -77,8 +77,8 @@ struct CodexTimeWidgetView: View {
 
                 Button(intent: RefreshUsageIntent()) {
                     Image(systemName: "arrow.clockwise")
-                        .font(.system(size: 13, weight: .semibold))
-                        .frame(width: 30, height: 30)
+                        .font(.system(size: 12, weight: .semibold))
+                        .frame(width: 26, height: 26)
                         .background(.quaternary, in: Circle())
                 }
                 .buttonStyle(.plain)
