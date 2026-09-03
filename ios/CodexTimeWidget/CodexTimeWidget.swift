@@ -60,12 +60,12 @@ struct CodexTimeWidgetView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .center) {
-                VStack(alignment: .leading, spacing: 1) {
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
                     Text("Codex")
                         .font(.headline)
                         .foregroundStyle(.secondary)
 
-                    Text(updateTimeText)
+                    Text("(\(updateTimeText))")
                         .font(.system(size: 10, weight: .medium, design: .default))
                         .monospacedDigit()
                         .foregroundStyle(.tertiary)
