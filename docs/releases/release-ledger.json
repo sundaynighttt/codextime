@@ -1,0 +1,241 @@
+{
+  "schemaVersion": 1,
+  "project": "codextime",
+  "updatedAt": "2026-09-04",
+  "pointers": [
+    {
+      "key": "latest_candidate",
+      "label": "iPhone 최신 후보",
+      "releaseId": "ios-10-b9"
+    },
+    {
+      "key": "last_external",
+      "label": "Apple 처리 확인 최신",
+      "releaseId": "ios-030-b8"
+    },
+    {
+      "key": "latest_desktop_release",
+      "label": "데스크톱 공개 최신",
+      "releaseId": "v0.2.3"
+    }
+  ],
+  "releases": [
+    {
+      "id": "v0.1.0",
+      "sequence": 1,
+      "version": "v0.1.0",
+      "date": "2026-08-26",
+      "stage": "released",
+      "status": "historical",
+      "summary": "최초 macOS 공개 배포",
+      "evidence": [
+        "git:v0.1.0",
+        "https://github.com/sundaynighttt/codextime/releases/tag/v0.1.0"
+      ]
+    },
+    {
+      "id": "v0.1.1",
+      "sequence": 2,
+      "version": "v0.1.1",
+      "date": "2026-08-26",
+      "stage": "released",
+      "status": "historical",
+      "summary": "macOS 서명·공증 공개본",
+      "evidence": [
+        "git:v0.1.1",
+        "https://github.com/sundaynighttt/codextime/releases/tag/v0.1.1"
+      ]
+    },
+    {
+      "id": "windows-v0.2.0",
+      "sequence": 3,
+      "version": "windows-v0.2.0",
+      "date": "2026-08-26",
+      "stage": "released",
+      "status": "historical",
+      "summary": "Windows 상시 표시 WPF 사전 배포",
+      "evidence": [
+        "git:windows-v0.2.0",
+        "https://github.com/sundaynighttt/codextime/releases/tag/windows-v0.2.0"
+      ]
+    },
+    {
+      "id": "v0.2.0",
+      "sequence": 4,
+      "version": "v0.2.0",
+      "date": "2026-08-26",
+      "stage": "released",
+      "status": "historical",
+      "summary": "한국어 중심 공개 안내 및 데스크톱 배포",
+      "evidence": [
+        "git:v0.2.0",
+        "https://github.com/sundaynighttt/codextime/releases/tag/v0.2.0"
+      ]
+    },
+    {
+      "id": "v0.2.1",
+      "sequence": 5,
+      "version": "v0.2.1",
+      "date": "2026-08-26",
+      "stage": "released",
+      "status": "historical",
+      "summary": "설치 앱 아이콘 추가",
+      "evidence": [
+        "git:v0.2.1",
+        "https://github.com/sundaynighttt/codextime/releases/tag/v0.2.1"
+      ]
+    },
+    {
+      "id": "v0.2.2",
+      "sequence": 6,
+      "version": "v0.2.2",
+      "date": "2026-08-26",
+      "stage": "released",
+      "status": "historical",
+      "summary": "간결한 사용량 표시 설정",
+      "evidence": [
+        "git:v0.2.2",
+        "https://github.com/sundaynighttt/codextime/releases/tag/v0.2.2"
+      ]
+    },
+    {
+      "id": "v0.2.3",
+      "sequence": 7,
+      "version": "v0.2.3",
+      "date": "2026-08-26",
+      "stage": "released",
+      "status": "historical",
+      "summary": "macOS 메뉴바 표시 복구",
+      "evidence": [
+        "git:v0.2.3",
+        "https://github.com/sundaynighttt/codextime/releases/tag/v0.2.3"
+      ]
+    },
+    {
+      "id": "ios-030-b1",
+      "sequence": 8,
+      "version": "0.3.0",
+      "build": "1",
+      "date": "2026-08-28",
+      "stage": "external_processed",
+      "status": "historical",
+      "summary": "최초 iPhone 전용·암호화 설정 및 내부 전용 테스트; 2026-09-04 ASC 처리 상태 확인, 설치 수만으로 smoke 통과를 추정하지 않음",
+      "evidence": [
+        "git:4a58f5a",
+        "docs/app-store/submission.md"
+      ]
+    },
+    {
+      "id": "ios-030-b2",
+      "sequence": 9,
+      "version": "0.3.0",
+      "build": "2",
+      "date": "2026-08-28",
+      "stage": "external_processed",
+      "status": "historical",
+      "summary": "일반 TestFlight 업로드 빌드; 2026-09-04 ASC 처리 상태 확인, 설치 수만으로 smoke 통과를 추정하지 않음",
+      "evidence": [
+        "git:24be6f8",
+        "docs/app-store/submission.md"
+      ]
+    },
+    {
+      "id": "ios-030-b3",
+      "sequence": 10,
+      "version": "0.3.0",
+      "build": "3",
+      "date": "2026-08-28",
+      "stage": "external_processed",
+      "status": "historical",
+      "summary": "기기 로그인 대기 유지; 2026-09-04 ASC 처리 상태 확인, 설치 수만으로 smoke 통과를 추정하지 않음",
+      "evidence": [
+        "git:eb80e99",
+        "docs/app-store/submission.md"
+      ]
+    },
+    {
+      "id": "ios-030-b4",
+      "sequence": 11,
+      "version": "0.3.0",
+      "build": "4",
+      "date": "2026-08-28",
+      "stage": "external_processed",
+      "status": "historical",
+      "summary": "위젯 새로고침 버튼; 2026-09-04 ASC 처리 상태 확인, 설치 수만으로 smoke 통과를 추정하지 않음",
+      "evidence": [
+        "git:13a95d9",
+        "docs/app-store/submission.md"
+      ]
+    },
+    {
+      "id": "ios-030-b5",
+      "sequence": 12,
+      "version": "0.3.0",
+      "build": "5",
+      "date": "2026-08-28",
+      "stage": "external_processed",
+      "status": "historical",
+      "summary": "위젯 갱신 시각 표시; 2026-09-04 ASC 처리 상태 확인, 설치 수만으로 smoke 통과를 추정하지 않음",
+      "evidence": [
+        "git:cd2139c",
+        "docs/app-store/submission.md"
+      ]
+    },
+    {
+      "id": "ios-030-b6",
+      "sequence": 13,
+      "version": "0.3.0",
+      "build": "6",
+      "date": "2026-08-30",
+      "stage": "external_processed",
+      "status": "historical",
+      "summary": "위젯 누적 토큰 표시; 2026-09-04 ASC 처리 상태 확인, 설치 수만으로 smoke 통과를 추정하지 않음",
+      "evidence": [
+        "git:df50a6e",
+        "docs/app-store/submission.md"
+      ]
+    },
+    {
+      "id": "ios-030-b7",
+      "sequence": 14,
+      "version": "0.3.0",
+      "build": "7",
+      "date": "2026-09-03",
+      "stage": "external_processed",
+      "status": "historical",
+      "summary": "위젯 새로고침 버튼 정렬; 2026-09-04 ASC 처리 상태 확인, 설치 수만으로 smoke 통과를 추정하지 않음",
+      "evidence": [
+        "git:d9f37ad",
+        "docs/app-store/submission.md"
+      ]
+    },
+    {
+      "id": "ios-030-b8",
+      "sequence": 15,
+      "version": "0.3.0",
+      "build": "8",
+      "date": "2026-09-03",
+      "stage": "external_processed",
+      "status": "historical",
+      "summary": "위젯 갱신 시각을 제목 오른쪽 괄호로 이동; 2026-09-04 ASC 처리 상태 확인, 설치 수만으로 smoke 통과를 추정하지 않음",
+      "evidence": [
+        "git:df03b4d",
+        "docs/app-store/submission.md"
+      ]
+    },
+    {
+      "id": "ios-10-b9",
+      "sequence": 16,
+      "version": "1.0",
+      "build": "9",
+      "date": "2026-09-04",
+      "stage": "local_verified",
+      "status": "active",
+      "summary": "예시 모드·개인정보·이용 안내, 14개 테스트 및 archive 검증, 업로드 성공; 콘텐츠 이용 권한 확인 및 심사 제출 대기",
+      "evidence": [
+        "ios/project.yml",
+        "docs/app-store/submission.md"
+      ]
+    }
+  ]
+}
