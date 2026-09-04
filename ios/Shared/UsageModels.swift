@@ -5,6 +5,17 @@ struct UsageSnapshot: Codable, Equatable, Sendable {
     let resetAt: Date
     let updatedAt: Date
     let lifetimeTokens: Int64?
+    var isDemo: Bool? = nil
+
+    static func demo(now: Date = Date()) -> UsageSnapshot {
+        UsageSnapshot(
+            remainingPercent: 73,
+            resetAt: now.addingTimeInterval(3 * 86_400 + 17 * 3_600),
+            updatedAt: now,
+            lifetimeTokens: 155_000_000,
+            isDemo: true
+        )
+    }
 
     static let placeholder = UsageSnapshot(
         remainingPercent: 98,

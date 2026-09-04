@@ -66,6 +66,12 @@ final class AppModel {
         }
     }
 
+    func beginDemo() {
+        guard case .signedOut = state else { return }
+        state = .connected(usageStore.startDemo())
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+
     func cancelSignIn() {
         signInTask?.cancel()
         signInTask = nil

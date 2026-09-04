@@ -28,6 +28,7 @@ final class CodexTimeTests: XCTestCase {
         XCTAssertEqual(snapshot.resetAt, Date(timeIntervalSince1970: 2_000_000_000))
         XCTAssertEqual(snapshot.updatedAt, now)
         XCTAssertNil(snapshot.lifetimeTokens)
+        XCTAssertNil(snapshot.isDemo)
     }
 
     func testProfilePayloadReadsLifetimeTokens() throws {
@@ -134,6 +135,52 @@ final class CodexTimeTests: XCTestCase {
         )
     }
 
+    func testDemoIsExplicitAndSeparateFromRealCache() {
+        let store = SharedUsageStore(suiteName: "codextime-test-\(UUID().uuidString)")
+        defer { store.delete() }
+        let real = UsageSnapshot(remainingPercent: 42, resetAt: .distantFuture,
+                                 updatedAt: .distantPast, lifetimeTokens: nil)
+        store.save(real)
+        let demo = store.startDemo(now: Date(timeIntervalSince1970: 1_000))
+        XCTAssertEqual(demo.isDemo, true)
+        XCTAssertEqual(store.load(), demo)
+        store.save(demo)
+        store.endDemo()
+        XCTAssertEqual(store.load(), real)
+        XCTAssertFalse(store.isDemoEnabled)
+    }
+
+    func testDemoRefreshKeepsSampleValueAndResetTime() throws {
+        let store = SharedUsageStore(suiteName: "codextime-test-\(UUID().uuidString)")
+        defer { store.delete() }
+        let initial = store.startDemo(now: Date(timeIntervalSince1970: 1_000))
+        let refreshed = try XCTUnwrap(store.refreshDemo(now: Date(timeIntervalSince1970: 2_000)))
+        XCTAssertEqual(refreshed.remainingPercent, initial.remainingPercent)
+        XCTAssertEqual(refreshed.resetAt, initial.resetAt)
+        XCTAssertEqual(refreshed.updatedAt, Date(timeIntervalSince1970: 2_000))
+        XCTAssertEqual(refreshed.isDemo, true)
+    }
+
+    func testDemoClientDoesNotNeedNetworkAndExitClearsDemo() async throws {
+        let store = SharedUsageStore(suiteName: "codextime-test-\(UUID().uuidString)")
+        defer { store.delete() }
+        _ = store.startDemo()
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [RejectNetworkProtocol.self]
+        let client = CodexAccountClient(session: URLSession(configuration: configuration), usageStore: store)
+        let snapshot = try await client.fetchUsage()
+        XCTAssertEqual(snapshot.isDemo, true)
+        XCTAssertEqual(snapshot.remainingPercent, 73)
+        try await client.signOut()
+        XCTAssertNil(store.load())
+    }
+
+    func testReleaseKeepsAppIdentity() {
+        XCTAssertEqual(CodexConfiguration.appGroupID, "group.com.sundaynighttt.codextime")
+        XCTAssertEqual(CodexConfiguration.keychainGroupSuffix, "com.sundaynighttt.codextime.auth")
+        XCTAssertEqual(Bundle.main.bundleIdentifier, "com.sundaynighttt.codextime.ios")
+    }
+
     private func fakeJWT(payload: [String: Any]) throws -> String {
         let header = try JSONSerialization.data(withJSONObject: ["alg": "none"])
         let payload = try JSONSerialization.data(withJSONObject: payload)
@@ -146,4 +193,14 @@ final class CodexTimeTests: XCTestCase {
             }
             .joined(separator: ".")
     }
+}
+
+private final class RejectNetworkProtocol: URLProtocol {
+    override class func canInit(with request: URLRequest) -> Bool { true }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+    override func startLoading() {
+        XCTFail("예시 모드는 네트워크를 호출하면 안 됩니다")
+        client?.urlProtocol(self, didFailWithError: URLError(.notConnectedToInternet))
+    }
+    override func stopLoading() {}
 }
