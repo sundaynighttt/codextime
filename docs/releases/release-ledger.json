@@ -231,7 +231,7 @@
       "date": "2026-09-04",
       "stage": "external_processed",
       "status": "active",
-      "summary": "예시 모드·개인정보·이용 안내, 14개 테스트 및 CI 통과, Apple 처리·빌드 선택 완료; 콘텐츠 이용 권한 확인 및 심사 제출 대기",
+      "summary": "예시 모드·개인정보·이용 안내, 14개 테스트 및 CI 통과; 2026-09-04 09:55 KST App Store 심사 제출 완료·심사 대기 중, 승인 및 수동 출시 전",
       "evidence": [
         "ios/project.yml",
         "docs/app-store/submission.md"

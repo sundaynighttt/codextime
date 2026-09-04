@@ -28,8 +28,8 @@ CodexTime은 Codex의 남은 사용량과 리셋까지 남은 시간을 항상 �
 
 | 기준 | 버전 | 단계 | 상태 | 요약 | 근거 |
 | --- | --- | --- | --- | --- | --- |
-| iPhone 최신 후보<br>`latest_candidate` | **`1.0 (9)`** | `external_processed` | `active` | 예시 모드·개인정보·이용 안내, 14개 테스트 및 CI 통과, Apple 처리·빌드 선택 완료; 콘텐츠 이용 권한 확인 및 심사 제출 대기 | [project.yml](ios/project.yml)<br>[submission.md](docs/app-store/submission.md) |
-| Apple 처리 확인 최신<br>`last_external` | **`1.0 (9)`** | `external_processed` | `active` | 예시 모드·개인정보·이용 안내, 14개 테스트 및 CI 통과, Apple 처리·빌드 선택 완료; 콘텐츠 이용 권한 확인 및 심사 제출 대기 | [project.yml](ios/project.yml)<br>[submission.md](docs/app-store/submission.md) |
+| iPhone 최신 후보<br>`latest_candidate` | **`1.0 (9)`** | `external_processed` | `active` | 예시 모드·개인정보·이용 안내, 14개 테스트 및 CI 통과; 2026-09-04 09:55 KST App Store 심사 제출 완료·심사 대기 중, 승인 및 수동 출시 전 | [project.yml](ios/project.yml)<br>[submission.md](docs/app-store/submission.md) |
+| Apple 처리 확인 최신<br>`last_external` | **`1.0 (9)`** | `external_processed` | `active` | 예시 모드·개인정보·이용 안내, 14개 테스트 및 CI 통과; 2026-09-04 09:55 KST App Store 심사 제출 완료·심사 대기 중, 승인 및 수동 출시 전 | [project.yml](ios/project.yml)<br>[submission.md](docs/app-store/submission.md) |
 | 데스크톱 공개 최신<br>`latest_desktop_release` | **`v0.2.3`** | `released` | `historical` | macOS 메뉴바 표시 복구 | `git:v0.2.3`<br>[외부 근거](https://github.com/sundaynighttt/codextime/releases/tag/v0.2.3) |
 
 ### 전체 버전 흐름
@@ -51,7 +51,7 @@ CodexTime은 Codex의 남은 사용량과 리셋까지 남은 시간을 항상 �
 | 13 | 2026-08-30 | `0.3.0 (6)` | `external_processed` | `historical` | 위젯 누적 토큰 표시; 2026-09-04 ASC 처리 상태 확인, 설치 수만으로 smoke 통과를 추정하지 않음 | `git:df50a6e`<br>[submission.md](docs/app-store/submission.md) |
 | 14 | 2026-09-03 | `0.3.0 (7)` | `external_processed` | `historical` | 위젯 새로고침 버튼 정렬; 2026-09-04 ASC 처리 상태 확인, 설치 수만으로 smoke 통과를 추정하지 않음 | `git:d9f37ad`<br>[submission.md](docs/app-store/submission.md) |
 | 15 | 2026-09-03 | `0.3.0 (8)` | `external_processed` | `historical` | 위젯 갱신 시각을 제목 오른쪽 괄호로 이동; 2026-09-04 ASC 처리 상태 확인, 설치 수만으로 smoke 통과를 추정하지 않음 | `git:df03b4d`<br>[submission.md](docs/app-store/submission.md) |
-| 16 | 2026-09-04 | `1.0 (9)` | `external_processed` | `active` | 예시 모드·개인정보·이용 안내, 14개 테스트 및 CI 통과, Apple 처리·빌드 선택 완료; 콘텐츠 이용 권한 확인 및 심사 제출 대기 | [project.yml](ios/project.yml)<br>[submission.md](docs/app-store/submission.md) |
+| 16 | 2026-09-04 | `1.0 (9)` | `external_processed` | `active` | 예시 모드·개인정보·이용 안내, 14개 테스트 및 CI 통과; 2026-09-04 09:55 KST App Store 심사 제출 완료·심사 대기 중, 승인 및 수동 출시 전 | [project.yml](ios/project.yml)<br>[submission.md](docs/app-store/submission.md) |
 <!-- project-release-ledger:end -->
 
 ## 화면
@@ -82,7 +82,7 @@ codex --version
 codex login status
 ```
 
-iPhone은 **1.0(9) App Store 제출 준비 단계**이며 아직 일반 공개되지 않았습니다. 기존 0.3.0(1–8)은 TestFlight 내부 테스트 이력이고, 정식 설치 링크는 Apple 승인 및 실제 출시 후 추가합니다. Codex CLI나 켜져 있는 Mac 없이 본인의 ChatGPT 계정을 직접 연결하며, 로그인 없는 **예시 데이터로 둘러보기**도 제공합니다. 예시는 앱과 위젯에 명확히 표시되고 실제 계정 캐시와 분리됩니다. [iPhone 안내](ios/README.md) · [제출 현황](docs/app-store/submission.md)
+iPhone은 **1.0(9) App Store 심사 대기 중**이며 아직 일반 공개되지 않았습니다. 2026-09-04 정식 심사에 제출했으며, 기존 0.3.0(1–8)은 TestFlight 내부 테스트 이력입니다. 정식 설치 링크는 Apple 승인 및 수동 출시 후 추가합니다. Codex CLI나 켜져 있는 Mac 없이 본인의 ChatGPT 계정을 직접 연결하며, 로그인 없는 **예시 데이터로 둘러보기**도 제공합니다. 예시는 앱과 위젯에 명확히 표시되고 실제 계정 캐시와 분리됩니다. [iPhone 안내](ios/README.md) · [제출 현황](docs/app-store/submission.md)
 
 ## macOS 설치
 
@@ -156,4 +156,4 @@ macOS와 Windows는 `codex app-server`를 짧게 실행해 `account/rateLimits/r
 
 ## English
 
-CodexTime is a free, open-source app for macOS, Windows, and iPhone that shows your remaining Codex allowance and reset countdown. Download desktop builds from [GitHub Releases](https://github.com/sundaynighttt/codextime/releases/latest). iPhone 1.0(9) is being prepared for App Store review, not publicly released. Its clearly labeled offline example mode is available without an account. Live account access communicates directly with OpenAI; there is no developer-operated backend, advertising, or analytics SDK.
+CodexTime is a free, open-source app for macOS, Windows, and iPhone that shows your remaining Codex allowance and reset countdown. Download desktop builds from [GitHub Releases](https://github.com/sundaynighttt/codextime/releases/latest). iPhone 1.0(9) was submitted on September 4, 2026 and is waiting for App Store review; approval and manual release are still pending. Its clearly labeled offline example mode is available without an account. Live account access communicates directly with OpenAI; there is no developer-operated backend, advertising, or analytics SDK.
