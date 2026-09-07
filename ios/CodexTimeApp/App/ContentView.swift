@@ -5,12 +5,19 @@ struct ContentView: View {
     let model: AppModel
     @Environment(\.openURL) private var openURL
     @State private var copiedUserCode: String?
+    @State private var presentedSheet: SheetDestination?
+
+    private enum SheetDestination: String, Identifiable {
+        case guide
+        var id: String { rawValue }
+    }
 
     var body: some View {
         ZStack {
             Color(.systemGroupedBackground).ignoresSafeArea()
 
-            VStack(spacing: 24) {
+            ScrollView {
+              VStack(spacing: 24) {
                 Spacer(minLength: 32)
 
                 Image(systemName: "clock.badge.checkmark")
@@ -24,10 +31,18 @@ struct ContentView: View {
                 content
                     .frame(maxWidth: 380)
 
+                Button("이용 안내 · 개인정보 · 지원") {
+                    presentedSheet = .guide
+                }
+                .font(.footnote)
+                .accessibilityIdentifier("open-guide")
+
                 Spacer()
             }
             .padding(24)
+            }
         }
+        .sheet(item: $presentedSheet) { _ in UsageGuideView() }
         .task {
             await model.load()
         }
@@ -52,6 +67,15 @@ struct ContentView: View {
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
                 .accessibilityIdentifier("connect-chatgpt")
+
+                Button("예시 데이터로 둘러보기") { model.beginDemo() }
+                    .buttonStyle(.bordered)
+                    .accessibilityIdentifier("start-demo")
+
+                Text("실제 사용량은 ChatGPT 연결 후 조회합니다.\nOpenAI가 제공하는 공식 앱이 아닙니다.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
             }
 
         case let .signingIn(authorization):
@@ -140,6 +164,12 @@ struct ContentView: View {
 
     private func connectedView(_ snapshot: UsageSnapshot) -> some View {
         VStack(spacing: 18) {
+            if snapshot.isDemo == true {
+                Text("예시 데이터 · 실제 계정 사용량이 아닙니다")
+                    .font(.footnote.bold())
+                    .foregroundStyle(.orange)
+                    .multilineTextAlignment(.center)
+            }
             TimelineView(.periodic(from: .now, by: 60)) { context in
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Codex")
@@ -152,6 +182,12 @@ struct ContentView: View {
                     Text(UsageFormatter.remainingTime(until: snapshot.resetAt, now: context.date))
                         .font(.title3.bold())
                         .foregroundStyle(.blue)
+
+                    if let tokens = snapshot.lifetimeTokens {
+                        Text("누적 토큰 \(UsageFormatter.compactTokenCount(tokens))")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(22)
@@ -175,7 +211,7 @@ struct ContentView: View {
             .disabled(model.isRefreshing)
             .accessibilityIdentifier("refresh-usage")
 
-            Button("연결 해제", role: .destructive) {
+            Button(snapshot.isDemo == true ? "예시 끝내기" : "연결 해제", role: .destructive) {
                 Task { await model.signOut() }
             }
             .font(.footnote)

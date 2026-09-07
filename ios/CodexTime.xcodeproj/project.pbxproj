@@ -11,12 +11,14 @@
 		209F90734B6EA47CD166F6D6 /* CodexAccountClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4168AAEC9B883FD8837BAED5 /* CodexAccountClient.swift */; };
 		239DEDB34C5F2DE69B70BB03 /* RefreshUsageIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E417C0A837B96308880FBDC /* RefreshUsageIntent.swift */; };
 		3207E1012EE13C7B623F3FC6 /* CodexConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74A4F755B919C6E725E7DF8C /* CodexConfiguration.swift */; };
+		32892F10105C73B3F9ACC408 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C73105F3DDB2F31A1B69E29B /* PrivacyInfo.xcprivacy */; };
 		32FC5D5FC1FFD624EFF16FB9 /* KeychainTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B923D0890D464850C53031E8 /* KeychainTokenStore.swift */; };
 		3925A6CFB07A68F4F70BB302 /* AuthModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40B1A7E35D926B525420C522 /* AuthModels.swift */; };
 		4B9C9937B187E8B27A7931AE /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 457D81058899C9B8057C34A1 /* AppModel.swift */; };
 		53923D61905BF2CAA351812F /* AuthModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40B1A7E35D926B525420C522 /* AuthModels.swift */; };
 		5E4B21E8B96F0EFBE8BE46C2 /* CodexTimeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A50F486C17482AB8795D65 /* CodexTimeApp.swift */; };
 		61E07CBF037F29CA5B5EA46B /* UsageModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D8DE89F8301DF38FF6C519 /* UsageModels.swift */; };
+		724ED8BECFFD10202BAB4ECE /* UsageGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA820FE63B0CD214C11D955 /* UsageGuideView.swift */; };
 		896E52D214C09A89BC396E1E /* CodexTimeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8469A2B105882F57CE07469C /* CodexTimeWidget.swift */; };
 		97ADC604913462A1042DBA51 /* CodexAccountClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4168AAEC9B883FD8837BAED5 /* CodexAccountClient.swift */; };
 		A6210FCCD9A98AC8E822E4D5 /* CodexTimeWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5DFD0E37BF09910D8A4F3664 /* CodexTimeWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -27,6 +29,7 @@
 		CE693044E1C6B81334B08F6A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA1DCCA3F9D4FE716EA2799A /* ContentView.swift */; };
 		CF5D8BBB5AF899949400CE16 /* UsageModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D8DE89F8301DF38FF6C519 /* UsageModels.swift */; };
 		D256B89816B0D0E547422224 /* CodexConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74A4F755B919C6E725E7DF8C /* CodexConfiguration.swift */; };
+		E23755518489EE3D22AEFB5A /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C73105F3DDB2F31A1B69E29B /* PrivacyInfo.xcprivacy */; };
 		FD525D0D52A04DA5F7BAE3D0 /* SharedUsageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362FBC4F7FF8C360488A9168 /* SharedUsageStore.swift */; };
 /* End PBXBuildFile section */
 
@@ -77,7 +80,9 @@
 		B0833964EC2977FEBCE5B62C /* CodexTime.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CodexTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B923D0890D464850C53031E8 /* KeychainTokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainTokenStore.swift; sourceTree = "<group>"; };
 		BA1DCCA3F9D4FE716EA2799A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		C73105F3DDB2F31A1B69E29B /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		D964DE06E623122334DE0DEB /* CodexTimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexTimeTests.swift; sourceTree = "<group>"; };
+		EFA820FE63B0CD214C11D955 /* UsageGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageGuideView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -107,6 +112,7 @@
 				4168AAEC9B883FD8837BAED5 /* CodexAccountClient.swift */,
 				74A4F755B919C6E725E7DF8C /* CodexConfiguration.swift */,
 				B923D0890D464850C53031E8 /* KeychainTokenStore.swift */,
+				C73105F3DDB2F31A1B69E29B /* PrivacyInfo.xcprivacy */,
 				7E417C0A837B96308880FBDC /* RefreshUsageIntent.swift */,
 				362FBC4F7FF8C360488A9168 /* SharedUsageStore.swift */,
 				12D8DE89F8301DF38FF6C519 /* UsageModels.swift */,
@@ -147,6 +153,7 @@
 				457D81058899C9B8057C34A1 /* AppModel.swift */,
 				A1A50F486C17482AB8795D65 /* CodexTimeApp.swift */,
 				BA1DCCA3F9D4FE716EA2799A /* ContentView.swift */,
+				EFA820FE63B0CD214C11D955 /* UsageGuideView.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -197,6 +204,7 @@
 			buildConfigurationList = 1814A10AFD742065CFB4F030 /* Build configuration list for PBXNativeTarget "CodexTimeWidgetExtension" */;
 			buildPhases = (
 				927D59D8EA5311CB813A4065 /* Sources */,
+				A1515F0C1BF3A27521783954 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -251,11 +259,20 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		A1515F0C1BF3A27521783954 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E23755518489EE3D22AEFB5A /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DDC64F7B5973C7559B8CC272 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				C7E8264D40D345CEBA95DC0E /* Assets.xcassets in Resources */,
+				32892F10105C73B3F9ACC408 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -298,6 +315,7 @@
 				C6B51D0DF8D2F42545F5AF9A /* KeychainTokenStore.swift in Sources */,
 				239DEDB34C5F2DE69B70BB03 /* RefreshUsageIntent.swift in Sources */,
 				FD525D0D52A04DA5F7BAE3D0 /* SharedUsageStore.swift in Sources */,
+				724ED8BECFFD10202BAB4ECE /* UsageGuideView.swift in Sources */,
 				61E07CBF037F29CA5B5EA46B /* UsageModels.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -372,7 +390,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -387,7 +405,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 0.3.0;
+				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -523,7 +541,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -544,7 +562,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 0.3.0;
+				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;

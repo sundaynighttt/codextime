@@ -16,7 +16,7 @@ actor CodexAccountClient {
     }
 
     func isAuthenticated() -> Bool {
-        (try? tokenStore.load()) != nil
+        usageStore.isDemoEnabled || (try? tokenStore.load()) != nil
     }
 
     func requestDeviceAuthorization() async throws -> DeviceAuthorization {
@@ -50,6 +50,8 @@ actor CodexAccountClient {
     }
 
     func fetchUsage() async throws -> UsageSnapshot {
+        // Public sample mode never reads credentials or contacts OpenAI.
+        if let demo = usageStore.refreshDemo() { return demo }
         guard var tokens = try tokenStore.load() else {
             throw CodexClientError.notAuthenticated
         }
@@ -67,6 +69,10 @@ actor CodexAccountClient {
     }
 
     func signOut() throws {
+        if usageStore.isDemoEnabled {
+            usageStore.endDemo()
+            return
+        }
         try tokenStore.delete()
         usageStore.delete()
     }

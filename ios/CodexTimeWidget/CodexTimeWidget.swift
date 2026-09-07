@@ -61,7 +61,7 @@ struct CodexTimeWidgetView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .center) {
                 HStack(alignment: .firstTextBaseline, spacing: 4) {
-                    Text("Codex")
+                    Text(entry.snapshot?.isDemo == true ? "예시" : "Codex")
                         .font(.headline)
                         .foregroundStyle(.secondary)
 
@@ -134,6 +134,7 @@ struct CodexTimeWidgetView: View {
 
     private var updateTimeAccessibilityText: String {
         guard entry.snapshot != nil else { return "Codex, 업데이트 시간 없음" }
+        if entry.snapshot?.isDemo == true { return "예시 데이터, 마지막 업데이트 \(updateTimeText)" }
         return "Codex, 마지막 업데이트 \(updateTimeText)"
     }
 
@@ -146,7 +147,7 @@ struct CodexTimeWidgetView: View {
         guard let snapshot = entry.snapshot else {
             return "CodexTime, ChatGPT 연결 필요"
         }
-        var text = "Codex 사용량 \(snapshot.remainingPercent)퍼센트 남음, 리셋까지 \(resetText)"
+        var text = "\(snapshot.isDemo == true ? "예시 데이터" : "Codex 사용량") \(snapshot.remainingPercent)퍼센트 남음, 리셋까지 \(resetText)"
         if let lifetimeTokens = snapshot.lifetimeTokens {
             text += ", 누적 토큰 \(lifetimeTokens.formatted())"
         }
