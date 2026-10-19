@@ -18,6 +18,8 @@ jobs:
         run: command -v xcodegen || brew install xcodegen
       - name: Render production macOS views with sample data
         run: python3 docs/screenshots/render-macos.py
+      - name: Fetch pinned TestFlight widget source
+        run: git fetch origin 0effad7c2f703638a0a97d6b066dc6ea93d89114
       - name: Render production iPhone widget on Simulator
         run: python3 docs/screenshots/render-ios.py
       - uses: actions/upload-artifact@v4
