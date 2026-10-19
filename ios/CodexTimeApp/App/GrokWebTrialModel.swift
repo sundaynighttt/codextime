@@ -134,6 +134,10 @@ final class ProviderWebUsageModel: NSObject, ObservableObject, WKNavigationDeleg
     let provider: WebUsageProvider
     var onReading: ((WebUsageReading) -> Void)?
     var onDisconnect: (() -> Void)?
+    @Published private(set) var claudeReadings: [WebUsageMetric: WebUsageReading] = [:]
+    @Published private(set) var hasRecognizedClaudeUsage = false
+    private var claudeReadRequestID: UUID?
+    private let claudeEvaluator: (WKWebView) async throws -> Any?
     @Published var valueKind: WebUsageValueKind = .used {
         didSet { if valueKind != oldValue { invalidateReadingContext() } }
     }
@@ -141,8 +145,9 @@ final class ProviderWebUsageModel: NSObject, ObservableObject, WKNavigationDeleg
         didSet { if metric != oldValue { invalidateReadingContext() } }
     }
 
-    init(provider: WebUsageProvider = .grok) {
+    init(provider: WebUsageProvider = .grok, claudeEvaluator: ((WKWebView) async throws -> Any?)? = nil) {
         self.provider = provider
+        self.claudeEvaluator = claudeEvaluator ?? { view in try await ProviderWebUsageModel.evaluateClaudeUsage(in: view) }
         self.metric = provider == .grok ? .grokWeekly : .claudeSession
         super.init()
         self.pageHost = provider.usageURL.host ?? provider.name
@@ -193,6 +198,76 @@ final class ProviderWebUsageModel: NSObject, ObservableObject, WKNavigationDeleg
         webView != nil && isAtUsagePage && userConfirmedUsageVisible && !isReading
     }
 
+    /// This is only an origin gate, never a claim that login has succeeded.
+    var canReadClaudeUsage: Bool {
+        provider == .claude && webView != nil && !isLoading && !isReading
+            && Self.isOfficialClaudeURL(webView?.url)
+    }
+
+    nonisolated static func isOfficialClaudeURL(_ url: URL?) -> Bool {
+        guard let url else { return false }
+        return url.scheme?.lowercased() == "https" && url.host?.lowercased() == "claude.ai"
+            && (url.port == nil || url.port == 443)
+    }
+
+    static func evaluateClaudeUsage(in view: WKWebView) async throws -> Any? {
+        try await view.evaluateJavaScript(ClaudeUsagePanelReader.script, in: nil, contentWorld: .defaultClient)
+    }
+
+    private func invalidateClaudeRead() {
+        if claudeReadRequestID != nil { isReading = false }
+        claudeReadRequestID = nil
+        hasRecognizedClaudeUsage = false
+    }
+
+    func readClaudeUsage() async {
+        guard !Task.isCancelled, canReadClaudeUsage, let view = webView else { return }
+        let requestID = UUID(), generation = navigationGeneration
+        claudeReadRequestID = requestID
+        hasRecognizedClaudeUsage = false
+        isReading = true
+        readMessage = "보이는 현재 세션과 전체 모델 주간 사용량을 확인하는 중입니다."
+        defer {
+            if claudeReadRequestID == requestID {
+                claudeReadRequestID = nil
+                isReading = false
+            }
+        }
+        do {
+            let result = try await claudeEvaluator(view)
+            guard !Task.isCancelled, claudeReadRequestID == requestID, generation == navigationGeneration,
+                  view === webView, Self.isOfficialClaudeURL(view.url), !isLoading else { return }
+            switch ClaudeUsagePanelReader.decode(result) {
+            case let .unsupported(reason):
+                readMessage = reason.message
+            case let .success(sessionUsed, weeklyUsed):
+                let now = Date()
+                let session = WebUsageReading(provider: .claude, percent: sessionUsed, valueKind: .used,
+                                              metric: .claudeSession, updatedAt: now)
+                let weekly = WebUsageReading(provider: .claude, percent: weeklyUsed, valueKind: .used,
+                                             metric: .claudeWeekly, updatedAt: now)
+                guard session.isValid(at: now), weekly.isValid(at: now) else {
+                    readMessage = ClaudeUsagePanelFailure.unexpectedResult.message
+                    return
+                }
+                // Both readings are validated before either cache callback.
+                claudeReadings = [.claudeSession: session, .claudeWeekly: weekly]
+                hasRecognizedClaudeUsage = true
+                readMessage = "세션 잔여 " + WebUsageReading.percentText(session.remainingPercent)
+                    + " · 주간 잔여 " + WebUsageReading.percentText(weekly.remainingPercent)
+                for reading in [session, weekly] {
+                    guard claudeReadRequestID == requestID, generation == navigationGeneration,
+                          view === webView else { return }
+                    onReading?(reading)
+                }
+            }
+        } catch {
+            guard !Task.isCancelled, claudeReadRequestID == requestID, generation == navigationGeneration,
+                  view === webView else { return }
+            readMessage = ClaudeUsagePanelFailure.executionFailed.message
+        }
+    }
+
     func open() {
         guard webView == nil else { return }
         let configuration = WKWebViewConfiguration()
@@ -214,6 +289,7 @@ final class ProviderWebUsageModel: NSObject, ObservableObject, WKNavigationDeleg
         urlObservation = view.observe(\.url, options: [.new]) { [weak self, weak view] _, _ in
             Task { @MainActor [weak self, weak view] in
                 guard let self, let view, view === self.webView else { return }
+                self.invalidateClaudeRead()
                 self.updateLocation()
             }
         }
@@ -248,6 +324,7 @@ final class ProviderWebUsageModel: NSObject, ObservableObject, WKNavigationDeleg
     }
 
     private func invalidateNavigationReading() {
+        invalidateClaudeRead()
         activeNavigation = nil
         cancelPointRead(clearMessage: false)
         navigationGeneration &+= 1
@@ -266,6 +343,8 @@ final class ProviderWebUsageModel: NSObject, ObservableObject, WKNavigationDeleg
     func disconnect() { close() }
 
     func close() {
+        invalidateClaudeRead()
+        claudeReadings = [:]
         activeNavigation = nil
         cancelPointRead(clearMessage: false)
         navigationGeneration &+= 1
@@ -329,6 +408,7 @@ final class ProviderWebUsageModel: NSObject, ObservableObject, WKNavigationDeleg
     }
 
     func cancelPointRead(clearMessage: Bool = true) {
+        if claudeReadRequestID != nil { invalidateClaudeRead() }
         let requestID = pointReadRequestID
         pointReadRequestID = nil
         pointReadTask?.cancel()
@@ -689,6 +769,7 @@ final class ProviderWebUsageModel: NSObject, ObservableObject, WKNavigationDeleg
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         guard webView === self.webView, let navigation else { return }
+        invalidateClaudeRead()
         activeNavigation = navigation
         isLoading = true
         navigationGeneration &+= 1

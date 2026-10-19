@@ -53,7 +53,9 @@ struct ProviderWebUsageView: View {
                                     .disabled(model.webView == nil)
                                 Button(model.provider == .claude ? "Claude 화면으로 돌아가기" : "사용량 화면 열기") { model.openUsagePage() }
                                     .disabled(model.webView == nil)
-                                Button("읽기 설정", systemImage: "slider.horizontal.3") { openPanel(.reading) }
+                                if model.provider == .grok {
+                                    Button("읽기 설정", systemImage: "slider.horizontal.3") { openPanel(.reading) }
+                                }
                                 Button("도움말", systemImage: "questionmark.circle") { openPanel(.help) }
                                 Divider()
                                 Button("연결 해제·기록 삭제", role: .destructive) { model.disconnect() }
@@ -116,7 +118,60 @@ struct ProviderWebUsageView: View {
         }
     }
 
+    @ViewBuilder
     private var compactControls: some View {
+        if model.provider == .claude {
+            claudeControls
+        } else {
+            grokControls
+        }
+    }
+
+    private var claudeControls: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            HStack(spacing: 12) {
+                if model.isLoading { ProgressView().controlSize(.small) }
+                Text(model.hasRecognizedClaudeUsage ? "사용량 확인됨" : "사용량 화면에서 읽어 주세요")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .accessibilityIdentifier("claude-usage-recognition-status")
+                Spacer(minLength: 4)
+                Button(model.isReading ? "읽는 중…" : "사용량 읽기") {
+                    didAttemptRead = true
+                    Task { await model.readClaudeUsage() }
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(!model.canReadClaudeUsage)
+                .accessibilityIdentifier("claude-read-usage")
+            }
+            .font(.subheadline)
+            .frame(minHeight: 44)
+            if model.hasRecognizedClaudeUsage || didAttemptRead {
+                Text(claudeResultText ?? model.readMessage)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .accessibilityIdentifier("claude-usage-read-result")
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 4)
+        .background(.bar)
+    }
+
+    private var claudeResultText: String? {
+        guard model.hasRecognizedClaudeUsage,
+              let session = model.claudeReadings[.claudeSession],
+              let weekly = model.claudeReadings[.claudeWeekly],
+              session.isValid, weekly.isValid else { return nil }
+        return "세션 잔여 " + WebUsageReading.percentText(session.remainingPercent)
+            + " · 주간 잔여 " + WebUsageReading.percentText(weekly.remainingPercent)
+    }
+
+    private var grokControls: some View {
         VStack(alignment: .leading, spacing: 2) {
             HStack(spacing: 12) {
                 Button("사용량 열기") { model.openUsagePage() }
@@ -139,7 +194,7 @@ struct ProviderWebUsageView: View {
                     .accessibilityIdentifier("grok-trial-read-usage")
                 } else {
                     if model.isLoading { ProgressView().controlSize(.small) }
-                    Text(model.provider == .claude ? "Claude 계정 이메일로 로그인" : "로그인 후 사용량을 여세요")
+                    Text("로그인 후 사용량을 여세요")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
@@ -177,16 +232,7 @@ struct ProviderWebUsageView: View {
                     }
                     .pickerStyle(.segmented)
                     .accessibilityIdentifier("web-usage-value-kind")
-                    if model.provider == .claude {
-                        Picker("읽는 한도", selection: $model.metric) {
-                            Text("현재 세션").tag(WebUsageMetric.claudeSession)
-                            Text("주간").tag(WebUsageMetric.claudeWeekly)
-                        }
-                        .pickerStyle(.segmented)
-                        .accessibilityIdentifier("web-usage-metric")
-                    } else {
-                        LabeledContent("읽는 한도", value: "주간")
-                    }
+                    LabeledContent("읽는 한도", value: "주간")
                 } footer: {
                     Text("설정을 마친 뒤 ‘숫자 읽기’를 누르고 웹 화면의 %를 한 번 탭하세요.")
                 }
@@ -216,11 +262,20 @@ struct ProviderWebUsageView: View {
                     }
                 }
                 Section("계정 연결") {
-                    Text("공식 웹에서 본인 계정으로 로그인한 뒤 ‘사용량 열기’를 누르세요.")
+                    if model.provider == .claude {
+                        Text("공식 웹에서 본인 계정으로 로그인한 뒤 Claude의 사용량 화면을 여세요. 이미 사용량이 보이면 다시 로그인할 필요가 없습니다.")
+                    } else {
+                        Text("공식 웹에서 본인 계정으로 로그인한 뒤 ‘사용량 열기’를 누르세요.")
+                    }
                     Text("로그인은 앱 실행 중에만 유지됩니다. 화면을 닫아도 유지되지만 앱 종료·연결 해제 후에는 다시 로그인해야 합니다.")
                 }
                 Section("사용량 확인") {
-                    Text("사용량 화면에서 ‘읽기 설정’을 열어 숫자 의미와 한도를 고르세요. ‘숫자 읽기’를 누르고 15초 안에 해당 %를 한 번 탭하면 잔여율로 표시합니다.")
+                    if model.provider == .claude {
+                        Text("현재 세션과 주간 한도가 보이는 사용량 화면에서 ‘사용량 읽기’를 한 번 누르세요. 확인된 두 구간의 사용률을 각각 잔여율로 바꿔 표시합니다. 읽기 설정이나 숫자 위치 지정은 필요하지 않습니다.")
+                        Text("화면 구조나 두 한도를 확인하지 못하면 읽기를 중단합니다. 이는 로그인 실패를 뜻하지 않으며 기존 수동 확인 값은 유지됩니다.")
+                    } else {
+                        Text("사용량 화면에서 ‘읽기 설정’을 열어 숫자 의미와 한도를 고르세요. ‘숫자 읽기’를 누르고 15초 안에 해당 %를 한 번 탭하면 잔여율로 표시합니다.")
+                    }
                     Text("웹 사용량은 자동 갱신되지 않습니다. 앱과 위젯에는 마지막 수동 확인 값과 시각이 남습니다.")
                 }
                 Section("개인정보") {

@@ -20,6 +20,7 @@ struct UsageEntry: TimelineEntry {
     let date: Date
     let snapshot: UsageSnapshot?
     var webReadings: [WebUsageProvider: WebUsageReading] = [:]
+    var webMetricReadings: [WebUsageMetric: WebUsageReading] = [:]
 }
 
 struct UsageTimelineProvider: TimelineProvider {
@@ -34,7 +35,8 @@ struct UsageTimelineProvider: TimelineProvider {
         let snapshot = context.isPreview ? UsageSnapshot.demo() : usageStore.load()
         let now = Date()
         completion(UsageEntry(date: now, snapshot: snapshot,
-                              webReadings: snapshot?.isDemo == true ? [:] : webUsageStore.loadAll(now: now)))
+                              webReadings: snapshot?.isDemo == true ? [:] : webUsageStore.loadAll(now: now),
+                              webMetricReadings: snapshot?.isDemo == true ? [:] : webUsageStore.loadAllMetrics(now: now)))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<UsageEntry>) -> Void) {
@@ -48,7 +50,8 @@ struct UsageTimelineProvider: TimelineProvider {
 
             let now = Date()
             let entry = UsageEntry(date: now, snapshot: snapshot,
-                                   webReadings: snapshot?.isDemo == true ? [:] : webUsageStore.loadAll(now: now))
+                                   webReadings: snapshot?.isDemo == true ? [:] : webUsageStore.loadAll(now: now),
+                                   webMetricReadings: snapshot?.isDemo == true ? [:] : webUsageStore.loadAllMetrics(now: now))
             completion(
                 Timeline(
                     entries: [entry],
@@ -85,7 +88,8 @@ struct CodexTimeWidgetView: View {
             Spacer(minLength: 4)
 
             ProviderUsageColumns(snapshot: entry.snapshot, now: entry.date, compact: true,
-                                 webReadings: entry.webReadings)
+                                 webReadings: entry.webReadings,
+                                 webMetricReadings: entry.webMetricReadings)
                 .invalidatableContent()
 
             Spacer(minLength: 6)

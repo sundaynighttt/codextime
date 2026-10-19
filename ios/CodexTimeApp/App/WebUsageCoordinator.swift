@@ -6,12 +6,14 @@ import WidgetKit
 @MainActor
 final class WebUsageCoordinator: ObservableObject {
     @Published private(set) var readings: [WebUsageProvider: WebUsageReading]
+    @Published private(set) var metricReadings: [WebUsageMetric: WebUsageReading]
     private let store: WebUsageStore
     private var models: [WebUsageProvider: ProviderWebUsageModel] = [:]
 
-    init(store: WebUsageStore = WebUsageStore()) {
+    init(store: WebUsageStore = WebUsageStore(), now: Date = Date()) {
         self.store = store
-        readings = store.loadAll()
+        metricReadings = store.loadAllMetrics(now: now)
+        readings = store.loadAll(now: now)
     }
 
     func model(for provider: WebUsageProvider) -> ProviderWebUsageModel {
@@ -30,7 +32,8 @@ final class WebUsageCoordinator: ObservableObject {
 
     func accept(_ reading: WebUsageReading, now: Date = Date()) {
         guard store.save(reading, now: now) else { return }
-        readings[reading.provider] = reading
+        metricReadings[reading.metric] = reading
+        readings[reading.provider] = store.load(reading.provider, now: now)
         WidgetCenter.shared.reloadTimelines(ofKind: "CodexTimeWidget")
     }
 
@@ -45,6 +48,7 @@ final class WebUsageCoordinator: ObservableObject {
     private func clear(_ provider: WebUsageProvider) {
         store.delete(provider)
         readings.removeValue(forKey: provider)
+        metricReadings = metricReadings.filter { $0.key.provider != provider }
         // Retain the closed model: an open sheet can reopen its WebKit session,
         // and that same session must still belong to the coordinator after dismissal.
         WidgetCenter.shared.reloadTimelines(ofKind: "CodexTimeWidget")

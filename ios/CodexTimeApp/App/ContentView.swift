@@ -204,7 +204,8 @@ struct ContentView: View {
             Spacer(minLength: 0)
             TimelineView(.periodic(from: .now, by: 60)) { context in
                 ProviderUsageColumns(snapshot: currentSnapshot, now: context.date,
-                                     webReadings: webUsage.readings)
+                                     webReadings: webUsage.readings,
+                                     webMetricReadings: webUsage.metricReadings)
             }
                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
             Spacer(minLength: 0)
@@ -235,17 +236,21 @@ struct ContentView: View {
             }
             Text(currentSnapshot?.isDemo == true
                  ? "예시를 끝내면 Grok·Claude 계정을 연결할 수 있습니다. 예시 모드에서는 웹 로그인이나 실제 사용량 확인을 시작하지 않습니다."
-                 : "Grok·Claude는 웹에서 직접 로그인한 뒤 사용량 숫자를 수동으로 확인합니다. 카드에는 선택한 구간의 잔여율과 마지막 확인 시각이 표시됩니다.")
+                 : "Grok·Claude는 웹에서 직접 로그인한 뒤 사용량 숫자를 수동으로 확인합니다. Claude는 주간·세션을 각각 표시하며, 각 구간의 잔여율과 마지막 확인 시각을 구분합니다.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
             if currentSnapshot?.isDemo != true && !webUsage.readings.isEmpty {
                 DisclosureGroup("웹 사용량 관리") {
                     ForEach(WebUsageProvider.allCases) { provider in
-                        if let reading = webUsage.readings[provider] {
+                        if webUsage.readings[provider] != nil {
                             VStack(alignment: .leading, spacing: 6) {
-                                Text("\(provider.name) · \(reading.metric.name) · 사용 \(WebUsageReading.percentText(reading.usedPercent)) / 잔여 \(WebUsageReading.percentText(reading.remainingPercent))")
-                                    .font(.footnote)
+                                ForEach(WebUsageMetric.allCases.filter { $0.provider == provider }) { metric in
+                                    if let limit = webUsage.metricReadings[metric] {
+                                        Text("\(provider.name) · \(metric.name) · 사용 \(WebUsageReading.percentText(limit.usedPercent)) / 잔여 \(WebUsageReading.percentText(limit.remainingPercent)) · 확인 \(limit.confirmationTimeText(at: Date()))")
+                                            .font(.footnote)
+                                    }
+                                }
                                 Button(provider.name + " 연결 해제·기록 삭제", role: .destructive) {
                                     webUsage.disconnect(provider)
                                 }
