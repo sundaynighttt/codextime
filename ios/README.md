@@ -16,6 +16,12 @@
 
 > OpenAI의 공식 iPhone 앱이 아닙니다. 인증 또는 사용량 인터페이스가 바뀌면 업데이트가 필요할 수 있으며, 동작 확인과 타사 서비스 이용 권한 확인은 별개입니다. 1.0(9)의 [App Store 제출 현황](../docs/app-store/submission.md)을 참고하세요.
 
+## 위젯 화면 — 1.0 (9)
+
+<img src="../docs/screenshots/ios-widget-v1.0-b9.png" width="170" alt="1.0 빌드 9 소형 위젯: 예시, 갱신 시각, 남은 사용량, 리셋 시간, 누적 토큰">
+
+iOS Simulator에서 현재 위젯 뷰와 오프라인 예시 데이터를 렌더링했습니다. 실제 계정 수치가 아닙니다. [이미지 기준·생성 방법](../docs/screenshots/README.md)
+
 ## 직접 빌드
 
 1. Xcode 16 이상과 [XcodeGen](https://github.com/yonaskolb/XcodeGen)을 설치합니다.

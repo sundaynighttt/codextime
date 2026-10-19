@@ -8,12 +8,10 @@ permissions:
 
 jobs:
   render:
-    runs-on: macos-15-intel
+    runs-on: macos-latest
     timeout-minutes: 15
     env:
       TZ: Asia/Seoul
-      DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
-      DOCS_IOS_RUNTIME: com.apple.CoreSimulator.SimRuntime.iOS-18-5
     steps:
       - uses: actions/checkout@v4
       - name: Install preview project generator

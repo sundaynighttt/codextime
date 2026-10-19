@@ -46,19 +46,23 @@ enum DocumentationPreview {
             onLaunchAtLoginChanged: { _ in }, onConfirmGrok: {})
         let window = settings.window!
         window.appearance = NSAppearance(named: .aqua)
-        window.setContentSize(NSSize(width: 660, height: 820))
+        // Lay out independently of the current display's available height.
+        // Hosted CI displays can be shorter than all three provider rows.
+        window.setContentSize(NSSize(width: 660, height: 520))
         window.orderFront(nil)
+        let content = window.contentView!
+        window.contentView = nil
+        window.orderOut(nil)
+        content.setFrameSize(NSSize(width: 660, height: 820))
         let initial = Dictionary(uniqueKeysWithValues: ProviderID.allCases.map { id in
             (id, ProviderUsageState(id: id, failure: .authenticationRequired))
         })
         settings.update(states: initial, now: now, canConfirmGrok: false)
         RunLoop.current.run(until: Date().addingTimeInterval(0.2))
-        window.displayIfNeeded()
-        try save(window.contentView!, to: output.appendingPathComponent("macos-setup-v0.3.1.png"))
+        try save(content, to: output.appendingPathComponent("macos-setup-v0.3.1.png"))
         settings.update(states: states, now: now, canConfirmGrok: false)
         RunLoop.current.run(until: Date().addingTimeInterval(0.2))
-        window.displayIfNeeded()
-        try save(window.contentView!, to: output.appendingPathComponent("macos-connected-v0.3.1.png"))
+        try save(content, to: output.appendingPathComponent("macos-connected-v0.3.1.png"))
         print("Exported actual menu-bar renderer and setup views with documentation fixtures.")
     }
 

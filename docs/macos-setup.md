@@ -4,6 +4,10 @@
 
 v0.3.0 사용자는 [이전 버전 안내](https://github.com/sundaynighttt/codextime/blob/v0.3.0/docs/macos-setup.md)를 참고하거나 최신 DMG로 업데이트하세요.
 
+<img src="screenshots/macos-setup-v0.3.1.png" width="560" alt="v0.3.1 간편 설정: 서비스 선택, 기존 계정 연결, 로그인하기">
+
+v0.3.1 실제 설정 창을 문서용 로그인 전 상태로 렌더링한 화면입니다. [이미지 생성 기준](screenshots/README.md)
+
 ## 1. 설치 또는 업데이트
 
 1. **CodexTime-macOS-0.3.1.dmg**를 다운로드해 엽니다. DMG 안의 **시작하기.html**에서도 기본 사용법을 볼 수 있습니다.

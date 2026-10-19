@@ -64,15 +64,22 @@ CodexTime은 지원하는 AI 서비스의 남은 사용량과 리셋까지 남�
 
 ## 화면
 
-macOS 메뉴바:
+macOS **v0.3.1 (2026101907)** — Codex · Grok · Claude 기본 메뉴바:
 
-![CodexTime macOS 메뉴바](docs/screenshots/macos-menu-preview.jpg)
+<img src="docs/screenshots/macos-menubar-v0.3.1.png" width="378" alt="macOS v0.3.1 메뉴바: Codex 73%, Grok 82%, Claude 64% — 문서용 예시">
 
-iPhone 소형 위젯:
+<details>
+<summary>macOS v0.3.1 간편 설정 화면 — 로그인 전</summary>
 
-<img src="docs/screenshots/ios-widget-preview.jpg" width="160" alt="CodexTime iPhone 소형 위젯">
+<img src="docs/screenshots/macos-setup-v0.3.1.png" width="560" alt="macOS v0.3.1 간편 설정: 사용할 서비스 선택, 기존 계정 연결과 로그인하기">
 
-화면의 수치는 개인정보 노출을 막기 위한 예시 값이며, macOS 화면은 리셋 시간 표시를 켠 상태입니다.
+</details>
+
+iPhone **1.0 (9)** — 예시·갱신 시각·누적 토큰이 표시되는 현재 소형 위젯:
+
+<img src="docs/screenshots/ios-widget-v1.0-b9.png" width="170" alt="iPhone 1.0 빌드 9 위젯: 예시, 갱신 시각, 73%, 리셋까지 3d 17h, 누적 토큰">
+
+수치는 모두 문서용 예시입니다. macOS는 리셋 시간 표시를 끈 기본 설정이며, iPhone은 iOS Simulator에서 현재 위젯 뷰를 렌더링한 미리보기입니다. 2026-10-19 갱신. [이미지 기준과 다시 생성하는 방법](docs/screenshots/README.md)
 
 ## 다운로드
 
@@ -131,7 +138,7 @@ powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\CodexUsageMonitor\un
 - macOS에서 Claude·Grok의 기존 인증정보 접근은 사용자별 앱 연결 동의 후 시작합니다. Claude는 기본 Claude Code Keychain 항목, Grok은 Cursor 저장소의 `cursorAuth/accessToken` 한 항목만 앱 메모리에서 사용합니다. 배포 파일에 인증정보를 동봉하거나 별도 인증 파일로 저장하지 않습니다.
 - Claude는 `api.anthropic.com`의 고정 usage 경로, Cursor 기반 Grok은 `api2.cursor.sh`의 고정 `GetSandUsageStatus` RPC만 호출합니다. Grok은 최초 웹 사용률·리셋 대조가 끝나기 전 자동 접근을 차단합니다. 이 내부 인터페이스의 지원 여부는 계정·구독과 서비스 변경에 따라 달라질 수 있습니다.
 - 세 서비스 표시의 기본값은 켜짐이며, 숨긴 서비스는 자동·수동·잠자기 복귀 조회를 중지합니다. 연결된 표시 서비스만 기본 600초마다 갱신합니다. macOS 연결 해제는 앱 플래그와 메모리 캐시만 지우고 공식 앱·CLI의 원본 인증정보는 유지합니다.
-- Claude의 OS 확인창은 명시적인 연결 요청에서만 허용하며 백그라운드 갱신은 확인창을 띄우지 않습니다. 로그인·토큰 갱신·인증정보 수정·쿠키·대화 원문·다른 DB 항목 읽기를 하지 않고 비밀값·원시 응답·원시 오류를 로그에 남기지 않습니다.
+- Claude의 OS 확인창은 명시적인 연결 요청에서만 허용하며 백그라운드 갱신은 확인창을 띄우지 않습니다. 로그인은 사용자가 앱에서 시작한 공식 CLI가 처리하며 앱은 인증 출력을 캡처하지 않습니다. 직접 토큰 갱신·원본 인증정보 수정·쿠키·대화 원문·다른 DB 항목 읽기를 하지 않고 비밀값·원시 응답·원시 오류를 로그에 남기지 않습니다.
 - iPhone은 OpenAI 기기 로그인으로 받은 토큰을 동기화되지 않는 iOS Keychain에 저장합니다. ID 토큰에는 계정 정보가 포함될 수 있습니다.
 - 개발자 자체 서버는 없습니다. 실제 계정 연결 시 해당 서비스 제공자에 인증·사용량 요청과 네트워크 정보가 직접 전달됩니다.
 - iPhone 예시 모드는 인증정보와 네트워크 요청 없이 동작합니다. iPhone 연결 해제는 이 앱의 기기 내 토큰과 캐시를 지우며 외부 계정을 삭제하지 않습니다.
