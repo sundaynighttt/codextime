@@ -19,13 +19,6 @@ booted_here = device["state"] != "Booted"
 if booted_here:
     subprocess.run(["xcrun", "simctl", "boot", simulator], check=True)
 try:
-    subprocess.run(["xcrun", "simctl", "bootstatus", simulator, "-b"],
-                   check=True, timeout=90)
-except subprocess.TimeoutExpired:
-    # CI runtimes can keep migrating CoreLocation data after launch services
-    # are usable. Build first, then let install/launch confirm readiness.
-    print("Simulator background migration is still running; continuing to build.", flush=True)
-try:
     with tempfile.TemporaryDirectory(prefix="codextime-docs-ios-") as temp:
         project = Path(temp)
         source = project / "Sources"
@@ -54,7 +47,6 @@ struct DocsPreviewApp: App {
         let view = CodexTimeWidgetView(entry: UsageEntry(date: now, snapshot: .demo(now: now)))
             .environment(\\.locale, Locale(identifier: "ko_KR"))
             .environment(\\.colorScheme, .light)
-            .environment(\\.widgetFamily, .systemSmall)
             .padding(16)
             .frame(width: 170, height: 170)
             .background(Color.white)
@@ -80,6 +72,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.sundaynighttt.codextime.docs-preview
         GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         TARGETED_DEVICE_FAMILY: "1"
         SWIFT_VERSION: "5.0"
@@ -89,6 +82,13 @@ targets:
         subprocess.run(["xcodebuild", "-project", str(project / "DocsPreview.xcodeproj"),
                         "-scheme", "DocsPreview", "-destination", "platform=iOS Simulator,id=" + simulator,
                         "-derivedDataPath", str(build), "CODE_SIGNING_ALLOWED=NO", "build"], check=True)
+        try:
+            subprocess.run(["xcrun", "simctl", "bootstatus", simulator, "-b"],
+                           check=True, timeout=30)
+        except subprocess.TimeoutExpired:
+            # CoreLocation migration may outlive usable launch services on CI.
+            # Actual install/launch below confirms the preview can run.
+            print("Background migration continues; checking app install/launch.", flush=True)
         app = build / "Build/Products/Debug-iphonesimulator/DocsPreview.app"
         subprocess.run(["xcrun", "simctl", "install", simulator, str(app)], check=True)
         subprocess.run(["xcrun", "simctl", "spawn", simulator, "launchctl", "setenv", "TZ", "Asia/Seoul"], check=True)
