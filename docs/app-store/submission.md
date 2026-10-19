@@ -1,11 +1,19 @@
 # CodexTime App Store 제출 현황
 
+## 현재 후보 1.0(15) — Claude 로그인 제한 안내·복구
+
+- **local_verified/pending:** 사용자 빌드14 실기기 Grok 로그인 성공·Claude Google 로그인 후 흰 화면/복귀 불가 보고에 대응한다. Grok 사용량·위젯까지 통과한 것으로 추정하지 않는다.
+- 빌드14 시뮬레이터는 Google 빈 이메일 페이지까지 열렸으나 로그인 정보를 입력하지 않아 로그인 이후 흰 화면은 직접 재현하지 못했다. 정적 새창/opener 계약 손실과 복귀 조작 부재를 확인했고 전체 원인은 미확정이다.
+- Google의 [embedded OAuth 제한](https://developers.google.com/identity/protocols/oauth2/policies#use-secure-browsers)에 따라 Google/Claude 새창 진입을 안내 후 중단하고 부모 페이지를 덮어쓰지 않는다. Google OAuth 완료는 미지원이며 제한 안내와 Claude 화면 복귀를 검증했다. 공식 이메일 대안과 뒤로·새로고침·고정 사용량 복귀·오류/프로세스 종료 복구를 추가한다.
+- [Claude 공식 이메일 경로](https://support.claude.com/en/articles/13189465-log-in-to-your-claude-account)는 같은 계정 이메일을 사용한다. 실제 앱 내 완료는 미검증이다. 외부 브라우저 세션 자동 이전·쿠키/토큰 복사·Google 연결 해제나 계정 권한 변경을 요구하지 않는다.
+- **51개 XCTest·Release 컴파일(실패/건너뜀/경고/오류0), iPhone17e의 Google 제한 안내·부모 보존·Claude 복귀·빈 이메일/키보드, Release archive·엄격 서명을 통과했다.** 앱·위젯 모두1.0(15)와 각 번들 식별자를 확인했다. Grok Release의 공식 로그인 선택 화면도 로그인 정보 입력 없이 표시됨을 확인했다. **2026-10-19 22:38:48 KST** 단일 업로드 프로세스 exit0과 Xcode `Upload succeeded`·`Uploaded CodexTime`·`EXPORT SUCCEEDED`를 확인했다. 직전 상태는 `Uploaded package is processing`이며 Apple 처리·내부 그룹 배정은 확인 대기다. 22:41~22:44 KST ASC가 로그인 페이지로 돌아가 한 번 새로고침 후에도 로딩 상태가 남아 **사용자 웹 재로그인 응답 대기**로 확인을 보류했다. 기존 업로드 성공은 유지하며 재업로드하지 않았다. 최신 외부 처리 포인터는14를 유지한다. [조사·후보 근거](../releases/2026-10-19-claude-login-recovery.md). 정책 고정 링크694는 유지한다.
+
 ## TestFlight 처리 완료 1.0(14) — 웹 로그인 영역 확대
 
 - 빌드13 공통 연결 화면의 긴 안내·숫자 설정 때문에 로그인 웹 영역이 좁아지는 문제를 수리했다. 네이티브 상단 공급자/호스트, 도움말·읽기 설정 시트, 기본 한 줄 하단, 키보드 시 하단 숨김·키보드 닫기를 적용했다.
 - 같은 WKWebView 세션과 네이티브 웹 폼 스크롤을 유지한다. View와 빌드 설정만 변경하고 인증·사용량 모델·Coordinator·파서·캐시·권한은 변경하지 않았다. 정책 고정 커밋 `6943976`을 유지한다.
 - **external_processed/passed:** iPhone 17e / iOS 26.5의 빈 Claude·Grok 로그인 폼·소프트웨어 키보드·버튼 접근·설정/도움말 복원, XCTest42·Debug/Release·Release archive·엄격 서명을 통과했다. 앱/위젯 1.0(14), App Group·Keychain만 사용하며 CloudKit 권한은 없다.
-- 로그인 정보 입력·제출은 수행하지 않았다. 실제 계정 인증·숫자 대조·실기기 smoke 통과로 확대하지 않는다. **2026-10-19 21:39:25 KST 빌드14 TestFlight 업로드에 성공**했다. Xcode의 `Uploaded package is processing`·`Upload succeeded`·`Uploaded CodexTime`·`EXPORT SUCCEEDED`를 확인했다. **21:42~21:43 KST** ASC에서 업로드 상태 완료·제출 준비 완료·90일 유효를 확인하고 [빌드14 상세](https://appstoreconnect.apple.com/teams/8874948e-3fee-4bea-a414-67a4c0f0e7d8/apps/6805935440/testflight/ios/9b6de1a7-c183-4198-a084-9dfe9be7182a)에서 **CodexTime Internal 내부 1명 배정**을 확인했다. 기존 내부 테스터가 설치·업데이트할 수 있다. **21:44 KST** 새 UI 테스트 안내의 저장 완료 상태도 확인했다. 사용자 기기의 설치·실계정 기능 smoke를 완료했다고 추정하지 않는다. 최신 후보·외부 처리 포인터는14다. [UI 수리 근거](../releases/2026-10-19-ios-web-height.md).
+- 로그인 정보 입력·제출은 수행하지 않았다. 실제 계정 인증·숫자 대조·실기기 smoke 통과로 확대하지 않는다. **2026-10-19 21:39:25 KST 빌드14 TestFlight 업로드에 성공**했다. Xcode의 `Uploaded package is processing`·`Upload succeeded`·`Uploaded CodexTime`·`EXPORT SUCCEEDED`를 확인했다. **21:42~21:43 KST** ASC에서 업로드 상태 완료·제출 준비 완료·90일 유효를 확인하고 [빌드14 상세](https://appstoreconnect.apple.com/teams/8874948e-3fee-4bea-a414-67a4c0f0e7d8/apps/6805935440/testflight/ios/9b6de1a7-c183-4198-a084-9dfe9be7182a)에서 **CodexTime Internal 내부 1명 배정**을 확인했다. 기존 내부 테스터가 설치·업데이트할 수 있다. **21:44 KST** 새 UI 테스트 안내의 저장 완료 상태도 확인했다. 사용자 기기의 설치·실계정 기능 smoke를 완료했다고 추정하지 않는다. 이 내용은 빌드14의 처리·내부 배정 근거이며 최신 후보 포인터는 상단 원장을 따른다. [UI 수리 근거](../releases/2026-10-19-ios-web-height.md).
 
 ## TestFlight 처리 완료 1.0(13) — iPhone 단독 공식 웹 사용량
 
@@ -50,7 +58,7 @@
 ## 스토어 표현과 심사 경계
 
 - 비공식 읽기 전용 사용량 대시보드이며 OpenAI·xAI·Anthropic·Apple의 제작·보증을 주장하지 않는다.
-- Codex는 본인 ChatGPT 계정으로 직접 인증한다. Grok·Claude는 공식 웹에서 사용자가 직접 로그인·수동 확인하며 자동 조회나 영구 로그인 유지로 소개하지 않는다. Mac·Codex CLI·Cursor·iCloud·별도 API 키가 필요하지 않다. 실제 계정별 성공과 배포 허용은 각각 별도로 확인한다.
+- Codex는 본인 ChatGPT 계정으로 직접 인증한다. Grok·Claude는 지원되는 공식 웹 로그인·수동 확인만 설명하며 계정별 제약과 Claude Google/새창 제한을 명시한다. 자동 조회·영구 로그인·모든 계정 로그인 성공으로 소개하지 않는다. Mac·Codex CLI·Cursor·iCloud·별도 API 키가 필요하지 않다. 실제 계정별 성공과 배포 허용은 각각 별도로 확인한다.
 - 기본 한도 구간만 표시한다. 모든 구간, 결제 크레딧, 리셋 실행 기능은 없다.
 - 위젯은 30분 뒤 갱신을 요청하지만 실제 일정은 iOS가 결정한다.
 - 공개 예시 모드는 로그인 없이 작동한다. 심사에만 보이는 숨겨진 경로나 실제 값처럼 꾸민 예시가 아니다.
