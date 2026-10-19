@@ -7,12 +7,12 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 > [!NOTE]
-> **새 소식 · 2026-10-19 · macOS v0.3.1 공개**
+> **새 소식 · macOS v0.3.1 공개 · iPhone 1.0(16) TestFlight**
 >
 > **v0.3.0부터 macOS에서 Codex · Grok · Claude를 함께 표시합니다.**
 > 이번 v0.3.1에는 **간편 설정·공식 로그인·연결 완료 확인**을 추가했습니다. 사용할 서비스를 고르고 **로그인하기**로 공식 로그인을 시작한 뒤 연결 상태를 확인할 수 있습니다.
 >
-> Grok은 Cursor 로그인과 웹 사용량 대조가 필요한 조건부 연결입니다. **Windows·iPhone은 Codex 전용**입니다.
+> macOS의 Grok은 Cursor 로그인과 웹 사용량 대조가 필요한 조건부 연결입니다. **iPhone 1.0(16)은 Codex·Grok·Claude를 표시**하며 Grok·Claude는 공식 웹에서 수동 확인합니다. **현재 Windows 공개본은 Codex 전용**이고 Grok·Claude 연결은 아직 구현되지 않았습니다.
 >
 > **[macOS 설치 파일](https://github.com/sundaynighttt/codextime/releases/download/v0.3.1/CodexTime-macOS-0.3.1.dmg)** · **[Windows 설치 파일](https://github.com/sundaynighttt/codextime/releases/download/v0.3.1/CodexTime-Windows-0.3.1.zip)** · [처음 설치·계정 연결하기](docs/macos-setup.md) · [전체 변경 내용](docs/releases/2026-10-19-v0.3.1.md)
 
@@ -22,7 +22,7 @@ CodexTime은 지원하는 AI 서비스의 남은 사용량과 리셋까지 남�
 
 - **macOS — Codex · Grok · Claude:** 기본 표시와 서비스별 숨김·조회 중지 선택, 필요하면 리셋 시간도 함께 표시
 - **Windows — Codex 전용:** 작업표시줄에 `Codex 95% · 6d 16h` 표시
-- **iPhone — Codex 전용:** 홈 화면 소형 위젯에 `Codex (갱신 시각) / 95% / 3d 17h / 누적 토큰` 표시
+- **iPhone — Codex · Grok · Claude:** TestFlight 1.0(16)의 3열 카드·소형 위젯. Codex 직접 조회, Grok 웹 수동 확인, Claude 세션·주간 한 번 읽기
 - Windows에서는 우상단 미니 위젯으로 전환 가능
 - 별도 OpenAI API 키 불필요
 - 광고·분석·텔레메트리 없음
@@ -35,14 +35,14 @@ CodexTime은 지원하는 AI 서비스의 남은 사용량과 리셋까지 남�
 <!-- project-release-ledger:start -->
 ## 릴리스 기준과 전체 버전 흐름
 
-> 자동 관리 원장: [`docs/releases/release-ledger.json`](docs/releases/release-ledger.json) · 갱신일: `2026-10-19`
+> 자동 관리 원장: [`docs/releases/release-ledger.json`](docs/releases/release-ledger.json) · 갱신일: `2026-10-20`
 
 ### 현재 기준선
 
 | 기준 | 버전 | 단계 | 상태 | 요약 | 근거 |
 | --- | --- | --- | --- | --- | --- |
-| iPhone 최신 후보<br>`latest_candidate` | **`1.0 (9)`** | `external_processed` | `active` | 예시 모드·개인정보·이용 안내, 14개 테스트 및 CI 통과; 2026-09-04 09:55 KST App Store 심사 제출 완료·심사 대기 중, 승인 및 수동 출시 전 | [project.yml](ios/project.yml)<br>[submission.md](docs/app-store/submission.md) |
-| Apple 처리 확인 최신<br>`last_external` | **`1.0 (9)`** | `external_processed` | `active` | 예시 모드·개인정보·이용 안내, 14개 테스트 및 CI 통과; 2026-09-04 09:55 KST App Store 심사 제출 완료·심사 대기 중, 승인 및 수동 출시 전 | [project.yml](ios/project.yml)<br>[submission.md](docs/app-store/submission.md) |
+| iPhone 최신 후보<br>`latest_candidate` | **`1.0 (16)`** | `external_processed` | `passed` | Claude 세션·공통주간 한 번 읽기·한도별 앱/위젯 표시; 80 XCTest·Release·서명, 23:40:44 업로드·23:43:46 KST Apple 테스트 가능 확인, iPhone 실계정 대조 대기 | [project.yml](ios/project.yml)<br>[2026-10-19-claude-usage-reader.md](docs/releases/2026-10-19-claude-usage-reader.md)<br>[submission.md](docs/app-store/submission.md)<br>`git:9cd429d`<br>`git:0effad7`<br>[외부 근거](https://testflight.apple.com/v1/app/6805935440) |
+| Apple 처리 확인 최신<br>`last_external` | **`1.0 (16)`** | `external_processed` | `passed` | Claude 세션·공통주간 한 번 읽기·한도별 앱/위젯 표시; 80 XCTest·Release·서명, 23:40:44 업로드·23:43:46 KST Apple 테스트 가능 확인, iPhone 실계정 대조 대기 | [project.yml](ios/project.yml)<br>[2026-10-19-claude-usage-reader.md](docs/releases/2026-10-19-claude-usage-reader.md)<br>[submission.md](docs/app-store/submission.md)<br>`git:9cd429d`<br>`git:0effad7`<br>[외부 근거](https://testflight.apple.com/v1/app/6805935440) |
 | 데스크톱 공개 최신<br>`latest_desktop_release` | **`0.3.1 (2026101907)`** | `released` | `active` | macOS 간편 설정·공식 로그인·자동 연결 확인 공개; 109 tests·전체 CI·서명·공증 universal DMG·비로그인 다운로드 및 체크섬 검증 통과 | [2026-10-19-v0.3.1.md](docs/releases/2026-10-19-v0.3.1.md)<br>[macos-setup.md](docs/macos-setup.md)<br>[build-macos.sh](macos/scripts/build-macos.sh)<br>[release.yml](.github/workflows/release.yml)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39216253992)<br>[외부 근거](https://github.com/sundaynighttt/codextime/releases/tag/v0.3.1)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39216176410) |
 | macOS 로컬 설치·실행 확인<br>`last_installed_smoke` | **`0.3.1 (2026101907)`** | `released` | `active` | macOS 간편 설정·공식 로그인·자동 연결 확인 공개; 109 tests·전체 CI·서명·공증 universal DMG·비로그인 다운로드 및 체크섬 검증 통과 | [2026-10-19-v0.3.1.md](docs/releases/2026-10-19-v0.3.1.md)<br>[macos-setup.md](docs/macos-setup.md)<br>[build-macos.sh](macos/scripts/build-macos.sh)<br>[release.yml](.github/workflows/release.yml)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39216253992)<br>[외부 근거](https://github.com/sundaynighttt/codextime/releases/tag/v0.3.1)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39216176410) |
 
@@ -65,14 +65,22 @@ CodexTime은 지원하는 AI 서비스의 남은 사용량과 리셋까지 남�
 | 13 | 2026-08-30 | `0.3.0 (6)` | `external_processed` | `historical` | 위젯 누적 토큰 표시; 2026-09-04 ASC 처리 상태 확인, 설치 수만으로 smoke 통과를 추정하지 않음 | `git:df50a6e`<br>[submission.md](docs/app-store/submission.md) |
 | 14 | 2026-09-03 | `0.3.0 (7)` | `external_processed` | `historical` | 위젯 새로고침 버튼 정렬; 2026-09-04 ASC 처리 상태 확인, 설치 수만으로 smoke 통과를 추정하지 않음 | `git:d9f37ad`<br>[submission.md](docs/app-store/submission.md) |
 | 15 | 2026-09-03 | `0.3.0 (8)` | `external_processed` | `historical` | 위젯 갱신 시각을 제목 오른쪽 괄호로 이동; 2026-09-04 ASC 처리 상태 확인, 설치 수만으로 smoke 통과를 추정하지 않음 | `git:df03b4d`<br>[submission.md](docs/app-store/submission.md) |
-| 16 | 2026-09-04 | `1.0 (9)` | `external_processed` | `active` | 예시 모드·개인정보·이용 안내, 14개 테스트 및 CI 통과; 2026-09-04 09:55 KST App Store 심사 제출 완료·심사 대기 중, 승인 및 수동 출시 전 | [project.yml](ios/project.yml)<br>[submission.md](docs/app-store/submission.md) |
+| 16 | 2026-09-04 | `1.0 (9)` | `external_processed` | `historical` | 2026-09-04 당시 예시 모드·14 tests·업로드 처리·App Store 심사 제출 확인 이력; 2026-10-19 현재 심사 대기로 단정하지 않음 | [project.yml](ios/project.yml)<br>[submission.md](docs/app-store/submission.md) |
 | 17 | 2026-10-19 | `0.2.4 (2026101901)` | `installed_smoke` | `historical` | macOS 세 로고·독립 상태 처리 로컬 설치·실행 및 42 tests/Codex 실조회 통과; Grok Bot·Claude quota 미연결, 실제 메뉴 클릭 검수는 Computer Use timeout으로 미완료 | [2026-10-19-macos-local.md](docs/releases/2026-10-19-macos-local.md)<br>[protocol.md](docs/protocol.md)<br>[build-macos.sh](macos/scripts/build-macos.sh) |
 | 18 | 2026-10-19 | `0.2.4 (2026101902)` | `installed_smoke` | `historical` | 승인된 Grok Bot·Claude 연결 구현·설치 및 75 tests; Codex·Claude 실제 조회 성공, Grok 인증 필요 | [2026-10-19-macos-local.md](docs/releases/2026-10-19-macos-local.md)<br>[protocol.md](docs/protocol.md)<br>[build-macos.sh](macos/scripts/build-macos.sh) |
 | 19 | 2026-10-19 | `0.2.4 (2026101903)` | `installed_smoke` | `historical` | Grok 고정 인증 단계 진단·설치 및 78 tests; Codex·Claude 실제 조회 성공, Grok 지정 Keychain 항목 부재로 HTTP 전 중단, 메뉴 육안 검수는 Computer Use timeout으로 미완료 | [2026-10-19-macos-local.md](docs/releases/2026-10-19-macos-local.md)<br>[protocol.md](docs/protocol.md)<br>[build-macos.sh](macos/scripts/build-macos.sh) |
 | 20 | 2026-10-19 | `0.2.4 (2026101904)` | `installed_smoke` | `historical` | 일반 Grok 구독으로 전환 준비·Bot 조회 중단; 79 tests 및 설치본 Codex·Claude 실조회 통과, 일반 Grok 새 인증 연결 승인 대기 | [2026-10-19-macos-local.md](docs/releases/2026-10-19-macos-local.md)<br>[protocol.md](docs/protocol.md)<br>[build-macos.sh](macos/scripts/build-macos.sh) |
 | 21 | 2026-10-19 | `0.2.4 (2026101905)` | `installed_smoke` | `historical` | 승인된 Cursor 단일 키로 Grok 공유 quota 연결·웹 표시 정밀도 및 reset 대조 후 10분 갱신 활성화; 90 tests·설치·서명·세 로고 실제 검수 창 readback 통과 | [2026-10-19-macos-local.md](docs/releases/2026-10-19-macos-local.md)<br>[protocol.md](docs/protocol.md)<br>[CursorGrokCredentialSource.swift](macos/Sources/CodexUsageMonitor/CursorGrokCredentialSource.swift)<br>[build-macos.sh](macos/scripts/build-macos.sh) |
 | 22 | 2026-10-19 | `0.3.0 (2026101906)` | `released` | `historical` | macOS 세 서비스 표시·조회 선택과 본인 계정 설정 공개; 99 tests·전체 CI·서명·공증 universal DMG·비로그인 다운로드 및 체크섬 검증 통과 | [2026-10-19-v0.3.0.md](docs/releases/2026-10-19-v0.3.0.md)<br>[macos-setup.md](docs/macos-setup.md)<br>[build-macos.sh](macos/scripts/build-macos.sh)<br>[release.yml](.github/workflows/release.yml)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39195054137)<br>[외부 근거](https://github.com/sundaynighttt/codextime/releases/tag/v0.3.0)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39195689279) |
-| 23 | 2026-10-19 | `0.3.1 (2026101907)` | `released` | `active` | macOS 간편 설정·공식 로그인·자동 연결 확인 공개; 109 tests·전체 CI·서명·공증 universal DMG·비로그인 다운로드 및 체크섬 검증 통과 | [2026-10-19-v0.3.1.md](docs/releases/2026-10-19-v0.3.1.md)<br>[macos-setup.md](docs/macos-setup.md)<br>[build-macos.sh](macos/scripts/build-macos.sh)<br>[release.yml](.github/workflows/release.yml)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39216253992)<br>[외부 근거](https://github.com/sundaynighttt/codextime/releases/tag/v0.3.1)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39216176410) |
+| 23 | 2026-10-19 | `1.0 (10)` | `external_processed` | `historical` | Codex 전용 iPhone 앱·위젯, 14 tests·서명 검증·13:02 KST 업로드 및 13:04 KST Apple 테스트 가능 알림 확인; 그룹 배포·실기기 설치 미확인 | [project.yml](ios/project.yml)<br>[2026-10-19-ios-testflight.md](docs/releases/2026-10-19-ios-testflight.md)<br>[submission.md](docs/app-store/submission.md) |
+| 24 | 2026-10-19 | `1.0 (11)` | `external_processed` | `historical` | 3열 카드·Codex 직접 조회·17 tests 및 업로드/Apple 처리 확인; ASC CodexTime Internal 1명·빌드11 설치 표시1 확인, 실제 기능 smoke는 별도 미확인 | [project.yml](ios/project.yml)<br>[2026-10-19-ios-three-provider-card.md](docs/releases/2026-10-19-ios-three-provider-card.md)<br>[submission.md](docs/app-store/submission.md) |
+| 25 | 2026-10-19 | `0.3.1 (2026101907)` | `released` | `active` | macOS 간편 설정·공식 로그인·자동 연결 확인 공개; 109 tests·전체 CI·서명·공증 universal DMG·비로그인 다운로드 및 체크섬 검증 통과 | [2026-10-19-v0.3.1.md](docs/releases/2026-10-19-v0.3.1.md)<br>[macos-setup.md](docs/macos-setup.md)<br>[build-macos.sh](macos/scripts/build-macos.sh)<br>[release.yml](.github/workflows/release.yml)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39216253992)<br>[외부 근거](https://github.com/sundaynighttt/codextime/releases/tag/v0.3.1)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39216176410) |
+| 26 | 2026-10-19 | `iCloud 동기화 실험` | `abandoned` | `abandoned` | 별도 브랜치에서 macOS 0.3.1(2026101907)을 재사용한 중단·미배포 iCloud 후보; Mac102/shared20 tests·ad-hoc 패키징 통과, Developer ID export 프로비저닝 대기 후 종료, 공개 v0.3.1과 다른 산출물이며 정식 서명 배포·설치·실제 전송 없음 | [2026-10-19-private-icloud-sync.md](docs/releases/2026-10-19-private-icloud-sync.md)<br>`git:f98bb6d`<br>`git:bdef8de` |
+| 27 | 2026-10-19 | `1.0 (12)` | `failed` | `historical` | 중단·미업로드 iCloud 후보:24 tests·시뮬레이터 통과, 앱/위젯 CloudKit 프로필 불일치로 두 Release archive 실패; TestFlight·실제 동기화 없음 | [2026-10-19-private-icloud-sync.md](docs/releases/2026-10-19-private-icloud-sync.md)<br>`git:f98bb6d`<br>`git:bdef8de` |
+| 28 | 2026-10-19 | `1.0 (13)` | `external_processed` | `historical` | iPhone 웹 수동 사용량·42 XCTest/96 Node cases·Release UI/서명 통과; 21:13업로드·약21:18 Apple 처리와Internal1명배정 확인, 실계정 검증은 사용자 TestFlight 예정 | [project.yml](ios/project.yml)<br>[2026-10-19-ios-web-usage.md](docs/releases/2026-10-19-ios-web-usage.md)<br>[submission.md](docs/app-store/submission.md)<br>`git:bdb1bb6`<br>`git:6943976`<br>[외부 근거](https://appstoreconnect.apple.com/teams/8874948e-3fee-4bea-a414-67a4c0f0e7d8/apps/6805935440/testflight/ios/4e556a52-67f9-4190-a95a-09dca4272252) |
+| 29 | 2026-10-19 | `1.0 (14)` | `external_processed` | `historical` | 웹 로그인 영역 확대·조작 패널 접기·키보드 대응; iPhone17e 빈 폼·42 XCTest·Release 서명, 21:39업로드·21:42~43 Apple 처리/Internal1명·21:44안내 저장 확인 | [project.yml](ios/project.yml)<br>[2026-10-19-ios-web-height.md](docs/releases/2026-10-19-ios-web-height.md)<br>[submission.md](docs/app-store/submission.md)<br>`git:da7d762`<br>[외부 근거](https://appstoreconnect.apple.com/teams/8874948e-3fee-4bea-a414-67a4c0f0e7d8/apps/6805935440/testflight/ios/9b6de1a7-c183-4198-a084-9dfe9be7182a) |
+| 30 | 2026-10-19 | `1.0 (15)` | `external_processed` | `historical` | Claude 새창 제한 안내·화면 복귀·51 XCTest·Release 서명 통과; 22:38:48 KST 업로드·22:41:37 Apple 테스트 가능 알림 확인, Google OAuth 미지원·실계정 검증 대기 | [project.yml](ios/project.yml)<br>[2026-10-19-claude-login-recovery.md](docs/releases/2026-10-19-claude-login-recovery.md)<br>[submission.md](docs/app-store/submission.md)<br>`git:48015b5`<br>[외부 근거](https://testflight.apple.com/v1/app/6805935440) |
+| 31 | 2026-10-19 | `1.0 (16)` | `external_processed` | `passed` | Claude 세션·공통주간 한 번 읽기·한도별 앱/위젯 표시; 80 XCTest·Release·서명, 23:40:44 업로드·23:43:46 KST Apple 테스트 가능 확인, iPhone 실계정 대조 대기 | [project.yml](ios/project.yml)<br>[2026-10-19-claude-usage-reader.md](docs/releases/2026-10-19-claude-usage-reader.md)<br>[submission.md](docs/app-store/submission.md)<br>`git:9cd429d`<br>`git:0effad7`<br>[외부 근거](https://testflight.apple.com/v1/app/6805935440) |
 <!-- project-release-ledger:end -->
 
 </details>
@@ -94,7 +102,7 @@ iPhone **1.0 (16) · TestFlight** — 세 서비스와 Claude 주간·세션을 
 
 <img src="docs/screenshots/ios-widget-v1.0-b16.png" width="170" alt="iPhone 1.0 빌드 16 소형 위젯: Codex·Grok·Claude 세 로고, Codex 예시 73%, Grok 예시 없음, Claude 주간·세션 예시 없음, 리셋 3d 17h, 갱신 10:24">
 
-수치는 문서용 예시입니다. iPhone은 [빌드 16 소스](https://github.com/sundaynighttt/codextime/tree/0effad7c2f703638a0a97d6b066dc6ea93d89114)의 실제 위젯 뷰를 iOS Simulator에서 렌더링했습니다. 예시 모드에는 Grok·Claude 샘플 숫자가 없으므로 `—`로 표시합니다. 빌드 16은 TestFlight 배포본이며 소스는 별도 작업 브랜치에 있습니다. 이 이미지 갱신은 main의 iPhone 코드 통합이나 App Store 정식 출시를 뜻하지 않습니다. macOS는 리셋 시간 표시를 끈 기본 설정입니다. [이미지 기준과 다시 생성하는 방법](docs/screenshots/README.md)
+수치는 문서용 예시입니다. iPhone은 [빌드 16 소스](https://github.com/sundaynighttt/codextime/tree/0effad7c2f703638a0a97d6b066dc6ea93d89114)의 실제 위젯 뷰를 iOS Simulator에서 렌더링했습니다. 예시 모드에는 Grok·Claude 샘플 숫자가 없으므로 `—`로 표시합니다. macOS는 리셋 시간 표시를 끈 기본 설정입니다. [이미지 기준과 다시 생성하는 방법](docs/screenshots/README.md)
 
 ## 다운로드
 
@@ -109,7 +117,7 @@ iPhone **1.0 (16) · TestFlight** — 세 서비스와 Claude 주간·세션을 
 
 각 사용자가 자신의 Mac·PC에서 본인 계정으로 로그인해야 합니다. 배포 파일에 개발자의 인증정보나 계정 캐시가 들어 있지 않습니다. macOS Codex 연결은 설치된 ChatGPT/Codex 앱의 지원되는 내장 CLI 또는 [공식 Codex CLI](https://github.com/openai/codex#installation)를 사용하며, 다른 서비스는 각각 별도로 연결합니다. [macOS 설치·계정 연결 안내](docs/macos-setup.md)를 참고하세요.
 
-iPhone은 **1.0(9) App Store 심사 대기 중**이며 아직 일반 공개되지 않았습니다. 2026-09-04 정식 심사에 제출했으며, 기존 0.3.0(1–8)은 TestFlight 내부 테스트 이력입니다. 정식 설치 링크는 Apple 승인 및 수동 출시 후 추가합니다. Codex CLI나 켜져 있는 Mac 없이 본인의 ChatGPT 계정을 직접 연결하며, 로그인 없는 **예시 데이터로 둘러보기**도 제공합니다. 예시는 앱과 위젯에 명확히 표시되고 실제 계정 캐시와 분리됩니다. [iPhone 안내](ios/README.md) · [제출 현황](docs/app-store/submission.md)
+iPhone 최신 배포본은 **1.0(16) TestFlight**입니다. iOS 17 이상에서 기존 테스터는 [TestFlight](https://testflight.apple.com/v1/app/6805935440)로 업데이트할 수 있습니다. Codex·Grok·Claude를 모두 표시하며, Grok·Claude는 iPhone의 공식 웹에 직접 로그인한 뒤 수동 확인한 숫자와 시각을 앱·위젯에 저장합니다. Mac·Cursor·iCloud·별도 API 키가 필요하지 않습니다. 소스와 빌드 설정도 이 저장소의 빌드 16 기준입니다. 실계정 숫자·위젯 대조는 별도 검증 항목이며 App Store 정식 출시는 수행하지 않았습니다. [iPhone 연결 안내](ios/README.md) · [빌드16 동작·검증](docs/releases/2026-10-19-claude-usage-reader.md) · [제출 현황](docs/app-store/submission.md)
 
 ## macOS 설치와 간편 설정
 
@@ -125,9 +133,18 @@ iPhone은 **1.0(9) App Store 심사 대기 중**이며 아직 일반 공개되�
 
 표시 선택을 끄면 해당 서비스의 표시와 조회가 멈춥니다. 모두 꺼도 복구용 **사용량** 메뉴가 남습니다. `—`는 미연결·미확인, `*`는 이전 성공 값입니다. 연결 설정은 다음 실행에도 유지되며, 계정 변경은 Claude·Grok의 **연결 해제** 후 진행합니다. 언제든 메뉴의 **간편 설정 및 계정 연결…**에서 다시 설정할 수 있습니다.
 
+## iPhone 연결
+
+1. Codex는 앱의 **ChatGPT 연결**에서 본인의 기기 로그인을 완료합니다.
+2. Grok은 **Grok 연결·확인**에서 공식 웹에 로그인합니다. 주간 사용량이 보이면 **읽기 설정**에서 사용함/남음·주간을 정하고 **숫자 읽기**를 누른 뒤 해당 퍼센트를 탭합니다.
+3. Claude는 **Claude 연결·확인**에서 공식 웹에 로그인하고 사용량 화면의 **사용량 읽기**를 누릅니다. 현재 세션·전체 모델 주간을 함께 검증해 각각 저장·표시합니다. Google OAuth는 내부 웹뷰에서 지원하지 않아 공식 이메일 대안을 안내합니다.
+4. 위젯은 같은 iPhone에 마지막으로 저장한 숫자·한도·확인 시각을 표시합니다. Grok·Claude 웹 사용량은 자동 갱신하지 않으므로 앱에서 다시 확인합니다.
+
+[상세 연결·로그인 제약·기록 삭제 안내](ios/README.md)
+
 ## Windows 설치
 
-현재 Windows 앱은 Codex 전용입니다. 본인의 ChatGPT 계정으로 Codex CLI 로그인을 완료한 뒤 사용하세요.
+현재 Windows 공개 앱은 Codex 전용이며 Grok·Claude 연결과 세 서비스 표시는 아직 구현되지 않았습니다. 본인의 ChatGPT 계정으로 Codex CLI 로그인을 완료한 뒤 사용하세요.
 
 1. ZIP 파일의 압축을 풉니다.
 2. 해당 폴더에서 PowerShell을 엽니다.
@@ -154,9 +171,9 @@ powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\CodexUsageMonitor\un
 - Claude는 `api.anthropic.com`의 고정 usage 경로, Cursor 기반 Grok은 `api2.cursor.sh`의 고정 `GetSandUsageStatus` RPC만 호출합니다. Grok은 최초 웹 사용률·리셋 대조가 끝나기 전 자동 접근을 차단합니다. 이 내부 인터페이스의 지원 여부는 계정·구독과 서비스 변경에 따라 달라질 수 있습니다.
 - 세 서비스 표시의 기본값은 켜짐이며, 숨긴 서비스는 자동·수동·잠자기 복귀 조회를 중지합니다. 연결된 표시 서비스만 기본 600초마다 갱신합니다. macOS 연결 해제는 앱 플래그와 메모리 캐시만 지우고 공식 앱·CLI의 원본 인증정보는 유지합니다.
 - Claude의 OS 확인창은 명시적인 연결 요청에서만 허용하며 백그라운드 갱신은 확인창을 띄우지 않습니다. 로그인은 사용자가 앱에서 시작한 공식 CLI가 처리하며 앱은 인증 출력을 캡처하지 않습니다. 직접 토큰 갱신·원본 인증정보 수정·쿠키·대화 원문·다른 DB 항목 읽기를 하지 않고 비밀값·원시 응답·원시 오류를 로그에 남기지 않습니다.
-- iPhone은 OpenAI 기기 로그인으로 받은 토큰을 동기화되지 않는 iOS Keychain에 저장합니다. ID 토큰에는 계정 정보가 포함될 수 있습니다.
+- iPhone Codex는 기기 로그인 토큰을 동기화되지 않는 기기 전용 Keychain에 저장합니다. Grok·Claude 웹 로그인은 비영구 WebKit 세션을 사용하며 앱은 쿠키·토큰·입력 내용을 읽거나 내보내지 않습니다. 웹뷰의 숫자 읽기는 제한된 사용량 결과만 반환합니다.
 - 개발자 자체 서버는 없습니다. 실제 계정 연결 시 해당 서비스 제공자에 인증·사용량 요청과 네트워크 정보가 직접 전달됩니다.
-- iPhone 예시 모드는 인증정보와 네트워크 요청 없이 동작합니다. iPhone 연결 해제는 이 앱의 기기 내 토큰과 캐시를 지우며 외부 계정을 삭제하지 않습니다.
+- iPhone의 웹 수동 확인 숫자·한도·확인 시각은 같은 기기의 App Group 캐시에만 보관합니다. 전체 웹 원문·인증정보는 저장하지 않고 자동 웹 갱신도 하지 않습니다. 예시 모드는 실제 웹 숫자와 분리합니다. 연결 해제·기록 삭제는 해당 서비스의 앱 세션과 캐시만 정리하며 외부 계정을 삭제하지 않습니다.
 - 광고·사용자 분석·텔레메트리가 없습니다.
 - 소스 코드와 빌드 과정이 모두 공개되어 있습니다.
 
@@ -194,4 +211,4 @@ macOS와 Windows의 Codex 조회는 `codex app-server`를 짧게 실행해 `acco
 
 ## English
 
-CodexTime is a free, open-source app for macOS, Windows, and iPhone that shows your remaining Codex allowance and reset countdown. Download desktop builds from [GitHub Releases](https://github.com/sundaynighttt/codextime/releases/latest). iPhone 1.0(9) was submitted on September 4, 2026 and is waiting for App Store review; approval and manual release are still pending. Its clearly labeled offline example mode is available without an account. macOS adds opt-in Claude and conditional Cursor-backed Grok usage, with per-provider visibility controls; Windows remains Codex-only. Users connect their own accounts, and no credentials are included in downloads. Account access communicates directly with the connected provider; there is no developer-operated backend, advertising, or analytics SDK.
+CodexTime is a free, open-source usage display for macOS, Windows, and iPhone. Download macOS and Windows v0.3.1 from [GitHub Releases](https://github.com/sundaynighttt/codextime/releases/latest). macOS displays Codex, Claude, and conditional Cursor-backed Grok usage with per-provider visibility controls. iPhone 1.0(16) is available to existing testers through [TestFlight](https://testflight.apple.com/v1/app/6805935440), and its source is integrated here. The iPhone app and small widget display all three services: Codex refreshes directly, Grok uses a manual official-web percentage tap, and Claude reads separate session and all-model weekly limits after the user taps Read usage. Web values keep their limit and confirmation time and do not refresh automatically. Windows currently implements Codex only; Grok and Claude have not been ported to Windows. Real-account iPhone numeric/widget verification remains separate, and this is not a public App Store release. Users connect their own accounts; downloads contain no developer credentials, advertising, or analytics SDK.

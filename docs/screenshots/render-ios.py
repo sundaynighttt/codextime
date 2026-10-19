@@ -11,7 +11,7 @@ import time
 root = Path(__file__).resolve().parents[2]
 output = root / "docs/screenshots"
 bundle_id = "com.sundaynighttt.codextime.docs-preview"
-# Keep this preview reproducible while the TestFlight source is on its own branch.
+# Keep the preview pinned to the tested TestFlight 16 UI source.
 source_ref = "0effad7c2f703638a0a97d6b066dc6ea93d89114"
 devices = json.loads(subprocess.check_output(
     ["xcrun", "simctl", "list", "devices", "available", "--json"]))["devices"]
