@@ -15,13 +15,18 @@
     },
     {
       "key": "latest_desktop_release",
-      "label": "데스크톱 공개 최신",
+      "label": "macOS 공개 최신",
       "releaseId": "macos-031-b2026101907"
     },
     {
       "key": "last_installed_smoke",
       "label": "macOS 로컬 설치·실행 확인",
       "releaseId": "macos-031-b2026101907"
+    },
+    {
+      "key": "latest_windows_candidate",
+      "label": "Windows 확장 최신 후보",
+      "releaseId": "windows-040"
     }
   ],
   "releases": [
@@ -483,6 +488,20 @@
         "git:9cd429d",
         "git:0effad7",
         "https://testflight.apple.com/v1/app/6805935440"
+      ]
+    },
+    {
+      "id": "windows-040",
+      "sequence": 32,
+      "version": "windows-v0.4.0",
+      "date": "2026-10-20",
+      "stage": "candidate",
+      "status": "pending",
+      "summary": "Windows 세 서비스·간편 설정·조회 동의·웹 대조·숨김/조회중지 구현; .NET 8 win-x64 교차 빌드 경고0·오류0 및 합성 상태관리7시나리오 통과, 네이티브 Windows 패키지/화면 검증 대기",
+      "evidence": [
+        "windows/CodexTime.Windows/CodexTime.Windows.csproj",
+        "docs/releases/2026-10-20-windows-v0.4.0.md",
+        "docs/windows-setup.md"
       ]
     }
   ]

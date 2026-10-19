@@ -2,7 +2,7 @@
 
 ## CodexBar provider logos
 
-The same PNG marks are also bundled in `ios/Shared/ProviderAssets.xcassets` for the iPhone app and widget. The complete notice is included in both bundles as `ThirdPartyNotices.txt`.
+The same PNG marks are also bundled in `ios/Shared/ProviderAssets.xcassets` for the iPhone app and widget, and in `windows/CodexTime.Windows/Assets` for the Windows 0.4.0 candidate. The logo MIT notice is included in the iPhone bundles as `ThirdPartyNotices.txt` and in the Windows distribution's [THIRD_PARTY_NOTICES.txt](../windows/THIRD_PARTY_NOTICES.txt).
 
 The monochrome provider marks below are derived from [CodexBar](https://github.com/steipete/CodexBar), pinned to commit [`6480977b47f6e4ffd5dcaae1cb0c7fdf34ee449e`](https://github.com/steipete/CodexBar/tree/6480977b47f6e4ffd5dcaae1cb0c7fdf34ee449e).
 
@@ -43,3 +43,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+
+## Windows SQLite dependencies
+
+The Windows 0.4.0 candidate pins these packages in [CodexTime.Windows.csproj](../windows/CodexTime.Windows/CodexTime.Windows.csproj) for the bounded Cursor database reader:
+
+| Package | Version | License reference |
+| --- | --- | --- |
+| Microsoft.Data.Sqlite | 10.0.13 | [NuGet package and MIT license](https://www.nuget.org/packages/Microsoft.Data.Sqlite/10.0.13) |
+| SQLitePCLRaw.bundle_e_sqlite3 | 3.0.5 | [NuGet package and Apache-2.0 license](https://www.nuget.org/packages/SQLitePCLRaw.bundle_e_sqlite3/3.0.5) |
+| SQLite native package | 3.53.4 | [NuGet package and its License Info](https://www.nuget.org/packages/SQLite/3.53.4) |
+
+The Windows [THIRD_PARTY_NOTICES.txt](../windows/THIRD_PARTY_NOTICES.txt) includes the provider-logo MIT text, the exact SQLitePCLRaw package copyright notices and complete Apache-2.0 license, SQLite's packaged public-domain notice, Microsoft.Data.Sqlite's MIT notice, and the bundled .NET runtime license and third-party notices. Package version, runtime pin, notice files, and the reader's native-version check must be reviewed together when updating SQLite. This dependency does not permit access to any additional Cursor key, profile, or credential source.

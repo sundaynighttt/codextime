@@ -132,3 +132,26 @@ SELECT value FROM ItemTable WHERE key = 'cursorAuth/accessToken' LIMIT 1
 2026-10-19 공식 Claude Code OAuth 로그인 후 설치 앱 0.2.4(2026101902)의 실제 Codex·Claude 사용량 응답 성공을 확인했다. 과거 Grok Bot 진단 2026101903은 지정 Keychain 항목 미발견으로 끝났다. 이후 사용자가 Bot 사용량 화면은 보인다고 확인하고 일반 Grok로 대상을 바꾸어 해당 추적을 중단했다. 2026101904는 새 대상의 미연결 경계를 보호하는 테스트를 포함해 79개 합성·회귀 테스트를 통과했으며, 일반 Grok 실조회 성공을 뜻하지 않는다. 동일 설치판의 background 진단에서 기존 Codex·Claude 실제 응답 성공을 다시 확인했고, Grok은 인증·네트워크 없는 미연결로 종료했다.
 
 프로토콜 비교 참고: [CodexBar Grok](https://github.com/steipete/CodexBar/blob/main/docs/grok.md), [QuotaBar](https://github.com/hibik1725/ai-usage-monitor). 로고 라이선스는 [third-party-notices.md](third-party-notices.md)에 보존한다.
+
+
+## Windows 0.4.0 후보: 세 공급자와 계정 연결
+
+이 절은 소스 후보의 동작 계약이다. 이전 공개 Windows v0.3.1은 Codex 전용이며, 새 ZIP 공개·실물 Windows 실계정 검증은 [후보 기록](releases/2026-10-20-windows-v0.4.0.md)에서 별도로 확인한다. macOS 0.3.1과 iPhone TestFlight 1.0(16)의 런타임은 변경하지 않는다.
+
+기본 순서는 `Codex / Grok / Claude`이고 세 로고·잔여율을 모두 표시한다. 대표 값은 공통 한도 중 가장 적게 남은 비율을 내림한 값이다. Claude 모델별 한도는 상세에만 두며 공통 한도와 합산하지 않는다. 수치가 없으면 `—`, 실제 영이면 `0%`다. 리셋 시간의 기본 표시는 꺼짐이며 사용자가 선택해 켠다.
+
+서비스별 동의·표시·상태·취소·이전 성공 값을 독립 관리한다. 켜진 연결은 기본 600초 간격으로 조회하고 리셋 카운트다운은 60초 간격으로 표시만 갱신한다. 조회 실패는 이전 성공 값을 유지하며 즉시 이전 값으로 구분하고, 성공 후 20분 경과도 이전 값이다. 숨김은 새 조회를 차단하고 진행 중 작업을 취소한다. 모두 숨겨도 `사용량` 진입점이 남는다. 앱 종료·연결 해제로 메모리 캐시를 정리하고 비민감 설정만 보관한다.
+
+Codex는 기존 공식 `codex app-server` JSONL 조회를 유지한다. 설정에서 사용자가 시작한 Codex·Claude 로그인은 공식 CLI를 사용하며 인증 출력·대화·프롬프트를 수집하지 않는다. Claude는 서비스별 앱 동의 뒤 기본 `~/.claude/.credentials.json`의 `claudeAiOauth.accessToken`·만료·필요 scope만 사용한다. 고정 `GET https://api.anthropic.com/api/oauth/usage`의 공통 `five_hour`·`seven_day`와 제공되는 모델별 `utilization`·`resets_at`만 해석한다. refresh token이나 다른 저장소로 대체하지 않는다.
+
+Grok의 저장소는 `%APPDATA%\Cursor\User\globalStorage\state.vscdb`이고 SQL은 아래 하나다.
+
+```sql
+SELECT value FROM ItemTable WHERE key = 'cursorAuth/accessToken' LIMIT 1
+```
+
+고정 SQLite 3.53.4와 `mode=ro&readonly_shm=1`을 사용하고 읽기 전용 상태를 확인한다. 기본 DB와 기존 WAL·SHM의 로컬 경로·파일·핸들을 검증하며, 두 sidecar가 없거나 지원 조건이 다르면 연결을 중단한다. reparse point·네트워크 경로·DB 복사·immutable/nolock 우회·다른 키·프로필 탐색은 없다. SQL 크기·결과 크기·실행 시간·취소를 제한하며 원본 DB·WAL·SHM·인증정보를 쓰거나 새로 만들지 않는다.
+
+Grok 네트워크는 고정 `POST https://api2.cursor.sh/aiserver.v1.DashboardService/GetSandUsageStatus`, JSON `{}`와 ConnectRPC 헤더를 사용한다. 응답의 사용률·리셋·공유/enterprise 구분을 해석하고 pooled enterprise·유효하지 않은 비율은 미지원으로 끝낸다. 최초 동의 조회 후 사용자가 본인 [Grok 웹 사용량](https://grok.com/?_s=usage)의 계정·기간·사용률·리셋을 대조해야 자동 조회를 허용한다. 불일치·미확인은 연결 완료로 처리하지 않는다.
+
+추가 토큰·사용량 스냅샷은 메모리에만 둔다. 두 HTTP 경로는 redirect·쿠키를 사용하지 않으며 원시 오류·응답·인증정보를 표시나 로그에 남기지 않는다. 앱 연결 해제는 해당 동의·검증·메모리 상태를 지우고 공식 인증정보는 유지한다. 계정을 바꾸면 연결 해제·공식 로그인·재연결과 Grok 재대조를 순서대로 수행한다.

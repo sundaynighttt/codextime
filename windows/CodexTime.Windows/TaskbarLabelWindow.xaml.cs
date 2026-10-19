@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Automation;
 using System.Windows.Controls.Primitives;
 using System.Windows.Threading;
 
@@ -48,11 +49,14 @@ public partial class TaskbarLabelWindow : Window
         Hide();
     }
 
-    public void UpdateUsage(string text, int? remainingPercent, string tooltip)
+    public void UpdateProviders(IReadOnlyList<ProviderUsageState> states, bool showResetTime)
     {
-        UsageText.Text = text;
-        ToolTip = tooltip;
-        StatusDot.Fill = new SolidColorBrush(UsageColors.ForRemaining(remainingPercent));
+        Providers.UpdateProviders(states, showResetTime);
+        Providers.Measure(new System.Windows.Size(double.PositiveInfinity, double.PositiveInfinity));
+        Width = Math.Ceiling(Providers.DesiredSize.Width + 24);
+        ToolTip = Providers.Summary;
+        AutomationProperties.SetName(this, Providers.Summary);
+        UpdateVisibilityAndPosition();
     }
 
     private void UpdateVisibilityAndPosition()
