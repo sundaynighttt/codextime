@@ -9,14 +9,14 @@ on:
       version:
         description: Version without the v prefix
         required: true
-        default: 0.2.0
+        default: 0.3.0
 
 permissions:
   contents: write
 
 jobs:
   macos:
-    name: Package macOS DMG
+    name: Package signed universal macOS DMG
     runs-on: macos-latest
     env:
       MACOS_CERTIFICATE_P12: ${{ secrets.MACOS_CERTIFICATE_P12 }}
@@ -26,58 +26,113 @@ jobs:
       APPLE_ID: ${{ secrets.APPLE_ID }}
       APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
       APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      CODEXTIME_PUBLIC_RELEASE: '1'
+      CODEXTIME_SIGN_IDENTITY: ${{ secrets.APPLE_DEVELOPER_IDENTITY }}
+      CODEXTIME_NOTARY_PROFILE: codextime-notary
     steps:
       - uses: actions/checkout@v4
+
+      - name: Require signing and notarization configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          missing=0
+          for name in MACOS_CERTIFICATE_P12 MACOS_CERTIFICATE_PASSWORD MACOS_KEYCHAIN_PASSWORD APPLE_DEVELOPER_IDENTITY APPLE_ID APPLE_APP_PASSWORD APPLE_TEAM_ID; do
+            if [[ -z "${!name}" ]]; then
+              echo "::error::Required release secret is missing: $name"
+              missing=1
+            fi
+          done
+          if [[ "$missing" != 0 ]]; then
+            exit 1
+          fi
 
       - name: Resolve version
         id: version
         shell: bash
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
         run: |
-          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
-            echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          if [[ "$GITHUB_REF_TYPE" == tag ]]; then
+            version="${GITHUB_REF_NAME#v}"
           else
-            echo "value=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+            version="$REQUESTED_VERSION"
           fi
+          if [[ ! "$version" =~ ^[0-9]+[.][0-9]+[.][0-9]+$ ]]; then
+            echo '::error::Version must be x.y.z.'
+            exit 1
+          fi
+          echo "value=$version" >> "$GITHUB_OUTPUT"
 
       - name: Run tests
+        env:
+          CODEX_LIVE_TEST: '0'
         run: swift test --package-path macos
 
       - name: Import Developer ID certificate
-        if: ${{ env.MACOS_CERTIFICATE_P12 != '' && env.APPLE_DEVELOPER_IDENTITY != '' }}
+        shell: bash
         run: |
+          set -euo pipefail
+          umask 077
           certificate_path="$RUNNER_TEMP/codextime-certificate.p12"
           keychain_path="$RUNNER_TEMP/codextime-signing.keychain-db"
-          echo "$MACOS_CERTIFICATE_P12" | base64 --decode > "$certificate_path"
+          printf '%s' "$MACOS_CERTIFICATE_P12" | base64 --decode > "$certificate_path"
           security create-keychain -p "$MACOS_KEYCHAIN_PASSWORD" "$keychain_path"
           security set-keychain-settings -lut 21600 "$keychain_path"
           security unlock-keychain -p "$MACOS_KEYCHAIN_PASSWORD" "$keychain_path"
-          security import "$certificate_path" -P "$MACOS_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$keychain_path"
-          security set-key-partition-list -S apple-tool:,apple: -k "$MACOS_KEYCHAIN_PASSWORD" "$keychain_path"
-          security list-keychain -d user -s "$keychain_path"
-          echo "CODEXTIME_SIGN_IDENTITY=$APPLE_DEVELOPER_IDENTITY" >> "$GITHUB_ENV"
+          security import "$certificate_path" -P "$MACOS_CERTIFICATE_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security -t cert -f pkcs12 -k "$keychain_path"
+          rm -f "$certificate_path"
+          security set-key-partition-list -S apple-tool:,apple: -k "$MACOS_KEYCHAIN_PASSWORD" "$keychain_path" >/dev/null
+          security list-keychains -d user -s "$keychain_path"
+          echo "CODEXTIME_NOTARY_KEYCHAIN=$keychain_path" >> "$GITHUB_ENV"
 
       - name: Configure Apple notarization
-        if: ${{ env.MACOS_CERTIFICATE_P12 != '' && env.APPLE_DEVELOPER_IDENTITY != '' && env.APPLE_ID != '' && env.APPLE_APP_PASSWORD != '' && env.APPLE_TEAM_ID != '' }}
+        shell: bash
         run: |
-          xcrun notarytool store-credentials codextime-notary \
+          set -euo pipefail
+          xcrun notarytool store-credentials "$CODEXTIME_NOTARY_PROFILE" \
+            --keychain "$CODEXTIME_NOTARY_KEYCHAIN" \
             --apple-id "$APPLE_ID" \
             --password "$APPLE_APP_PASSWORD" \
             --team-id "$APPLE_TEAM_ID"
-          echo "CODEXTIME_NOTARY_PROFILE=codextime-notary" >> "$GITHUB_ENV"
 
       - name: Package DMG
-        run: ./macos/scripts/package-macos.sh '${{ steps.version.outputs.value }}'
+        env:
+          CODEXTIME_VERSION: ${{ steps.version.outputs.value }}
+        run: ./macos/scripts/package-macos.sh "$CODEXTIME_VERSION"
 
       - name: Verify app and DMG
+        env:
+          CODEXTIME_VERSION: ${{ steps.version.outputs.value }}
         run: |
-          codesign --verify --deep --strict 'macos/dist/Codex Usage Monitor.app'
-          hdiutil verify 'dist/CodexTime-macOS-${{ steps.version.outputs.value }}.dmg'
+          set -euo pipefail
+          app='macos/dist/Codex Usage Monitor.app'
+          dmg="dist/CodexTime-macOS-$CODEXTIME_VERSION.dmg"
+          lipo "$app/Contents/MacOS/CodexUsageMonitor" -verify_arch arm64
+          lipo "$app/Contents/MacOS/CodexUsageMonitor" -verify_arch x86_64
+          codesign --verify --deep --strict "$app"
+          codesign --verify --strict "$dmg"
+          xcrun stapler validate "$app"
+          xcrun stapler validate "$dmg"
+          spctl --assess --type execute --verbose=2 "$app"
+          spctl --assess --type open --context context:primary-signature --verbose=2 "$dmg"
+          hdiutil verify "$dmg"
 
       - uses: actions/upload-artifact@v4
         with:
           name: macos-release
           path: dist/*.dmg
           if-no-files-found: error
+
+      - name: Remove temporary signing material
+        if: always()
+        shell: bash
+        run: |
+          rm -f "$RUNNER_TEMP/codextime-certificate.p12"
+          if [[ -f "$RUNNER_TEMP/codextime-signing.keychain-db" ]]; then
+            security delete-keychain "$RUNNER_TEMP/codextime-signing.keychain-db"
+          fi
 
   windows:
     name: Package Windows ZIP
@@ -95,26 +150,39 @@ jobs:
       - name: Resolve version
         id: version
         shell: bash
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
         run: |
-          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
-            echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          if [[ "$GITHUB_REF_TYPE" == tag ]]; then
+            version="${GITHUB_REF_NAME#v}"
           else
-            echo "value=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+            version="$REQUESTED_VERSION"
           fi
+          if [[ ! "$version" =~ ^[0-9]+[.][0-9]+[.][0-9]+$ ]]; then
+            echo '::error::Version must be x.y.z.'
+            exit 1
+          fi
+          echo "value=$version" >> "$GITHUB_OUTPUT"
 
       - name: Build and run parser tests
         run: .\windows\test-parser.ps1
 
       - name: Package ZIP
-        run: .\windows\package-windows.ps1 -Version '${{ steps.version.outputs.value }}'
+        env:
+          CODEXTIME_VERSION: ${{ steps.version.outputs.value }}
+        run: .\windows\package-windows.ps1 -Version $env:CODEXTIME_VERSION
 
       - name: Verify ZIP
+        env:
+          CODEXTIME_VERSION: ${{ steps.version.outputs.value }}
         run: |
-          Expand-Archive -Path 'dist\CodexTime-Windows-${{ steps.version.outputs.value }}.zip' -DestinationPath "$env:RUNNER_TEMP\codextime-release"
-          if (-not (Test-Path "$env:RUNNER_TEMP\codextime-release\CodexTime-Windows-${{ steps.version.outputs.value }}\install.ps1")) {
+          $artifactName = "CodexTime-Windows-$env:CODEXTIME_VERSION"
+          Expand-Archive -Path "dist\$artifactName.zip" -DestinationPath "$env:RUNNER_TEMP\codextime-release"
+          if (-not (Test-Path "$env:RUNNER_TEMP\codextime-release\$artifactName\install.ps1")) {
             throw 'install.ps1 is missing from the Windows release package.'
           }
-          if (-not (Test-Path "$env:RUNNER_TEMP\codextime-release\CodexTime-Windows-${{ steps.version.outputs.value }}\CodexTime.exe")) {
+          if (-not (Test-Path "$env:RUNNER_TEMP\codextime-release\$artifactName\CodexTime.exe")) {
             throw 'CodexTime.exe is missing from the Windows release package.'
           }
 
@@ -125,7 +193,7 @@ jobs:
           if-no-files-found: error
 
   publish:
-    name: Publish GitHub Release
+    name: Create draft GitHub Release
     if: github.ref_type == 'tag'
     needs: [macos, windows]
     runs-on: ubuntu-latest
@@ -135,9 +203,10 @@ jobs:
           path: artifacts
           merge-multiple: true
 
-      - name: Publish release assets
+      - name: Create draft with verified assets
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          set -euo pipefail
           (cd artifacts && sha256sum * > SHA256SUMS.txt)
-          gh release create "$GITHUB_REF_NAME" artifacts/* --repo "$GITHUB_REPOSITORY" --generate-notes --verify-tag
+          gh release create "$GITHUB_REF_NAME" artifacts/* --repo "$GITHUB_REPOSITORY" --draft --generate-notes --verify-tag

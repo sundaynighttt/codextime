@@ -53,6 +53,8 @@ struct CodexAppServerClient: Sendable {
         let candidates = [
             environmentPath,
             "/Applications/ChatGPT.app/Contents/Resources/codex",
+            "/Applications/Codex.app/Contents/Resources/codex",
+            FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".local/bin/codex").path,
             "/opt/homebrew/bin/codex",
             "/usr/local/bin/codex"
         ].compactMap { $0 }
