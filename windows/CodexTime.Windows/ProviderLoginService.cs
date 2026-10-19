@@ -22,6 +22,11 @@ public static class ProviderLoginService
             OpenOfficialDownload(provider);
             return;
         }
+        Process.Start(CreateLoginStartInfo(provider, executable))?.Dispose();
+    }
+
+    internal static ProcessStartInfo CreateLoginStartInfo(UsageProviderID provider, string executable)
+    {
         var start = new ProcessStartInfo(executable)
         {
             UseShellExecute = true,
@@ -34,7 +39,7 @@ public static class ProviderLoginService
             start.ArgumentList.Add("auth");
             start.ArgumentList.Add("login");
         }
-        Process.Start(start)?.Dispose();
+        return start;
     }
 
     public static void OpenUsage(UsageProviderID provider) => Open(provider switch

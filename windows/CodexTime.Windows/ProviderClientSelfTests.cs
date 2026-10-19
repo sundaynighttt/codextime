@@ -125,6 +125,26 @@ public static class ProviderClientSelfTests
         Process? writer = null;
         try
         {
+            foreach (var (provider, extension, expected) in new[]
+            {
+                (UsageProviderID.Codex, ".cmd", "login"),
+                (UsageProviderID.Claude, ".bat", "auth login")
+            })
+            {
+                // Exercise the Windows OS association and argument delivery with
+                // our own inert script. Never invoke an installed login client.
+                string script = Path.Combine(directory, "synthetic-login" + extension);
+                string received = Path.Combine(directory, "received-arguments.txt");
+                await File.WriteAllTextAsync(script, "@echo off\r\necho %1 %2>\"%~dp0received-arguments.txt\"\r\n");
+                var launch = ProviderLoginService.CreateLoginStartInfo(provider, script);
+                launch.WindowStyle = ProcessWindowStyle.Hidden;
+                using var process = Process.Start(launch) ?? throw new InvalidOperationException("Synthetic shell launch failed");
+                using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+                try { await process.WaitForExitAsync(timeout.Token); }
+                catch { try { process.Kill(entireProcessTree: true); } catch { } throw; }
+                Require(process.ExitCode == 0 && (await File.ReadAllTextAsync(received)).Trim() == expected);
+                File.Delete(received);
+            }
             string claudePath = Path.Combine(directory, "synthetic-credentials.json");
             await File.WriteAllBytesAsync(claudePath, JsonSerializer.SerializeToUtf8Bytes(new { claudeAiOauth = new
                 { accessToken = "synthetic-access", expiresAt = DateTimeOffset.UtcNow.AddHours(1).ToUnixTimeMilliseconds(), scopes = new[] { "user:profile" } } }));
