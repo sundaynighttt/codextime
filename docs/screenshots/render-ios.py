@@ -18,7 +18,13 @@ simulator = device["udid"]
 booted_here = device["state"] != "Booted"
 if booted_here:
     subprocess.run(["xcrun", "simctl", "boot", simulator], check=True)
-subprocess.run(["xcrun", "simctl", "bootstatus", simulator, "-b"], check=True)
+try:
+    subprocess.run(["xcrun", "simctl", "bootstatus", simulator, "-b"],
+                   check=True, timeout=90)
+except subprocess.TimeoutExpired:
+    # CI runtimes can keep migrating CoreLocation data after launch services
+    # are usable. Build first, then let install/launch confirm readiness.
+    print("Simulator background migration is still running; continuing to build.", flush=True)
 try:
     with tempfile.TemporaryDirectory(prefix="codextime-docs-ios-") as temp:
         project = Path(temp)
