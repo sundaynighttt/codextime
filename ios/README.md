@@ -1,6 +1,6 @@
 # CodexTime for iPhone
 
-작은 카드와 소형 위젯에 **Codex / Grok / Claude** 로고·잔여율을 가로 3열로 표시합니다. 새 **1.0(13) 후보**는 Codex 직접 조회와 Grok·Claude 공식 웹의 수동 사용량 확인을 함께 제공합니다. 최종 테스트·서명·실제 계정 검증·TestFlight 업로드는 별도 확인 단계이며 [이번 후보 기록](../docs/releases/2026-10-19-ios-web-usage.md)에 결과를 남깁니다.
+작은 카드와 소형 위젯에 **Codex / Grok / Claude** 로고·잔여율을 가로 3열로 표시합니다. **1.0(13)**는 Codex 직접 조회와 Grok·Claude 공식 웹의 수동 사용량 확인을 함께 제공합니다. **42개 XCTest·96개 오프라인 Node 사례·Release 화면·서명 검증**을 통과하고 2026-10-19 **21:13:48 KST TestFlight 업로드에 성공**했습니다. **약 21:18 KST Apple 처리 완료·90일 유효·CodexTime Internal 그룹 1명 배정**을 확인했습니다. 기존 내부 테스터는 TestFlight에서 설치·업데이트할 수 있습니다. 실제 Grok/Claude 계정 E2E는 사용자가 TestFlight에서 검증할 예정입니다. [이번 후보 기록](../docs/releases/2026-10-19-ios-web-usage.md)에 각 결과를 구분합니다.
 
 ## 서비스별 연결
 
@@ -23,7 +23,9 @@
 
 ## 배포와 이전 후보
 
-실제 Apple 처리 확인 최신은 **1.0(11)**입니다. 2026-10-19 13:37:25 KST 업로드 후 13:38:53 KST Apple ready-to-test를 확인했고, 이후 ASC에서 CodexTime Internal 그룹 1명·빌드 11 설치 표시 1을 확인했습니다. 설치 집계는 기능 smoke 성공의 증거가 아닙니다. 빌드 11은 Codex 직접 조회와 3열 UI만 지원하며 Grok·Claude는 미지원입니다.
+실제 Apple 처리 확인 최신은 **1.0(13)**입니다. 기존 CodexTime Internal 그룹 1명에게 배정됐으며 빌드 13의 실기기 설치·기능 검증은 사용자 진행 예정입니다. 정식 App Store 공개나 새 공개 초대 링크 생성은 수행하지 않았습니다.
+
+이전 **1.0(11)**은 2026-10-19 13:37:25 KST 업로드 후 13:38:53 KST Apple ready-to-test를 확인했고, 이후 ASC에서 CodexTime Internal 그룹 1명·빌드 11 설치 표시 1을 확인했습니다. 설치 집계는 기능 smoke 성공의 증거가 아닙니다. 빌드 11은 Codex 직접 조회와 3열 UI만 지원하며 Grok·Claude는 미지원입니다.
 
 iCloud 후보 **1.0(12) / Mac 0.3.1(2026101907)**은 로컬 검증 후 서명·프로필 문제로 중단·미배포했습니다. 현재 웹 후보에 포함하지 않습니다. [보존 이력](../docs/releases/2026-10-19-private-icloud-sync.md) · [원장](../docs/releases/release-ledger.json) · [제출 현황](../docs/app-store/submission.md).
 

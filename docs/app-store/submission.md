@@ -1,11 +1,12 @@
 # CodexTime App Store 제출 현황
 
-## 현재 후보 1.0(13) — iPhone 단독 공식 웹 사용량
+## TestFlight 처리 완료 1.0(13) — iPhone 단독 공식 웹 사용량
 
 - Codex 직접 로그인·조회와 3열 카드·위젯을 유지하고, Grok·Claude 각각의 공식 웹을 nonPersistent WKWebView에서 열어 직접 로그인·수동 퍼센트 확인을 추가한다. Mac·iCloud·Cursor·새 서버·API 키는 필요하지 않다.
 - 사용자는 공식 사용량 화면을 확인하고 사용함/남음과 한도(Grok 주간, Claude 현재 세션/주간)를 정해 숫자 위치 읽기를 한 번 실행한다. 검증된 퍼센트와 고정 결과만 앱으로 반환하며 전체 페이지 원문·로그인 필드·쿠키·토큰을 열람·내보내거나 내부 quota API에 요청하지 않는다.
 - 웹 세션은 앱 실행 중 메모리에만 유지하고 앱 종료·연결 해제 후 재로그인한다. 서비스·숫자·의미·한도·확인 시각만 App Group에 보관해 위젯이 마지막 수동 값을 표시한다. 자동 웹 갱신은 없고 1시간 뒤 지난 확인으로 표시한다. 연결 해제·기록 삭제, 유효하지 않은 값·예시 혼합 차단을 검증 대상으로 둔다.
-- **빌드 13은 candidate/pending이며 최종 테스트·서명·실제 계정별 성공·TestFlight 업로드/처리는 아직 완료로 기록하지 않는다.** [현재 후보 기록](../releases/2026-10-19-ios-web-usage.md)에 검증·업로드·처리 결과를 각각 추가한다.
+- **빌드 13은 external_processed/passed다.** XCTest 42개(Codex17/웹13/캐시12), 오프라인 Node 96개 사례, Release 3열·연결 버튼·예시 비활성/복원, 앱·위젯 1.0(13) 서명 검증을 통과했다. CloudKit 권한을 포함하지 않는다.
+- **2026-10-19 21:13:48 KST** Xcode `Upload succeeded`·`Uploaded CodexTime`·`EXPORT SUCCEEDED`로 TestFlight 업로드를 완료했다. 직전 상태는 `Uploaded package is processing`이었다. 21:15 KST 처리 중을 거쳐 **약 21:18 KST 제출 준비 완료·90일 유효**와 기존 **CodexTime Internal 그룹 1명** 배정을 [빌드 상세](https://appstoreconnect.apple.com/teams/8874948e-3fee-4bea-a414-67a4c0f0e7d8/apps/6805935440/testflight/ios/4e556a52-67f9-4190-a95a-09dca4272252)에서 확인했다. 기존 테스터가 TestFlight에서 설치·업데이트할 수 있다. 빌드 13 실기기 설치·실제 Grok/Claude 로그인·숫자 대조는 사용자 TestFlight 검증 예정이며 아직 완료를 뜻하지 않는다. 정식 App Store 공개·새 공개 초대 링크 생성은 수행하지 않았다. [현재 후보 근거](../releases/2026-10-19-ios-web-usage.md)에 각각 구분한다.
 - ASC에서 마지막으로 확인한 정식 버전 1.0은 ‘제출 준비 중’이다. 아래 2026-09-04 심사 제출은 당시 이력이며 새 빌드 13의 심사 제출·일반 공개가 아니다.
 
 ## 1.0(12) / Mac 0.3.1 iCloud 후보 — 중단·미배포
@@ -53,7 +54,7 @@
 
 현재 웹 후보의 계약은 [저장소 개인정보 방침](../privacy-policy.md)이다. Grok·Claude의 nonPersistent WebKit 공식 로그인, 앱 실행 중 세션 유지, 수동 숫자·의미·한도·시각만 App Group 보관, 연결 해제 시 캐시 삭제, 쿠키·토큰·원문 내보내기 없음, 자동 웹 갱신 없음을 설명한다. Codex의 기기 전용 Keychain·직접 요청 경로는 유지한다.
 
-빌드 11까지 앱 방침 링크는 고정 커밋 `0405d909da7db6fd58a337e417d336b89e88fee3`을 사용했다. 중단된 iCloud 후보의 방침 커밋 `1fa6718bc59942b7bd1b6fd5f410bef6ea2dc4c6`은 별도 과거 계약이다. 두 고정 링크가 새 웹 정책으로 자동 갱신되지는 않는다. 새 후보 배포 전 실제 공개 정책 고정 링크·앱 내 링크·ASC 개인정보 레이블·심사 메모의 일치 여부를 확인해야 한다.
+빌드 11까지 앱 방침 링크는 고정 커밋 `0405d909da7db6fd58a337e417d336b89e88fee3`을 사용했다. 중단된 iCloud 후보의 방침 커밋 `1fa6718bc59942b7bd1b6fd5f410bef6ea2dc4c6`은 별도 과거 계약이다. 두 고정 링크가 새 웹 정책으로 자동 갱신되지는 않는다. 빌드 13은 새 정책 커밋 [`694397676e700a164cb9d931b449a230267fe865`](https://github.com/sundaynighttt/codextime/blob/694397676e700a164cb9d931b449a230267fe865/docs/privacy-policy.md)을 앱 내 링크에 고정하고 후보 브랜치에 공개했다. ASC 개인정보 레이블·심사 메모의 현재 동작 일치 여부는 별도 확인 항목이며 저장 완료를 주장하지 않는다.
 
 개발자 자체 서버·광고·추적·분석 SDK는 없다. 실제 Codex 인증·사용량 요청과 공식 웹 페이지 열기는 해당 외부 제공자에 접속·인증 요청 정보를 보내므로 ‘외부 처리가 전혀 없다’고 설명하지 않는다. 로그인 세션은 WebKit 메모리, Codex 인증 토큰은 기기 전용 Keychain, 사용량 숫자는 로컬 App Group에 구분 보관한다. 예시는 외부 요청을 수행하지 않으며 실제 웹 값을 섞지 않는다.
 

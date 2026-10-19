@@ -11,7 +11,7 @@
     {
       "key": "last_external",
       "label": "Apple 처리 확인 최신",
-      "releaseId": "ios-10-b11"
+      "releaseId": "ios-10-b13"
     },
     {
       "key": "latest_desktop_release",
@@ -359,7 +359,7 @@
       "build": "11",
       "date": "2026-10-19",
       "stage": "external_processed",
-      "status": "passed",
+      "status": "historical",
       "summary": "3열 카드·Codex 직접 조회·17 tests 및 업로드/Apple 처리 확인; ASC CodexTime Internal 1명·빌드11 설치 표시1 확인, 실제 기능 smoke는 별도 미확인",
       "evidence": [
         "ios/project.yml",
@@ -403,13 +403,16 @@
       "version": "1.0",
       "build": "13",
       "date": "2026-10-19",
-      "stage": "candidate",
-      "status": "pending",
-      "summary": "iPhone 단독 Grok·Claude 공식 웹 로그인과 수동 퍼센트 확인·앱/위젯 숫자 캐시 후보; 최종 테스트·서명·실계정 검증·TestFlight 업로드 대기",
+      "stage": "external_processed",
+      "status": "passed",
+      "summary": "iPhone 웹 수동 사용량·42 XCTest/96 Node cases·Release UI/서명 통과; 21:13업로드·약21:18 Apple 처리와Internal1명배정 확인, 실계정 검증은 사용자 TestFlight 예정",
       "evidence": [
         "ios/project.yml",
         "docs/releases/2026-10-19-ios-web-usage.md",
-        "docs/app-store/submission.md"
+        "docs/app-store/submission.md",
+        "git:bdb1bb6",
+        "git:6943976",
+        "https://appstoreconnect.apple.com/teams/8874948e-3fee-4bea-a414-67a4c0f0e7d8/apps/6805935440/testflight/ios/4e556a52-67f9-4190-a95a-09dca4272252"
       ]
     }
   ]
