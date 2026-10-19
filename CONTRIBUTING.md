@@ -26,7 +26,7 @@ Live integration tests are optional because desktop tests require a local signed
 
 ## Release maintainers
 
-Pushing a version tag such as `v0.2.0` builds and publishes the macOS DMG and self-contained Windows ZIP. Without signing secrets, the workflow produces an ad-hoc signed, non-notarized macOS app and an unsigned Windows executable and installer.
+Pushing a version tag such as `v0.3.1` tests and builds the signed/notarized universal macOS DMG and self-contained Windows ZIP, then creates a **draft** GitHub Release with `SHA256SUMS.txt`. Download and verify the assets before publishing the draft. Public macOS builds require all signing and notarization secrets; missing configuration fails the workflow. Local builds can use ad-hoc signing. Windows executables and installation scripts remain unsigned.
 
 To Developer ID-sign and notarize the macOS artifact, configure these GitHub Actions secrets:
 
