@@ -30,8 +30,8 @@ CodexTime은 지원하는 AI 서비스의 남은 사용량과 리셋까지 남�
 | --- | --- | --- | --- | --- | --- |
 | iPhone 최신 후보<br>`latest_candidate` | **`1.0 (9)`** | `external_processed` | `active` | 예시 모드·개인정보·이용 안내, 14개 테스트 및 CI 통과; 2026-09-04 09:55 KST App Store 심사 제출 완료·심사 대기 중, 승인 및 수동 출시 전 | [project.yml](ios/project.yml)<br>[submission.md](docs/app-store/submission.md) |
 | Apple 처리 확인 최신<br>`last_external` | **`1.0 (9)`** | `external_processed` | `active` | 예시 모드·개인정보·이용 안내, 14개 테스트 및 CI 통과; 2026-09-04 09:55 KST App Store 심사 제출 완료·심사 대기 중, 승인 및 수동 출시 전 | [project.yml](ios/project.yml)<br>[submission.md](docs/app-store/submission.md) |
-| 데스크톱 공개 최신<br>`latest_desktop_release` | **`0.3.0 (2026101906)`** | `released` | `active` | macOS 세 서비스 표시·조회 선택과 본인 계정 설정 공개; 99 tests·전체 CI·서명·공증 universal DMG·비로그인 다운로드 및 체크섬 검증 통과 | [2026-10-19-v0.3.0.md](docs/releases/2026-10-19-v0.3.0.md)<br>[macos-setup.md](docs/macos-setup.md)<br>[build-macos.sh](macos/scripts/build-macos.sh)<br>[release.yml](.github/workflows/release.yml)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39195054137)<br>[외부 근거](https://github.com/sundaynighttt/codextime/releases/tag/v0.3.0)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39195689279) |
-| macOS 로컬 설치·실행 확인<br>`last_installed_smoke` | **`0.3.0 (2026101906)`** | `released` | `active` | macOS 세 서비스 표시·조회 선택과 본인 계정 설정 공개; 99 tests·전체 CI·서명·공증 universal DMG·비로그인 다운로드 및 체크섬 검증 통과 | [2026-10-19-v0.3.0.md](docs/releases/2026-10-19-v0.3.0.md)<br>[macos-setup.md](docs/macos-setup.md)<br>[build-macos.sh](macos/scripts/build-macos.sh)<br>[release.yml](.github/workflows/release.yml)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39195054137)<br>[외부 근거](https://github.com/sundaynighttt/codextime/releases/tag/v0.3.0)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39195689279) |
+| 데스크톱 공개 최신<br>`latest_desktop_release` | **`0.3.1 (2026101907)`** | `released` | `active` | macOS 간편 설정·공식 로그인·자동 연결 확인 공개; 109 tests·전체 CI·서명·공증 universal DMG·비로그인 다운로드 및 체크섬 검증 통과 | [2026-10-19-v0.3.1.md](docs/releases/2026-10-19-v0.3.1.md)<br>[macos-setup.md](docs/macos-setup.md)<br>[build-macos.sh](macos/scripts/build-macos.sh)<br>[release.yml](.github/workflows/release.yml)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39216253992)<br>[외부 근거](https://github.com/sundaynighttt/codextime/releases/tag/v0.3.1)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39216176410) |
+| macOS 로컬 설치·실행 확인<br>`last_installed_smoke` | **`0.3.1 (2026101907)`** | `released` | `active` | macOS 간편 설정·공식 로그인·자동 연결 확인 공개; 109 tests·전체 CI·서명·공증 universal DMG·비로그인 다운로드 및 체크섬 검증 통과 | [2026-10-19-v0.3.1.md](docs/releases/2026-10-19-v0.3.1.md)<br>[macos-setup.md](docs/macos-setup.md)<br>[build-macos.sh](macos/scripts/build-macos.sh)<br>[release.yml](.github/workflows/release.yml)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39216253992)<br>[외부 근거](https://github.com/sundaynighttt/codextime/releases/tag/v0.3.1)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39216176410) |
 
 ### 전체 버전 흐름
 
@@ -58,7 +58,8 @@ CodexTime은 지원하는 AI 서비스의 남은 사용량과 리셋까지 남�
 | 19 | 2026-10-19 | `0.2.4 (2026101903)` | `installed_smoke` | `historical` | Grok 고정 인증 단계 진단·설치 및 78 tests; Codex·Claude 실제 조회 성공, Grok 지정 Keychain 항목 부재로 HTTP 전 중단, 메뉴 육안 검수는 Computer Use timeout으로 미완료 | [2026-10-19-macos-local.md](docs/releases/2026-10-19-macos-local.md)<br>[protocol.md](docs/protocol.md)<br>[build-macos.sh](macos/scripts/build-macos.sh) |
 | 20 | 2026-10-19 | `0.2.4 (2026101904)` | `installed_smoke` | `historical` | 일반 Grok 구독으로 전환 준비·Bot 조회 중단; 79 tests 및 설치본 Codex·Claude 실조회 통과, 일반 Grok 새 인증 연결 승인 대기 | [2026-10-19-macos-local.md](docs/releases/2026-10-19-macos-local.md)<br>[protocol.md](docs/protocol.md)<br>[build-macos.sh](macos/scripts/build-macos.sh) |
 | 21 | 2026-10-19 | `0.2.4 (2026101905)` | `installed_smoke` | `historical` | 승인된 Cursor 단일 키로 Grok 공유 quota 연결·웹 표시 정밀도 및 reset 대조 후 10분 갱신 활성화; 90 tests·설치·서명·세 로고 실제 검수 창 readback 통과 | [2026-10-19-macos-local.md](docs/releases/2026-10-19-macos-local.md)<br>[protocol.md](docs/protocol.md)<br>[CursorGrokCredentialSource.swift](macos/Sources/CodexUsageMonitor/CursorGrokCredentialSource.swift)<br>[build-macos.sh](macos/scripts/build-macos.sh) |
-| 22 | 2026-10-19 | `0.3.0 (2026101906)` | `released` | `active` | macOS 세 서비스 표시·조회 선택과 본인 계정 설정 공개; 99 tests·전체 CI·서명·공증 universal DMG·비로그인 다운로드 및 체크섬 검증 통과 | [2026-10-19-v0.3.0.md](docs/releases/2026-10-19-v0.3.0.md)<br>[macos-setup.md](docs/macos-setup.md)<br>[build-macos.sh](macos/scripts/build-macos.sh)<br>[release.yml](.github/workflows/release.yml)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39195054137)<br>[외부 근거](https://github.com/sundaynighttt/codextime/releases/tag/v0.3.0)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39195689279) |
+| 22 | 2026-10-19 | `0.3.0 (2026101906)` | `released` | `historical` | macOS 세 서비스 표시·조회 선택과 본인 계정 설정 공개; 99 tests·전체 CI·서명·공증 universal DMG·비로그인 다운로드 및 체크섬 검증 통과 | [2026-10-19-v0.3.0.md](docs/releases/2026-10-19-v0.3.0.md)<br>[macos-setup.md](docs/macos-setup.md)<br>[build-macos.sh](macos/scripts/build-macos.sh)<br>[release.yml](.github/workflows/release.yml)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39195054137)<br>[외부 근거](https://github.com/sundaynighttt/codextime/releases/tag/v0.3.0)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39195689279) |
+| 23 | 2026-10-19 | `0.3.1 (2026101907)` | `released` | `active` | macOS 간편 설정·공식 로그인·자동 연결 확인 공개; 109 tests·전체 CI·서명·공증 universal DMG·비로그인 다운로드 및 체크섬 검증 통과 | [2026-10-19-v0.3.1.md](docs/releases/2026-10-19-v0.3.1.md)<br>[macos-setup.md](docs/macos-setup.md)<br>[build-macos.sh](macos/scripts/build-macos.sh)<br>[release.yml](.github/workflows/release.yml)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39216253992)<br>[외부 근거](https://github.com/sundaynighttt/codextime/releases/tag/v0.3.1)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39216176410) |
 <!-- project-release-ledger:end -->
 
 ## 화면
@@ -75,14 +76,14 @@ iPhone 소형 위젯:
 
 ## 다운로드
 
-최신 **v0.3.0**은 [GitHub Releases](https://github.com/sundaynighttt/codextime/releases/tag/v0.3.0)에서 받을 수 있습니다.
+최신 **v0.3.1**은 [GitHub Releases](https://github.com/sundaynighttt/codextime/releases/tag/v0.3.1)에서 받을 수 있습니다.
 
-**macOS v0.3.0 (2026101906)을 공개했습니다.** macOS 13 이상, Intel·Apple Silicon Universal 앱이며 Developer ID 서명과 앱·DMG Apple 공증을 완료했습니다. 비로그인 다운로드와 체크섬·Gatekeeper 검증도 확인했습니다.
+**macOS v0.3.1 (2026101907)을 공개했습니다.** macOS 13 이상, Intel·Apple Silicon Universal 앱이며 Developer ID 서명과 앱·DMG Apple 공증을 완료했습니다. 비로그인 다운로드와 체크섬·Gatekeeper 검증도 확인했습니다.
 
 | 운영체제 | 설치 파일 | 사용량 연결 |
 | --- | --- | --- |
-| macOS | [CodexTime-macOS-0.3.0.dmg](https://github.com/sundaynighttt/codextime/releases/download/v0.3.0/CodexTime-macOS-0.3.0.dmg) | Codex·Claude, 조건을 확인한 Cursor 기반 Grok 연결 |
-| Windows | [CodexTime-Windows-0.3.0.zip](https://github.com/sundaynighttt/codextime/releases/download/v0.3.0/CodexTime-Windows-0.3.0.zip) | Codex 전용, Windows 10/11 |
+| macOS | [CodexTime-macOS-0.3.1.dmg](https://github.com/sundaynighttt/codextime/releases/download/v0.3.1/CodexTime-macOS-0.3.1.dmg) | Codex·Claude, 조건을 확인한 Cursor 기반 Grok 연결 |
+| Windows | [CodexTime-Windows-0.3.1.zip](https://github.com/sundaynighttt/codextime/releases/download/v0.3.1/CodexTime-Windows-0.3.1.zip) | Codex 전용, Windows 10/11 |
 
 각 사용자가 자신의 Mac·PC에서 본인 계정으로 로그인해야 합니다. 배포 파일에 개발자의 인증정보나 계정 캐시가 들어 있지 않습니다. macOS Codex 연결은 설치된 ChatGPT/Codex 앱의 지원되는 내장 CLI 또는 [공식 Codex CLI](https://github.com/openai/codex#installation)를 사용하며, 다른 서비스는 각각 별도로 연결합니다. [macOS 설치·계정 연결 안내](docs/macos-setup.md)를 참고하세요.
 

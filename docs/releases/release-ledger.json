@@ -16,12 +16,12 @@
     {
       "key": "latest_desktop_release",
       "label": "데스크톱 공개 최신",
-      "releaseId": "macos-030-b2026101906"
+      "releaseId": "macos-031-b2026101907"
     },
     {
       "key": "last_installed_smoke",
       "label": "macOS 로컬 설치·실행 확인",
-      "releaseId": "macos-030-b2026101906"
+      "releaseId": "macos-031-b2026101907"
     }
   ],
   "releases": [
@@ -325,7 +325,7 @@
       "build": "2026101906",
       "date": "2026-10-19",
       "stage": "released",
-      "status": "active",
+      "status": "historical",
       "summary": "macOS 세 서비스 표시·조회 선택과 본인 계정 설정 공개; 99 tests·전체 CI·서명·공증 universal DMG·비로그인 다운로드 및 체크섬 검증 통과",
       "evidence": [
         "docs/releases/2026-10-19-v0.3.0.md",
@@ -335,6 +335,25 @@
         "https://github.com/sundaynighttt/codextime/actions/runs/39195054137",
         "https://github.com/sundaynighttt/codextime/releases/tag/v0.3.0",
         "https://github.com/sundaynighttt/codextime/actions/runs/39195689279"
+      ]
+    },
+    {
+      "id": "macos-031-b2026101907",
+      "sequence": 23,
+      "version": "0.3.1",
+      "build": "2026101907",
+      "date": "2026-10-19",
+      "stage": "released",
+      "status": "active",
+      "summary": "macOS 간편 설정·공식 로그인·자동 연결 확인 공개; 109 tests·전체 CI·서명·공증 universal DMG·비로그인 다운로드 및 체크섬 검증 통과",
+      "evidence": [
+        "docs/releases/2026-10-19-v0.3.1.md",
+        "docs/macos-setup.md",
+        "macos/scripts/build-macos.sh",
+        ".github/workflows/release.yml",
+        "https://github.com/sundaynighttt/codextime/actions/runs/39216253992",
+        "https://github.com/sundaynighttt/codextime/releases/tag/v0.3.1",
+        "https://github.com/sundaynighttt/codextime/actions/runs/39216176410"
       ]
     }
   ]
