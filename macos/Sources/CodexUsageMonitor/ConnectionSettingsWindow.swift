@@ -17,6 +17,11 @@ final class ConnectionSettingsWindow: NSWindowController {
     private let onDisconnect: (ProviderID) -> Void
     private let onOpenHelp: (ProviderID) -> Void
     private let onConfirmGrok: () -> Void
+    private let onCloudEnabledChanged: (Bool) -> Void
+    private let onCloudRefresh: () -> Void
+    private let onCloudDelete: () -> Void
+    private let cloudToggle = NSButton(checkboxWithTitle: "본인 iCloud로 iPhone에 동기화", target: nil, action: nil)
+    private let cloudStatus = NSTextField(wrappingLabelWithString: "iCloud 동기화 꺼짐")
     private var rows: [ProviderID: Row] = [:]
     private let menuBarPreview = NSImageView()
 
@@ -25,13 +30,19 @@ final class ConnectionSettingsWindow: NSWindowController {
         onConnect: @escaping (ProviderID) -> Void,
         onDisconnect: @escaping (ProviderID) -> Void,
         onOpenHelp: @escaping (ProviderID) -> Void,
-        onConfirmGrok: @escaping () -> Void
+        onConfirmGrok: @escaping () -> Void,
+        onCloudEnabledChanged: @escaping (Bool) -> Void,
+        onCloudRefresh: @escaping () -> Void,
+        onCloudDelete: @escaping () -> Void
     ) {
         self.onVisibilityChanged = onVisibilityChanged
         self.onConnect = onConnect
         self.onDisconnect = onDisconnect
         self.onOpenHelp = onOpenHelp
         self.onConfirmGrok = onConfirmGrok
+        self.onCloudEnabledChanged = onCloudEnabledChanged
+        self.onCloudRefresh = onCloudRefresh
+        self.onCloudDelete = onCloudDelete
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 600, height: 620),
             styleMask: [.titled, .closable, .resizable], backing: .buffered, defer: false
@@ -71,11 +82,16 @@ final class ConnectionSettingsWindow: NSWindowController {
                 setText("잔여 한도 · —\n리셋 · —", on: row.quota)
             }
             let busy = state.isRefreshing || state.connectionIsPending
-            row.connect.isEnabled = !busy
+            row.connect.isEnabled = !busy && id != .claude
             row.connect.title = busy ? "확인 중…" : connectTitle(for: id)
             row.disconnect?.isEnabled = !busy
             row.confirm?.isEnabled = canConfirmGrok && !busy
         }
+    }
+
+    func updateCloud(isEnabled: Bool, message: String) {
+        cloudToggle.state = isEnabled ? .on : .off
+        setText(message, on: cloudStatus)
     }
 
     private func configureContent(in window: NSWindow) {
@@ -111,6 +127,9 @@ final class ConnectionSettingsWindow: NSWindowController {
         )
         stack.addArrangedSubview(introduction)
         introduction.widthAnchor.constraint(equalTo: stack.widthAnchor).isActive = true
+        let cloudSection = makeCloudSection()
+        stack.addArrangedSubview(cloudSection)
+        cloudSection.widthAnchor.constraint(equalTo: stack.widthAnchor).isActive = true
         for (index, id) in ProviderID.allCases.enumerated() {
             let separator = NSBox()
             separator.boxType = .separator
@@ -133,6 +152,31 @@ final class ConnectionSettingsWindow: NSWindowController {
             stack.topAnchor.constraint(equalTo: document.topAnchor),
             stack.bottomAnchor.constraint(equalTo: document.bottomAnchor, constant: -4)
         ])
+    }
+
+    private func makeCloudSection() -> NSStackView {
+        cloudToggle.target = self
+        cloudToggle.action = #selector(cloudEnabledChanged(_:))
+        cloudToggle.setAccessibilityIdentifier("CodexTimeCloudSync-enabled")
+        cloudStatus.font = .systemFont(ofSize: 12, weight: .medium)
+        cloudStatus.isSelectable = true
+        cloudStatus.setAccessibilityIdentifier("CodexTimeCloudSync-status")
+        let description = text(
+            "같은 Apple 계정의 비공개 iCloud에 Grok 잔여율·리셋·조회 시각·상태만 보냅니다. 토큰·비밀번호는 Mac에 남습니다. 최신 값에는 Mac 실행이 필요하며, Claude는 공급자 제한으로 조회가 중지됩니다.",
+            font: .systemFont(ofSize: 12), color: .secondaryLabelColor)
+        let refresh = button("지금 동기화", index: 0, action: #selector(refreshCloud))
+        let delete = button("끄고 iCloud 값 삭제", index: 0, action: #selector(deleteCloud))
+        delete.setAccessibilityIdentifier("CodexTimeCloudSync-disable-delete")
+        let controls = NSStackView(views: [refresh, delete])
+        controls.spacing = 8
+        let section = NSStackView(views: [cloudToggle, cloudStatus, description, controls])
+        section.orientation = .vertical
+        section.alignment = .leading
+        section.spacing = 8
+        for view in [cloudStatus, description] {
+            view.widthAnchor.constraint(equalTo: section.widthAnchor).isActive = true
+        }
+        return section
     }
 
     private func makeRow(id: ProviderID, index: Int) -> NSStackView {
@@ -165,6 +209,9 @@ final class ConnectionSettingsWindow: NSWindowController {
         connect.setAccessibilityIdentifier("CodexTimeConnection-\(id.rawValue)-connect")
         let disconnect = id == .codex ? nil : button("연결 해제", index: index, action: #selector(disconnectProvider(_:)))
         let buttons = NSStackView(views: [help, connect] + (disconnect.map { [$0] } ?? []))
+        if id == .claude {
+            buttons.addArrangedSubview(button("이용 제한 안내", index: index, action: #selector(openClaudePolicy)))
+        }
         buttons.spacing = 8
         buttons.alignment = .centerY
         let row = NSStackView(views: [header, status, quota, guidance, buttons])
@@ -224,27 +271,33 @@ final class ConnectionSettingsWindow: NSWindowController {
     @objc private func openHelp(_ sender: NSButton) {
         if let id = provider(for: sender) { onOpenHelp(id) }
     }
+    @objc private func openClaudePolicy() {
+        if let url = URL(string: ProviderConnectionGuidance.claudePolicyURL) { NSWorkspace.shared.open(url) }
+    }
     @objc private func confirmGrok() { onConfirmGrok() }
+    @objc private func cloudEnabledChanged(_ sender: NSButton) { onCloudEnabledChanged(sender.state == .on) }
+    @objc private func refreshCloud() { onCloudRefresh() }
+    @objc private func deleteCloud() { onCloudDelete() }
 
     private func connectTitle(for id: ProviderID) -> String {
         switch id {
         case .codex: return "새로고침"
         case .grok: return "Cursor로 연결…"
-        case .claude: return "Claude 연결…"
+        case .claude: return "공급자 허용 필요"
         }
     }
     private func helpTitle(for id: ProviderID) -> String {
         switch id {
         case .codex: return "설치·로그인 안내"
         case .grok: return "웹 사용량 열기"
-        case .claude: return "로그인 안내"
+        case .claude: return "공식 사용량 열기"
         }
     }
     private func guidance(for id: ProviderID) -> String {
         switch id {
         case .codex: return "Codex CLI를 설치하고 codex login을 완료한 뒤 새로고침하세요."
         case .grok: return "Cursor에서 본인 계정으로 로그인한 뒤 연결하세요. 조회 후 grok.com 사용량과 대조합니다."
-        case .claude: return "Claude Code에서 구독 계정으로 로그인한 뒤 연결 권한을 허용하세요."
+        case .claude: return ProviderConnectionGuidance.claudeRestrictionMessage
         }
     }
 }

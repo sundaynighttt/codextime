@@ -6,8 +6,8 @@ macos_dir=${script_dir:h}
 app_name='Codex Usage Monitor'
 bundle_dir="$macos_dir/dist/$app_name.app"
 contents_dir="$bundle_dir/Contents"
-version=${CODEXTIME_VERSION:-0.3.0}
-build_number=${CODEXTIME_BUILD_NUMBER:-2026101906}
+version=${CODEXTIME_VERSION:-0.3.1}
+build_number=${CODEXTIME_BUILD_NUMBER:-2026101907}
 # A single architecture can be requested for local development only.
 archs=(${=CODEXTIME_ARCHS:-arm64 x86_64})
 version_pattern='^[0-9]+[.][0-9]+[.][0-9]+$'
@@ -37,6 +37,16 @@ if [[ ${CODEXTIME_PUBLIC_RELEASE:-0} == 1 ]]; then
     print -u2 'Public releases must include arm64 and x86_64.'
     exit 1
   fi
+fi
+
+signed_cloudkit=0
+if [[ -n ${CODEXTIME_SIGN_IDENTITY:-} && ${CODEXTIME_SIGN_IDENTITY:-} != - ]]; then
+  if [[ -z ${CODEXTIME_PROVISIONING_PROFILE:-} || ! -f "$CODEXTIME_PROVISIONING_PROFILE" ]]; then
+    print -u2 'CloudKit signing requires CODEXTIME_PROVISIONING_PROFILE pointing to a Production Developer ID profile.'
+    exit 1
+  fi
+  python3 "$script_dir/validate-cloudkit-profile.py" "$CODEXTIME_PROVISIONING_PROFILE"
+  signed_cloudkit=1
 fi
 
 build_args=(-c release --product CodexUsageMonitor)
@@ -80,8 +90,16 @@ fi
 /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $build_number" "$contents_dir/Info.plist"
 /usr/libexec/PlistBuddy -c 'Add :LSMinimumSystemVersion string 13.0' "$contents_dir/Info.plist"
 /usr/libexec/PlistBuddy -c 'Add :LSUIElement bool true' "$contents_dir/Info.plist"
-if [[ -n ${CODEXTIME_SIGN_IDENTITY:-} ]]; then
-  /usr/bin/codesign --force --deep --options runtime --timestamp --sign "$CODEXTIME_SIGN_IDENTITY" "$bundle_dir"
+/usr/libexec/PlistBuddy -c 'Add :CodexTimeCloudContainer string iCloud.com.sundaynighttt.codextime' "$contents_dir/Info.plist"
+if (( signed_cloudkit )); then
+  /usr/libexec/PlistBuddy -c 'Add :CodexTimeCloudSyncConfigured bool true' "$contents_dir/Info.plist"
+else
+  /usr/libexec/PlistBuddy -c 'Add :CodexTimeCloudSyncConfigured bool false' "$contents_dir/Info.plist"
+fi
+if (( signed_cloudkit )); then
+  cp "$CODEXTIME_PROVISIONING_PROFILE" "$contents_dir/embedded.provisionprofile"
+  /usr/bin/codesign --force --deep --options runtime --timestamp --entitlements "$macos_dir/Config/App.entitlements" --sign "$CODEXTIME_SIGN_IDENTITY" "$bundle_dir"
+  python3 "$script_dir/validate-cloudkit-profile.py" "$contents_dir/embedded.provisionprofile" --signed-app "$bundle_dir"
 else
   /usr/bin/codesign --force --deep --sign - "$bundle_dir"
 fi

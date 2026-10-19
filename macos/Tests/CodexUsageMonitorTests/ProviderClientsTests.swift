@@ -237,18 +237,18 @@ private actor GrokSubscriptionFixtureTransport: GrokBotUsageTransport {
     }
 }
 
-@Test func claudeProductionFactoryRequiresConsentWhileManualFactoryStaysInteractive() throws {
+@Test func claudeProductionAndInteractiveFactoriesArePolicyBlocked() throws {
     // Construction only: never fetch real production clients in unit tests.
     let automatic = try #require(ProductionUsageProviders.clients.first(where: { $0.id == .claude })
         as? ClaudeSubscriptionUsageProviderClient)
     let manual = try #require(ProductionUsageProviders.interactiveClient(for: .claude)
-        as? ClaudeOAuthUsageProviderClient)
+        as? ClaudeSubscriptionUsageProviderClient)
     #expect(automatic.id == .claude)
     #expect(manual.id == .claude)
     #expect(ClaudeSubscriptionUsageProviderClient.connectionEnabledKey == "claudeUsageConnectionEnabled")
 }
 
-@Test func claudeConsentGateStopsCredentialAndNetworkAccessUntilEnabled() async throws {
+@Test func claudePolicyGateStopsCredentialsAndNetworkEvenWithLegacyConsent() async throws {
     let counters = ClaudeConnectionFixtureCounters()
     let credentials = ClaudeConnectionFixtureCredentials(counters: counters)
     let transport = ClaudeConnectionFixtureTransport(counters: counters)
@@ -256,17 +256,19 @@ private actor GrokSubscriptionFixtureTransport: GrokBotUsageTransport {
     let disabled = ClaudeSubscriptionUsageProviderClient(
         credentials: credentials, transport: transport, now: { timestamp }, isConnectionEnabled: { false }
     )
-    await #expect(throws: ProviderUsageFailure.notConnected) { try await disabled.fetchUsage() }
+    await #expect(throws: ProviderUsageFailure.unsupported) { try await disabled.fetchUsage() }
     #expect(await counters.reads == 0)
     #expect(await counters.requests == 0)
     let enabled = ClaudeSubscriptionUsageProviderClient(
         credentials: credentials, transport: transport, now: { timestamp }, isConnectionEnabled: { true }
     )
-    let usage = try await enabled.fetchUsage()
-    #expect(usage.provider == .claude)
-    #expect(usage.displayRemainingPercent == 58)
-    #expect(await counters.reads == 1)
-    #expect(await counters.requests == 1)
+    await #expect(throws: ProviderUsageFailure.unsupported) { try await enabled.fetchUsage() }
+    #expect(await counters.reads == 0)
+    #expect(await counters.requests == 0)
+    let directSource = ClaudeUsageKeychainSource(allowAuthenticationUI: true)
+    await #expect(throws: ProviderUsageFailure.unsupported) {
+        try await directSource.loadCredential(now: timestamp)
+    }
 }
 
 private actor ClaudeConnectionFixtureCounters {

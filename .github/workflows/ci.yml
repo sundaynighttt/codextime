@@ -19,6 +19,9 @@ jobs:
       - name: Show Swift version
         run: swift --version
 
+      - name: Run shared iCloud isolation tests
+        run: swift test --package-path Shared/UsageSync
+
       - name: Run unit tests
         run: swift test --package-path macos
 

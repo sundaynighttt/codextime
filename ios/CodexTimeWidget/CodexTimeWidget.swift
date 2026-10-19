@@ -1,5 +1,6 @@
 import SwiftUI
 import WidgetKit
+import UsageSync
 
 @main
 struct CodexTimeWidget: Widget {
@@ -11,7 +12,7 @@ struct CodexTimeWidget: Widget {
                 .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("CodexTime")
-        .description("Codex·Grok·Claude를 한눈에 보고, 연결된 Codex 잔여량과 리셋 시간을 확인합니다.")
+        .description("Codex 직접 조회와 본인 Mac의 Grok iCloud 동기화 결과를 확인합니다. Claude는 허용 확인이 필요합니다.")
         .supportedFamilies([.systemSmall])
     }
 }
@@ -19,6 +20,13 @@ struct CodexTimeWidget: Widget {
 struct UsageEntry: TimelineEntry {
     let date: Date
     let snapshot: UsageSnapshot?
+    var cloud = CloudWidgetSnapshot()
+}
+
+struct CloudWidgetSnapshot {
+    var readings: [SyncProvider: SyncedUsage] = [:]
+    var isEnabled = false
+    var hadError = false
 }
 
 struct UsageTimelineProvider: TimelineProvider {
@@ -29,8 +37,14 @@ struct UsageTimelineProvider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (UsageEntry) -> Void) {
-        let snapshot = context.isPreview ? UsageSnapshot.demo() : usageStore.load()
-        completion(UsageEntry(date: Date(), snapshot: snapshot))
+        if context.isPreview {
+            completion(UsageEntry(date: Date(), snapshot: .demo()))
+            return
+        }
+        Task {
+            let cloud = await verifiedCloudSnapshot()
+            completion(UsageEntry(date: Date(), snapshot: usageStore.load(), cloud: cloud))
+        }
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<UsageEntry>) -> Void) {
@@ -42,15 +56,31 @@ struct UsageTimelineProvider: TimelineProvider {
                 snapshot = usageStore.load()
             }
 
+            let cloud = await verifiedCloudSnapshot()
             let now = Date()
-            let entry = UsageEntry(date: now, snapshot: snapshot)
-            completion(
-                Timeline(
-                    entries: [entry],
-                    policy: .after(now.addingTimeInterval(30 * 60))
-                )
-            )
+            var entries = [UsageEntry(date: now, snapshot: snapshot, cloud: cloud)]
+            // Schedule the stale label even when iOS postpones the next network refresh.
+            if let observedAt = cloud.readings[.grok]?.observedAt {
+                let becomesStale = observedAt.addingTimeInterval(20 * 60 + 1)
+                if becomesStale > now, becomesStale < now.addingTimeInterval(30 * 60) {
+                    entries.append(UsageEntry(date: becomesStale, snapshot: snapshot, cloud: cloud))
+                }
+            }
+            completion(Timeline(entries: entries, policy: .after(now.addingTimeInterval(30 * 60))))
         }
+    }
+
+    @MainActor
+    private func verifiedCloudSnapshot() async -> CloudWidgetSnapshot {
+        guard !usageStore.isDemoEnabled else { return CloudWidgetSnapshot() }
+        let preferences = UserDefaults(suiteName: CodexConfiguration.appGroupID) ?? .standard
+        // Never turn on sync from a widget. The engine checks the current iCloud scope
+        // before accepting even a cached result and clears another account's data.
+        guard UsageSyncCache.isRequestedEnabled(preferences: preferences) else { return CloudWidgetSnapshot() }
+        let sync = UsageCloudSync(preferences: preferences)
+        await sync.refresh()
+        return CloudWidgetSnapshot(readings: sync.readings, isEnabled: sync.isEnabled,
+                                   hadError: sync.state.hasCloudReadError)
     }
 }
 
@@ -74,12 +104,14 @@ struct CodexTimeWidgetView: View {
                 }
                 .buttonStyle(.plain)
                 .tint(.secondary)
-                .accessibilityLabel("Codex 사용량 새로고침")
+                .accessibilityLabel("사용량 새로고침")
             }
 
             Spacer(minLength: 4)
 
-            ProviderUsageColumns(snapshot: entry.snapshot, now: entry.date, compact: true)
+            ProviderUsageColumns(snapshot: entry.snapshot, now: entry.date, compact: true,
+                                 cloudReadings: entry.cloud.readings, cloudEnabled: entry.cloud.isEnabled,
+                                 cloudHadError: entry.cloud.hadError)
                 .invalidatableContent()
 
             Spacer(minLength: 6)

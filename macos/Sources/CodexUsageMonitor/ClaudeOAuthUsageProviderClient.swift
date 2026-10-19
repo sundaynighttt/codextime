@@ -37,8 +37,10 @@ struct ClaudeUsageKeychainSource: ClaudeUsageCredentialSource {
     }
 
     func loadCredential(now: Date) async throws -> ClaudeUsageCredential {
-        try await ClaudeUsageKeychainReader.shared.read(now: now, allowAuthenticationUI: allowAuthenticationUI,
-                                                       permissionState: permissionState)
+        // Defense in depth: old callers cannot read the Keychain through this
+        // source, even if a prior app version received operating-system consent.
+        try Task.checkCancellation()
+        throw ProviderUsageFailure.unsupported
     }
 }
 

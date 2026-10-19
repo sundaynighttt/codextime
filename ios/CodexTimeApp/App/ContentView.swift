@@ -1,8 +1,18 @@
 import SwiftUI
 import UIKit
+import UsageSync
+import WidgetKit
 
 struct ContentView: View {
     let model: AppModel
+    @ObservedObject private var cloudSync: UsageCloudSync
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var didLoad = false
+
+    init(model: AppModel) {
+        self.model = model
+        _cloudSync = ObservedObject(wrappedValue: model.cloudSync)
+    }
     @Environment(\.openURL) private var openURL
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var copiedUserCode: String?
@@ -26,10 +36,8 @@ struct ContentView: View {
 
                 usageCard
 
-                Text("Grok·Claude는 iPhone 연결을 아직 지원하지 않습니다.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
+                CloudSyncSettingsView(cloudSync: cloudSync, isDemoMode: model.isDemoEnabled)
+                    .frame(maxWidth: 380)
 
                 content
                     .frame(maxWidth: 380)
@@ -47,7 +55,21 @@ struct ContentView: View {
         }
         .sheet(item: $presentedSheet) { _ in UsageGuideView() }
         .task {
-            await model.load()
+            async let codex: Void = model.load()
+            async let cloud: Void = refreshCloud()
+            _ = await (codex, cloud)
+            didLoad = true
+        }
+        .onChange(of: model.isDemoEnabled) { _, isDemoEnabled in
+            guard !isDemoEnabled else { return }
+            Task { await refreshCloud() }
+        }
+        .onChange(of: cloudSync.isEnabled) { _, _ in
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+        .onChange(of: scenePhase) { _, phase in
+            guard didLoad, phase == .active else { return }
+            Task { await refreshCloud() }
         }
     }
 
@@ -197,8 +219,14 @@ struct ContentView: View {
                 }
             }
             Spacer(minLength: 0)
-            ProviderUsageColumns(snapshot: currentSnapshot, now: .now)
+            TimelineView(.periodic(from: .now, by: 60)) { context in
+                ProviderUsageColumns(
+                    snapshot: currentSnapshot, now: context.date,
+                    cloudReadings: cloudSync.readings, cloudEnabled: cloudSync.isEnabled,
+                    cloudHadError: cloudSync.state.hasCloudReadError
+                )
                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+            }
             Spacer(minLength: 0)
             Text(currentSnapshot.map { "업데이트 " + UsageFormatter.updateTime($0.updatedAt) } ?? "계정을 연결해 주세요")
                 .font(.caption)
@@ -208,6 +236,11 @@ struct ContentView: View {
             }
         .frame(maxWidth: 280)
         .accessibilityIdentifier("provider-usage-card")
+    }
+
+    private func refreshCloud() async {
+        await model.refreshCloudIfAllowed()
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     private func connectedView(_ snapshot: UsageSnapshot) -> some View {
@@ -235,7 +268,7 @@ struct ContentView: View {
             }
             .frame(maxWidth: 280)
 
-            Button(snapshot.isDemo == true ? "예시 끝내기" : "연결 해제", role: .destructive) {
+            Button(snapshot.isDemo == true ? "예시 끝내기" : "ChatGPT 연결 해제", role: .destructive) {
                 Task { await model.signOut() }
             }
             .font(.footnote)

@@ -37,6 +37,7 @@ enum MenuBarPresentation {
         case .authenticationRequired: return "로그인 필요"
         case .permissionRequired: return "연결 권한 필요"
         case .permissionDenied: return "권한 요청 취소·거부"
+        case .unsupported where state.id == .claude: return "공급자 허용 필요 · 조회 중지"
         case .notInstalled, .notConnected, .unsupported: return "미연결"
         case .some: return "조회 실패"
         case .none: return "조회 전"

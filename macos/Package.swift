@@ -11,8 +11,9 @@ let package = Package(
         .executable(name: "CodexUsageMonitor", targets: ["CodexUsageMonitor"]),
         .executable(name: "CodexTimeScreenshotPreview", targets: ["CodexTimeScreenshotPreview"])
     ],
+    dependencies: [.package(path: "../Shared/UsageSync")],
     targets: [
-        .executableTarget(name: "CodexUsageMonitor", resources: [.process("Resources")]),
+        .executableTarget(name: "CodexUsageMonitor", dependencies: [.product(name: "UsageSync", package: "UsageSync")], resources: [.process("Resources")]),
         .executableTarget(name: "CodexTimeScreenshotPreview"),
         .testTarget(
             name: "CodexUsageMonitorTests",

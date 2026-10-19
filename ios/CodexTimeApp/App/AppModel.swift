@@ -1,6 +1,7 @@
 import Foundation
 import Observation
 import WidgetKit
+import UsageSync
 
 @MainActor
 @Observable
@@ -16,16 +17,23 @@ final class AppModel {
     private(set) var state: State = .checking
     private(set) var isRefreshing = false
 
+    let cloudSync: UsageCloudSync
+    var isDemoEnabled: Bool { usageStore.isDemoEnabled }
+
     private let client: CodexAccountClient
     private let usageStore: SharedUsageStore
     private var signInTask: Task<Void, Never>?
 
     init(
         client: CodexAccountClient = CodexAccountClient(),
-        usageStore: SharedUsageStore = SharedUsageStore()
+        usageStore: SharedUsageStore = SharedUsageStore(),
+        cloudSync: UsageCloudSync? = nil
     ) {
         self.client = client
         self.usageStore = usageStore
+        self.cloudSync = cloudSync ?? UsageCloudSync(
+            preferences: UserDefaults(suiteName: CodexConfiguration.appGroupID) ?? .standard
+        )
     }
 
     func load() async {
@@ -98,6 +106,11 @@ final class AppModel {
                 state = .failed(error.localizedDescription)
             }
         }
+    }
+
+    func refreshCloudIfAllowed() async {
+        guard !isDemoEnabled else { return }
+        await cloudSync.refresh()
     }
 
     func signOut() async {

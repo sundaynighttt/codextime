@@ -9,7 +9,7 @@ on:
       version:
         description: Version without the v prefix
         required: true
-        default: 0.3.0
+        default: 0.3.1
 
 permissions:
   contents: write
@@ -21,6 +21,7 @@ jobs:
     env:
       MACOS_CERTIFICATE_P12: ${{ secrets.MACOS_CERTIFICATE_P12 }}
       MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+      MACOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.MACOS_PROVISIONING_PROFILE_BASE64 }}
       MACOS_KEYCHAIN_PASSWORD: ${{ secrets.MACOS_KEYCHAIN_PASSWORD }}
       APPLE_DEVELOPER_IDENTITY: ${{ secrets.APPLE_DEVELOPER_IDENTITY }}
       APPLE_ID: ${{ secrets.APPLE_ID }}
@@ -37,7 +38,7 @@ jobs:
         run: |
           set -euo pipefail
           missing=0
-          for name in MACOS_CERTIFICATE_P12 MACOS_CERTIFICATE_PASSWORD MACOS_KEYCHAIN_PASSWORD APPLE_DEVELOPER_IDENTITY APPLE_ID APPLE_APP_PASSWORD APPLE_TEAM_ID; do
+          for name in MACOS_CERTIFICATE_P12 MACOS_CERTIFICATE_PASSWORD MACOS_PROVISIONING_PROFILE_BASE64 MACOS_KEYCHAIN_PASSWORD APPLE_DEVELOPER_IDENTITY APPLE_ID APPLE_APP_PASSWORD APPLE_TEAM_ID; do
             if [[ -z "${!name}" ]]; then
               echo "::error::Required release secret is missing: $name"
               missing=1
@@ -68,7 +69,9 @@ jobs:
       - name: Run tests
         env:
           CODEX_LIVE_TEST: '0'
-        run: swift test --package-path macos
+        run: |
+          swift test --package-path Shared/UsageSync
+          swift test --package-path macos
 
       - name: Import Developer ID certificate
         shell: bash
@@ -86,6 +89,16 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple: -k "$MACOS_KEYCHAIN_PASSWORD" "$keychain_path" >/dev/null
           security list-keychains -d user -s "$keychain_path"
           echo "CODEXTIME_NOTARY_KEYCHAIN=$keychain_path" >> "$GITHUB_ENV"
+
+      - name: Prepare Production CloudKit profile
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          profile_path="$RUNNER_TEMP/codextime-cloudkit.provisionprofile"
+          printf '%s' "$MACOS_PROVISIONING_PROFILE_BASE64" | base64 --decode > "$profile_path"
+          python3 macos/scripts/validate-cloudkit-profile.py "$profile_path"
+          echo "CODEXTIME_PROVISIONING_PROFILE=$profile_path" >> "$GITHUB_ENV"
 
       - name: Configure Apple notarization
         shell: bash
@@ -129,7 +142,7 @@ jobs:
         if: always()
         shell: bash
         run: |
-          rm -f "$RUNNER_TEMP/codextime-certificate.p12"
+          rm -f "$RUNNER_TEMP/codextime-certificate.p12" "$RUNNER_TEMP/codextime-cloudkit.provisionprofile"
           if [[ -f "$RUNNER_TEMP/codextime-signing.keychain-db" ]]; then
             security delete-keychain "$RUNNER_TEMP/codextime-signing.keychain-db"
           fi

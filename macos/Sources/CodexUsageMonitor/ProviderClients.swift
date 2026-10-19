@@ -13,19 +13,23 @@ enum ProductionUsageProviders {
         switch id {
         case .codex: return CodexUsageProviderClient()
         case .grok: return GrokSubscriptionUsageProviderClient(requiresVerification: false)
-        case .claude: return ClaudeOAuthUsageProviderClient(credentials: ClaudeUsageKeychainSource(allowAuthenticationUI: true))
+        case .claude: return ClaudeSubscriptionUsageProviderClient()
         }
     }
 }
 
 enum ProviderConnectionGuidance {
+    static let claudeRestrictionMessage = "Claude 구독 인증정보의 타사 앱 이용 제한으로 자동 조회가 중지되었습니다. 공식 사용량 페이지에서 확인해 주세요."
+    static let claudePolicyURL = "https://code.claude.com/docs/en/legal-and-compliance#authentication-and-credential-use"
+    static let claudeUsageURL = "https://claude.ai/settings/usage"
+
     static func detail(for provider: ProviderID) -> String? {
         switch provider {
         case .codex: return nil
         case .grok:
             return "승인된 Cursor 로그인 항목으로 사용량을 확인합니다. 웹 값 대조 후 자동 갱신이 시작됩니다."
         case .claude:
-            return "Claude Code의 구독 계정으로 사용량만 읽습니다. 로그인은 공식 CLI에서 완료해 주세요."
+            return claudeRestrictionMessage
         }
     }
 }
@@ -62,14 +66,13 @@ struct GrokSubscriptionUsageProviderClient: UsageProviderClient {
     }
 }
 
-/// A fresh installation never reads Claude credentials merely by launching.
-/// The connection menu uses the interactive OAuth client only after user intent;
-/// later automatic refreshes use this consent gate before any credential access.
+/// Production access is blocked independently of any legacy consent preference.
+/// Provider policy does not permit this app to intermediate Claude.ai credentials.
+/// The injectable signature is retained so a regression test can prove no source
+/// or transport is touched, including after a previous installation opted in.
 struct ClaudeSubscriptionUsageProviderClient: UsageProviderClient {
     static let connectionEnabledKey = "claudeUsageConnectionEnabled"
     let id: ProviderID = .claude
-    private let client: ClaudeOAuthUsageProviderClient
-    private let isConnectionEnabled: @Sendable () -> Bool
 
     init(
         credentials: any ClaudeUsageCredentialSource = ClaudeUsageKeychainSource(),
@@ -78,15 +81,11 @@ struct ClaudeSubscriptionUsageProviderClient: UsageProviderClient {
         isConnectionEnabled: @escaping @Sendable () -> Bool = {
             UserDefaults.standard.bool(forKey: "claudeUsageConnectionEnabled")
         }
-    ) {
-        client = ClaudeOAuthUsageProviderClient(credentials: credentials, transport: transport, now: now)
-        self.isConnectionEnabled = isConnectionEnabled
-    }
+    ) {}
 
     func fetchUsage() async throws -> ProviderUsageSnapshot {
         try Task.checkCancellation()
-        guard isConnectionEnabled() else { throw ProviderUsageFailure.notConnected }
-        return try await client.fetchUsage()
+        throw ProviderUsageFailure.unsupported
     }
 }
 

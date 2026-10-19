@@ -36,7 +36,10 @@ enum UsageDiagnostics {
             var result: [String: Any] = ["provider": id.rawValue, "connected": state.snapshot != nil]
             result["remainingPercent"] = state.displayRemainingPercent ?? NSNull() as Any
             if let success = state.lastSuccess { result["lastSuccess"] = ISO8601DateFormatter().string(from: success) }
-            if let failure = state.failure { result["error"] = failure.errorDescription }
+            if let failure = state.failure {
+                result["error"] = id == .claude && failure == .unsupported
+                    ? ProviderConnectionGuidance.claudeRestrictionMessage : failure.errorDescription
+            }
             result["windows"] = state.snapshot?.windows.map { window in
                 var item: [String: Any] = ["label": window.label]
                 item["remainingPercent"] = window.displayRemainingPercent ?? NSNull() as Any

@@ -25,5 +25,9 @@
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.widgetkit-extension</string>
 	</dict>
+	<key>CodexTimeCloudContainer</key>
+	<string>iCloud.com.sundaynighttt.codextime</string>
+	<key>CodexTimeCloudSyncConfigured</key>
+	<string>$(CODEXTIME_CLOUD_SYNC_CONFIGURED)</string>
 </dict>
 </plist>

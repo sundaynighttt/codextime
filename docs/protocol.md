@@ -40,7 +40,7 @@ The profile response can contain a display name, username, and profile image URL
 
 프로필 JSON의 이름·사진을 저장하지 않는다는 것은 인증 토큰에 개인정보가 없다는 뜻이 아닙니다. ID 토큰에는 계정 정보가 포함될 수 있습니다. 실제 조회의 외부 전송, 로컬 저장, 연결 해제 범위는 [개인정보 처리방침](privacy-policy.md)을 따릅니다. 이 구현 자체가 외부 서비스의 독립 앱 이용 허가를 증명하지는 않습니다.
 
-### 1.0(11) iPhone 3열 표시와 데이터 범위
+### 이력: 1.0(11) iPhone 3열 표시와 데이터 범위
 
 앱의 작은 사각 카드와 `systemSmall` 위젯은 `Codex / Grok / Claude` 순서로 각 로고·이름·잔여 비율·상태를 가로 3열에 표시한다. 이 변경은 표시 계층만 확장하며, 실제 사용량은 기존 `CodexAccountClient`의 OpenAI 직접 인증·조회와 단일 `UsageSnapshot` 경로를 유지한다. Codex 스냅샷이 없으면 `— / 연결 필요`, 실제 잔여량이 0이면 `0%`로 구분한다. 앱의 Codex 상세에는 리셋·누적 토큰을 유지하고 소형 위젯 하단에는 리셋·갱신 시각을 표시한다.
 
@@ -48,12 +48,44 @@ Grok·Claude는 iPhone 인증·조회 구현이 없어 `— / 미지원`으로 �
 
 `SharedUsageStore`의 App Group은 같은 iPhone의 앱과 위젯 사이 저장소다. macOS의 다중 공급자 상태를 전달하는 서버·Mac 연결·기기 간 동기화 경로는 없다. 이번 UI 변경은 macOS Keychain·Cursor 인증정보를 읽거나 iPhone으로 전송하지 않으며 새 자격증명 접근·네트워크 공급자·지속 권한을 추가하지 않는다. Grok·Claude 실제 조회를 추가하려면 iPhone에서 사용할 인증 경로와 개인정보 처리 범위를 별도로 확정해야 한다.
 
+## 현재 후보: macOS 0.3.1 / iPhone 1.0(12) 비공개 iCloud 동기화
+
+이 절은 구현·검증 중인 후보의 데이터 계약이다. 배포·실제 계정 동기화·Apple 처리 완료를 뜻하지 않으며 실제 상태는 [README](../README.md)와 릴리스 기록에서 확인한다. iPhone Codex의 기존 직접 인증·`UsageSnapshot`·App Group·기기 전용 Keychain 경로는 유지한다. Grok은 사용자가 선택한 Mac → 본인 CloudKit → iPhone 경로를 추가하고 Claude 자동 연결은 차단한다.
+
+### 전송 경계와 사용자 격리
+
+공유 `Shared/UsageSync` 모듈의 `SyncedUsage`만 전송하며 허용 필드는 `provider`, `remainingPercent`, `resetAt`, `observedAt`, `status`다. `provider`는 고정 서비스 구분이고 상태는 `ready / disconnected / paused / blocked / failed`의 열거 값이다. Grok의 유효한 실제 조회 결과만 수치를 갖는다. 숨김·연결 해제·공급자 조회 실패는 해당 고정 상태와 빈 수치로 보내며 과거 성공 수치를 현재 성공처럼 재발행하지 않는다. 비율은 0~100 정수, 조회 시각은 공급자 조회 시각이며 클라우드 업로드 시각으로 최신성을 다시 시작하지 않는다. 잘못된 값은 실패 상태로 정규화한다. Claude는 직렬화 경계에서도 모든 수치·시각을 제거하고 `blocked`로 만든다.
+
+비밀번호·인증/갱신 토큰·쿠키·인증 파일·계정 ID/이메일·기기 이름·구독 이름·누적 토큰·제품별 상세·원시 응답·원시 오류를 DTO에 넣지 않는다. 수신 측은 미지 필드가 추가된 payload를 거부한다. 개발자 서버·public/shared CloudKit 데이터베이스는 사용하지 않는다.
+
+CloudKit 컨테이너는 `iCloud.com.sundaynighttt.codextime`, 접근 범위는 `privateCloudDatabase`다. 사용자의 iCloud 계정별 데이터베이스에 분리되며 같은 본인 Apple 계정의 기기만 이 경로로 결과를 공유한다. 계정 범위가 확인된 캐시만 사용한다. iCloud 로그아웃·계정 변경 감지 시 동기화 선택과 해당 로컬 캐시를 지우고 새 계정에서는 재동의를 요구한다. 인증 토큰이나 계정 식별자를 사용량 DTO로 동기화하지 않는다.
+
+### 동의, 갱신, 오류, 삭제
+
+Mac과 iPhone의 동기화 기본값은 꺼짐이며 각각의 명시적 설정이 필요하다. 이 설정은 기존 Grok 연결·웹 대조 gate를 우회하지 않는다. Mac이 깨어 있고 앱 실행·서비스 표시·연결·네트워크가 유지될 때 기존 600초 공급자 조회 결과를 전송한다. iPhone은 앱 새로고침·OS가 허용하는 위젯 갱신에서 결과를 읽는다. CloudKit 전달·WidgetKit 실행은 실시간이나 고정 10분 주기를 보장하지 않는다.
+
+성공 값의 최신성 기준은 `observedAt`이다. 20분 경과 또는 동기화 실패 시 마지막 값과 조회 시각을 이전 정보로 구분하며 실패를 새 성공으로 덮어쓰지 않는다. 수신·계정 확인에 실패했거나 값이 없으면 `—`와 연결/오류 상태를 표시하고 0%나 100%를 만들지 않는다. 예시 모드에서는 실제 cloud cache를 섞거나 예시 수치를 업로드하지 않는다.
+
+iPhone의 수신 해제는 해당 기기의 작업·로컬 캐시만 중지·정리하며 원격 삭제와 별개다. iPhone의 별도 iCloud 삭제 동작과 달리, Mac은 동기화 체크를 끄거나 `끄고 iCloud 값 삭제`를 선택할 때 로컬 중지·캐시 정리와 원격 삭제 요청을 함께 수행한다. 어느 기기든 Apple의 삭제 성공 응답 후에만 삭제 완료로 처리한다. 오프라인·오류는 `deletionPending`이며 재연결 후 재시도가 필요하다. 다른 Mac이 계속 동기화하면 새 레코드가 생길 수 있으므로 전체 중단에는 각 발신 Mac의 설정도 꺼야 한다. iPhone Codex 연결 해제는 기존 Codex 토큰·캐시 삭제이며 iCloud 동기화 설정·삭제를 대신하지 않는다.
+
+### Claude의 현재 차단
+
+Anthropic의 [Authentication and credential use](https://code.claude.com/docs/en/legal-and-compliance#authentication-and-credential-use)는 타사 개발자의 Claude.ai 인증정보·세션 토큰 수집·보관·중계를 제한한다. 현재 Claude 구독 Keychain/OAuth 경로는 앱 연결 선택과 무관하게 자격증명·HTTP 접근 전 차단한다. iCloud에도 Claude 실제 수치를 쓰지 않는다. iPhone 직접 웹 로그인·세션 수집·토큰 수동 입력·다른 인증 저장소 탐색을 대체 경로로 추가하지 않는다. 사용자는 공식 [Claude 사용량 페이지](https://claude.ai/settings/usage)를 직접 확인할 수 있다. 허용되는 외부 앱 조회 방식이나 공급자 허가가 확인된 뒤 별도 변경으로 검토해야 한다.
+
+### 빌드 설정과 검증 경계
+
+CloudKit 사용에는 Apple Developer에서 컨테이너와 각 앱 ID의 iCloud capability 연결, 해당 entitlement가 포함된 프로비저닝·서명이 필요하다. 앱·위젯은 동일 컨테이너와 환경을 사용해야 한다. 개발용 CloudKit 스키마와 배포용 production 스키마는 별도이며 TestFlight의 서명·production 스키마 접근까지 확인해야 실제 배포 연결 성공으로 보고할 수 있다. 단위 테스트·시뮬레이터·서명 빌드 성공만으로 실제 iCloud 동기화 성공을 주장하지 않는다.
+
 ## Compatibility boundary
 
 `app-server`, `account/rateLimits/read`, and the iPhone usage and profile paths are compatibility-sensitive interfaces. CodexTime's desktop parser ignores unrelated JSON-RPC notifications and initialization responses, but a renamed method, authentication change, or materially changed response shape will require a compatibility update.
 
 
-## macOS 공급자별 상태
+<a id="macos-공급자별-상태"></a>
+
+## 이력: macOS v0.3.0 공급자별 상태
+
+**이하 내용은 배포된 v0.3.0의 과거 동작 기록이다. 새 0.3.1 후보의 Claude 차단·선택적 iCloud 동기화가 우선하며, 과거 연결 승인·실조회 성공은 공급자 허용의 근거가 아니다.**
 
 macOS v0.3.0은 `Codex / Grok / Claude`를 기본 모두 표시하며 하나의 네이티브 메뉴 막대 항목에서 순서를 유지한다. 사용자는 `계정 연결 및 표시` 창이나 메뉴에서 서비스별 표시를 선택한다. 기본 수치는 요약 대상으로 지정된 공통 한도 창 중 가장 적게 남은 잔여율을 내림해 표시한다. Claude의 Sonnet·Opus 등 모델별 특수 한도는 상세 메뉴에 남기고 공통 잔여율 계산에서는 제외한다. 응답에 없는 값이나 유효 범위 밖 값은 `—`이며 API 금액·추가 사용량·토큰 합계를 구독 잔여율로 바꾸지 않는다.
 

@@ -1,4 +1,5 @@
 import XCTest
+import UsageSync
 @testable import CodexTime
 
 final class CodexTimeTests: XCTestCase {
@@ -184,15 +185,16 @@ final class CodexTimeTests: XCTestCase {
         XCTAssertEqual(ProviderUsageDisplay(provider: .codex, snapshot: zero).percentText, "0%")
     }
 
-    func testUnsupportedProvidersNeverReuseCodexValues() {
+    func testUnconnectedProvidersNeverReuseCodexValues() {
         let real = UsageSnapshot(remainingPercent: 42, resetAt: .distantFuture,
                                  updatedAt: .distantPast, lifetimeTokens: nil)
         for snapshot in [real, .demo()] {
             for provider in [PhoneUsageProvider.grok, .claude] {
                 let display = ProviderUsageDisplay(provider: provider, snapshot: snapshot)
                 XCTAssertEqual(display.percentText, "—")
-                XCTAssertEqual(display.statusText, "미지원")
-                XCTAssertTrue(display.accessibilityText.contains("iPhone 연결 미지원"))
+                XCTAssertEqual(display.statusText, provider == .claude ? "허용 확인" :
+                    (snapshot.isDemo == true ? "예시 · 일시 정지" : "iCloud 연결"))
+                XCTAssertTrue(display.accessibilityText.contains("잔여량 없음"))
             }
         }
     }
@@ -205,6 +207,106 @@ final class CodexTimeTests: XCTestCase {
         let demo = ProviderUsageDisplay(provider: .codex, snapshot: .demo())
         XCTAssertEqual(demo.statusText, "예시")
         XCTAssertTrue(demo.accessibilityText.contains("예시 데이터"))
+    }
+
+    func testGrokUsesOnlyOptedInMatchingCloudResult() {
+        let now = Date()
+        let reading = SyncedUsage(provider: .grok, remainingPercent: 67,
+                                  resetAt: now.addingTimeInterval(3_600), observedAt: now, status: .ready)
+        let codex = UsageSnapshot(remainingPercent: 42, resetAt: .distantFuture,
+                                  updatedAt: now, lifetimeTokens: nil)
+        let disconnected = ProviderUsageDisplay(provider: .grok, snapshot: codex,
+                                                cloudReading: reading, cloudEnabled: false, now: now)
+        XCTAssertEqual(disconnected.percentText, "—")
+        XCTAssertEqual(disconnected.statusText, "iCloud 연결")
+        let connected = ProviderUsageDisplay(provider: .grok, snapshot: codex,
+                                             cloudReading: reading, cloudEnabled: true, now: now)
+        XCTAssertEqual(connected.percentText, "67%")
+        XCTAssertEqual(connected.statusText, "Mac에서 동기화")
+        XCTAssertTrue(connected.accessibilityText.contains("67퍼센트"))
+        XCTAssertEqual(ProviderUsageDisplay(provider: .codex, snapshot: codex,
+                                            cloudReading: reading, cloudEnabled: true, now: now).percentText, "42%")
+    }
+
+    func testGrokCloudCacheShowsStaleAndNetworkFailureWithoutInventingNewValue() {
+        let now = Date()
+        let reading = SyncedUsage(provider: .grok, remainingPercent: 0,
+                                  resetAt: now.addingTimeInterval(3_600), observedAt: now, status: .ready)
+        let stale = ProviderUsageDisplay(provider: .grok, snapshot: nil, cloudReading: reading,
+                                         cloudEnabled: true, now: now.addingTimeInterval(1_201))
+        XCTAssertEqual(stale.percentText, "0%")
+        XCTAssertEqual(stale.statusText, "오래된 정보")
+        let networkError = ProviderUsageDisplay(provider: .grok, snapshot: nil, cloudReading: reading,
+                                                cloudEnabled: true, cloudHadError: true, now: now)
+        XCTAssertEqual(networkError.percentText, "0%")
+        XCTAssertEqual(networkError.statusText, "연결 오류 · 캐시")
+        let missing = ProviderUsageDisplay(provider: .grok, snapshot: nil,
+                                           cloudEnabled: true, cloudHadError: true, now: now)
+        XCTAssertEqual(missing.percentText, "—")
+        XCTAssertEqual(missing.statusText, "동기화 오류")
+    }
+
+    func testGrokNeverShowsBlockedFailedPausedOrOtherProviderNumbers() {
+        let now = Date()
+        for status in [SyncReadingStatus.disconnected, .paused, .blocked, .failed] {
+            let reading = SyncedUsage(provider: .grok, remainingPercent: 67,
+                                      resetAt: now.addingTimeInterval(3_600), observedAt: now, status: status)
+            XCTAssertEqual(ProviderUsageDisplay(provider: .grok, snapshot: nil, cloudReading: reading,
+                                                cloudEnabled: true, now: now).percentText, "—")
+        }
+        let claude = SyncedUsage(provider: .claude, remainingPercent: 67,
+                                 resetAt: now.addingTimeInterval(3_600), observedAt: now, status: .ready)
+        XCTAssertEqual(ProviderUsageDisplay(provider: .grok, snapshot: nil, cloudReading: claude,
+                                            cloudEnabled: true, now: now).percentText, "—")
+    }
+
+    func testClaudeRemainsBlockedEvenWithCloudValueAndCodexDemo() {
+        let now = Date()
+        let reading = SyncedUsage(provider: .claude, remainingPercent: 67,
+                                  resetAt: now.addingTimeInterval(3_600), observedAt: now, status: .ready)
+        let display = ProviderUsageDisplay(provider: .claude, snapshot: .demo(), cloudReading: reading,
+                                            cloudEnabled: true, now: now)
+        XCTAssertEqual(display.percentText, "—")
+        XCTAssertEqual(display.statusText, "허용 확인")
+        XCTAssertTrue(display.accessibilityText.contains("연결 차단됨"))
+    }
+
+    func testDemoNeverRendersRealCloudQuota() {
+        let now = Date()
+        let reading = SyncedUsage(provider: .grok, remainingPercent: 67,
+                                  resetAt: now.addingTimeInterval(3_600), observedAt: now, status: .ready)
+        let display = ProviderUsageDisplay(provider: .grok, snapshot: .demo(), cloudReading: reading,
+                                            cloudEnabled: true, now: now)
+        XCTAssertEqual(display.percentText, "—")
+        XCTAssertEqual(display.statusText, "예시 · 일시 정지")
+        XCTAssertTrue(display.accessibilityText.contains("일시 정지"))
+        XCTAssertFalse(display.accessibilityText.contains("67"))
+    }
+
+    @MainActor
+    func testDemoPausesCloudRequestsAndExitResumesExistingOptIn() async throws {
+        let suiteName = "codextime-demo-cloud-test-\(UUID().uuidString)"
+        let preferences = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        let usageStore = SharedUsageStore(suiteName: suiteName)
+        defer { preferences.removePersistentDomain(forName: suiteName) }
+        let transport = CountingCloudTransport()
+        let sync = UsageCloudSync(preferences: preferences, transport: transport)
+        await sync.enable()
+        let previousFetches = transport.fetches
+        let previousScopeChecks = transport.scopeChecks
+        _ = usageStore.startDemo()
+        let model = AppModel(usageStore: usageStore, cloudSync: sync)
+        await model.refreshCloudIfAllowed()
+        XCTAssertEqual(transport.fetches, previousFetches)
+        XCTAssertEqual(transport.scopeChecks, previousScopeChecks)
+        XCTAssertTrue(UsageSyncCache.isRequestedEnabled(preferences: preferences))
+        usageStore.endDemo()
+        await model.refreshCloudIfAllowed()
+        XCTAssertEqual(transport.fetches, previousFetches + 1)
+    }
+
+    func testConfigurationErrorMarksCloudResultAsCachedError() {
+        XCTAssertTrue(CloudSyncState.notConfigured.hasCloudReadError)
     }
 
     func testReleaseKeepsAppIdentity() {
@@ -235,4 +337,20 @@ private final class RejectNetworkProtocol: URLProtocol {
         client?.urlProtocol(self, didFailWithError: URLError(.notConnectedToInternet))
     }
     override func stopLoading() {}
+}
+
+@MainActor
+private final class CountingCloudTransport: UsageSyncTransport {
+    var scopeChecks = 0
+    var fetches = 0
+    func accountScope() async throws -> String? {
+        scopeChecks += 1
+        return "fake-own-account"
+    }
+    func fetch(expectedScope: String) async throws -> [SyncedUsage] {
+        fetches += 1
+        return []
+    }
+    func save(_ readings: [SyncedUsage], expectedScope: String) async throws {}
+    func deleteAll(expectedScope: String) async throws {}
 }

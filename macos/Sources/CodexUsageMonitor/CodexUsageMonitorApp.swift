@@ -1,12 +1,16 @@
 import AppKit
 import Combine
 import OSLog
+import UsageSync
 
 @main
 @MainActor
 final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private static var retainedDelegate: CodexUsageMonitorApp?
     private let store = UsageStore(enabledProviders: Set(MenuBarPreferences.visibleProviders))
+    private let cloudSync = UsageCloudSync()
+    private lazy var cloudPublisher = MacUsageCloudPublisher(sync: cloudSync)
+    private var cloudCancellable: AnyCancellable?
     private let statusMenu = NSMenu()
     private let logger = Logger(subsystem: "com.sundaynighttt.codex-usage-monitor", category: "MenuBar")
     private var statusItem: NSStatusItem?
@@ -37,7 +41,19 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
         statusMenu.delegate = self
         installStatusItem()
         storeCancellable = store.objectWillChange.sink { [weak self] in
-            DispatchQueue.main.async { self?.updateStatusTitle() }
+            DispatchQueue.main.async {
+                self?.updateStatusTitle()
+                self?.publishCloudSnapshot()
+            }
+        }
+        cloudCancellable = cloudSync.objectWillChange.sink { [weak self] in
+            DispatchQueue.main.async { self?.updateCloudControls() }
+        }
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            await self.cloudSync.refresh()
+            self.publishCloudSnapshot(force: true)
+            self.updateCloudControls()
         }
         observeSystemEvents()
         if !UserDefaults.standard.bool(forKey: "hasShownConnectionSettings")
@@ -58,6 +74,7 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
         guard !terminating else { return .terminateLater }
         terminating = true
         Task {
+            cloudPublisher.stopPending()
             await store.shutdown()
             sender.reply(toApplicationShouldTerminate: true)
         }
@@ -66,6 +83,7 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
 
     func applicationWillTerminate(_ notification: Notification) {
         storeCancellable = nil
+        cloudCancellable = nil
         NotificationCenter.default.removeObserver(self)
         NSWorkspace.shared.notificationCenter.removeObserver(self)
     }
@@ -100,7 +118,14 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
 
     @objc private func restoreStatusItem(_ notification: Notification) {
         ensureStatusItemVisible(reason: notification.name.rawValue)
-        if notification.name == NSWorkspace.didWakeNotification { store.refresh() }
+        if notification.name == NSWorkspace.didWakeNotification {
+            store.refresh()
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                await self.cloudSync.refresh()
+                self.publishCloudSnapshot(force: true)
+            }
+        }
     }
 
     private func ensureStatusItemVisible(reason: String) {
@@ -129,6 +154,7 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
         settingsWindow?.update(states: store.states, now: store.now,
             canConfirmGrok: grokAwaitingWebConfirmation && store.states[.grok]?.failure == nil
                 && store.states[.grok]?.snapshot != nil && store.states[.grok]?.isRefreshing != true)
+        updateCloudControls()
     }
 
     private func rebuildMenu() {
@@ -156,6 +182,13 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
         if MenuBarPreferences.visibleProviders.isEmpty {
             addInfoItem("서비스를 선택하면 사용량이 표시됩니다.", to: statusMenu)
         }
+        statusMenu.addItem(.separator())
+        let cloud = actionItem(title: "본인 iCloud로 iPhone에 동기화", action: #selector(toggleCloudSync))
+        cloud.state = cloudSync.isEnabled ? .on : .off
+        statusMenu.addItem(cloud)
+        addInfoItem(cloudSync.state.message, to: statusMenu)
+        statusMenu.addItem(actionItem(title: "지금 동기화", action: #selector(refreshCloudSync)))
+        statusMenu.addItem(actionItem(title: "동기화 끄고 iCloud 값 삭제…", action: #selector(disableCloudSync)))
         statusMenu.addItem(.separator())
         let refreshAll = actionItem(title: store.isRefreshing ? "나머지 서비스 새로고침" : "모두 새로고침",
             action: #selector(refreshUsage))
@@ -199,7 +232,8 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
         let connect = actionItem(title: id == .codex ? "설치·로그인 안내…" : "\(id.name) 연결 설정…",
             action: #selector(showConnectionSettings))
         menu.addItem(connect)
-        let help = actionItem(title: id == .grok ? "Grok 웹 사용량 열기" : "공식 안내 열기",
+        let help = actionItem(title: id == .grok ? "Grok 웹 사용량 열기"
+            : id == .claude ? "Claude 공식 사용량 열기" : "공식 안내 열기",
             action: #selector(openProviderHelp(_:)))
         help.representedObject = id.rawValue
         menu.addItem(help)
@@ -236,6 +270,7 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
         }
         store.setEnabled(visible, for: id)
         updateStatusTitle()
+        publishCloudSnapshot()
         rebuildMenu()
     }
 
@@ -246,7 +281,10 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
                 onConnect: { [weak self] id in self?.connectProvider(id) },
                 onDisconnect: { [weak self] id in self?.disconnectProvider(id) },
                 onOpenHelp: { [weak self] id in self?.openHelp(for: id) },
-                onConfirmGrok: { [weak self] in self?.confirmGrokWebMatch() })
+                onConfirmGrok: { [weak self] in self?.confirmGrokWebMatch() },
+                onCloudEnabledChanged: { [weak self] enabled in self?.setCloudEnabled(enabled) },
+                onCloudRefresh: { [weak self] in self?.refreshCloudSync() },
+                onCloudDelete: { [weak self] in self?.disableCloudSync() })
         }
         updateStatusTitle()
         settingsWindow?.showWindow(nil)
@@ -255,6 +293,15 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
     }
 
     private func connectProvider(_ id: ProviderID) {
+        if id == .claude {
+            let alert = NSAlert()
+            alert.messageText = "Claude 자동 조회 중지"
+            alert.informativeText = ProviderConnectionGuidance.claudeRestrictionMessage
+            alert.addButton(withTitle: "공식 사용량 열기")
+            alert.addButton(withTitle: "닫기")
+            if alert.runModal() == .alertFirstButtonReturn { openHelp(for: .claude) }
+            return
+        }
         guard connectionAttempts[id] == nil, store.states[id]?.isRefreshing != true else { return }
         if id == .codex {
             setProviderVisible(id, visible: true)
@@ -265,8 +312,6 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
         alert.messageText = "\(id.name) 계정 연결"
         if id == .grok {
             alert.informativeText = "이 Mac의 Cursor 로그인 토큰 한 항목만 앱 메모리에서 읽어 공유 사용량과 리셋을 조회합니다. 토큰을 별도 저장하거나 대화·쿠키·갱신 토큰을 읽지 않습니다. 조회 후 본인의 Grok 웹 사용량과 대조해야 자동 갱신이 시작됩니다."
-        } else {
-            alert.informativeText = "이 Mac의 Claude Code Keychain 항목을 앱 메모리에서 사용해 구독 사용량과 리셋만 조회합니다. OS 권한창이 나타날 수 있습니다. 연결하면 10분마다 갱신하며 토큰을 별도 저장하거나 갱신하지 않습니다."
         }
         alert.addButton(withTitle: "사용량 조회 허용")
         alert.addButton(withTitle: "취소")
@@ -276,8 +321,6 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
         if id == .grok {
             grokAwaitingWebConfirmation = false
             UserDefaults.standard.set(false, forKey: "grokCursorUsageVerified")
-        } else {
-            UserDefaults.standard.set(false, forKey: ClaudeSubscriptionUsageProviderClient.connectionEnabledKey)
         }
         // Enabling refreshes the normal gated client first; join it before the
         // explicit client so each provider retains a single owned request.
@@ -293,9 +336,6 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
             await self.store.refreshAndWait(id)
             guard self.connectionAttempts[id] == attempt else { return }
             self.connectionAttempts[id] = nil
-            if id == .claude, self.store.states[id]?.failure == nil, self.store.states[id]?.snapshot != nil {
-                UserDefaults.standard.set(true, forKey: ClaudeSubscriptionUsageProviderClient.connectionEnabledKey)
-            }
             if id == .grok {
                 self.grokAwaitingWebConfirmation = self.store.states[id]?.failure == nil
                     && self.store.states[id]?.snapshot != nil
@@ -316,6 +356,7 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
         guard alert.runModal() == .alertFirstButtonReturn else { return }
         UserDefaults.standard.set(true, forKey: "grokCursorUsageVerified")
         grokAwaitingWebConfirmation = false
+        publishCloudSnapshot(force: true)
         store.refresh(.grok)
         updateStatusTitle()
     }
@@ -332,6 +373,7 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
         Task { @MainActor [weak self] in
             guard let self else { return }
             await self.store.disconnect(id)
+            self.publishCloudSnapshot(force: true)
             self.updateStatusTitle()
         }
     }
@@ -346,9 +388,59 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
         switch id {
         case .codex: address = "https://github.com/openai/codex#installation"
         case .grok: address = "https://grok.com/?_s=usage"
-        case .claude: address = "https://code.claude.com/docs/en/setup"
+        case .claude: address = ProviderConnectionGuidance.claudeUsageURL
         }
         if let url = URL(string: address) { NSWorkspace.shared.open(url) }
+    }
+
+    private func publishCloudSnapshot(force: Bool = false) {
+        cloudPublisher.enqueue(MacUsageCloudSnapshot.readings(states: store.states,
+            enabledProviders: store.enabledProviders,
+            isGrokVerified: UserDefaults.standard.bool(forKey: "grokCursorUsageVerified")), force: force)
+    }
+
+    private func updateCloudControls() {
+        settingsWindow?.updateCloud(isEnabled: cloudSync.isEnabled, message: cloudSync.state.message)
+    }
+
+    @objc private func toggleCloudSync() { setCloudEnabled(!cloudSync.isEnabled) }
+
+    private func setCloudEnabled(_ enabled: Bool) {
+        if !enabled { disableCloudSync(); return }
+        let alert = NSAlert()
+        alert.messageText = "본인 iCloud로 iPhone에 동기화"
+        alert.informativeText = "이 Mac에서 검증된 Grok의 잔여율·리셋 시각·조회 시각·상태만 본인 비공개 iCloud에 저장합니다. 토큰·비밀번호는 전송하지 않습니다. 같은 Apple 계정의 iPhone에서 볼 수 있으며 최신 값에는 Mac 앱 실행이 필요합니다. Claude는 공급자 제한으로 자동 조회가 중지됩니다. 끄면 이 동기화 데이터를 삭제합니다."
+        alert.addButton(withTitle: "iCloud 동기화 켜기")
+        alert.addButton(withTitle: "취소")
+        guard alert.runModal() == .alertFirstButtonReturn else { updateCloudControls(); return }
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            await self.cloudSync.enable()
+            self.publishCloudSnapshot(force: true)
+            self.updateCloudControls()
+            self.rebuildMenu()
+        }
+    }
+
+    @objc private func refreshCloudSync() {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            // Cloud retry only: this button never starts another provider read.
+            await self.cloudSync.refresh()
+            self.publishCloudSnapshot(force: true)
+            self.updateCloudControls()
+            self.rebuildMenu()
+        }
+    }
+
+    @objc private func disableCloudSync() {
+        cloudPublisher.stopPending()
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            await self.cloudSync.disableAndDelete()
+            self.updateCloudControls()
+            self.rebuildMenu()
+        }
     }
 
     @objc private func toggleResetTime() {
