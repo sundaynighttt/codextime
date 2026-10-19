@@ -81,22 +81,31 @@ import Testing
     }
 }
 
-@Test @MainActor func partialSuccessPublishesBeforeOtherProviderCompletes() async throws {
+@Test(.timeLimit(.minutes(1))) @MainActor
+func partialSuccessPublishesBeforeOtherProviderCompletes() async {
     let codex = FakeUsageProvider(id: .codex, responses: [.success(snapshot(.codex, 93))])
-    let grok = FakeUsageProvider(id: .grok, responses: [.failure(.notConnected)], delay: 0.15)
+    let grok = GatedUsageProvider(id: .grok, response: .failure(.notConnected))
     let claude = FakeUsageProvider(id: .claude, responses: [.failure(.authenticationRequired)])
     let store = UsageStore(clients: [codex, grok, claude], automaticallyStart: false)
-    store.refresh()
-    try await waitUntil { store.states[.codex]?.lastSuccess != nil }
+    // Capture each first refresh so joining a completed fast provider never
+    // accidentally starts a second query. Grok cannot finish until released.
+    let codexRefresh = Task { @MainActor in await store.refreshAndWait(.codex) }
+    let grokRefresh = Task { @MainActor in await store.refreshAndWait(.grok) }
+    let claudeRefresh = Task { @MainActor in await store.refreshAndWait(.claude) }
+    await grok.requestEntered.wait()
+    await codexRefresh.value
     #expect(store.states[.codex]?.displayRemainingPercent == 93)
     #expect(store.states[.grok]?.isRefreshing == true)
     #expect(store.isRefreshing)
-    await store.refreshAndWait(.grok)
+    await grok.releaseRequest()
+    await grokRefresh.value
+    await claudeRefresh.value
     #expect(store.states[.grok]?.failure == .notConnected)
     #expect(store.states[.claude]?.failure == .authenticationRequired)
     #expect(store.states[.codex]?.failure == nil)
     #expect(!store.isRefreshing)
     #expect(await codex.callCount == 1)
+    #expect(await grok.callCount == 1)
 }
 
 @Test @MainActor func repeatedRefreshJoinsTheSameProviderRequest() async {
@@ -132,22 +141,25 @@ import Testing
     #expect(store.states[.codex]?.isStale(now: timestamp) == false)
 }
 
-@Test @MainActor func timeoutCancelsOwnedWorkAndKeepsDedupUntilCleanupFinishes() async throws {
-    let client = FakeUsageProvider(
-        id: .grok, responses: [.success(snapshot(.grok, 56))],
-        delay: 10, cancellationCleanupDelay: 0.06
+@Test(.timeLimit(.minutes(1))) @MainActor
+func timeoutCancelsOwnedWorkAndKeepsDedupUntilCleanupFinishes() async {
+    let client = GatedUsageProvider(
+        id: .grok, response: .success(snapshot(.grok, 56)), holdCancellationCleanup: true
     )
+    // Only the production deadline uses a clock. The fake stays pending until
+    // cancelled, then cleanup stays pending until the assertions release it.
     let store = UsageStore(clients: [client], requestTimeout: 0.02, automaticallyStart: false)
-    let start = DispatchTime.now().uptimeNanoseconds
-    store.refresh(.grok)
-    try await waitUntil { await client.cancellationCount == 1 }
+    let firstRefresh = Task { @MainActor in await store.refreshAndWait(.grok) }
+    await client.requestEntered.wait()
+    await client.cancellationStarted.wait()
     #expect(store.states[.grok]?.isRefreshing == true)
+    #expect(await client.activeCount == 1)
     store.refresh(.grok)
     store.refresh(.grok)
     #expect(await client.callCount == 1)
-    await store.refreshAndWait(.grok)
-    let elapsed = Double(DispatchTime.now().uptimeNanoseconds - start) / 1_000_000_000
-    #expect(elapsed < 1)
+    #expect(await client.cancellationCount == 1)
+    await client.releaseCleanup()
+    await firstRefresh.value
     #expect(store.states[.grok]?.failure == .timeout)
     #expect(store.states[.grok]?.lastSuccess == nil)
     #expect(store.states[.grok]?.displayRemainingPercent == nil)
@@ -419,6 +431,101 @@ private func waitUntil(_ condition: () async -> Bool) async throws {
         try await Task.sleep(nanoseconds: 1_000_000)
     }
     Issue.record("Provider state did not reach the expected condition")
+}
+
+/// Explicit events remain latched even when the test's MainActor resumes late.
+private actor ProviderTestLatch {
+    private var isOpen: Bool
+    private var waiters: [CheckedContinuation<Void, Never>] = []
+
+    init(isOpen: Bool = false) { self.isOpen = isOpen }
+
+    func wait() async {
+        guard !isOpen else { return }
+        await withCheckedContinuation { waiters.append($0) }
+    }
+
+    func open() {
+        isOpen = true
+        let pending = waiters
+        waiters.removeAll()
+        for waiter in pending { waiter.resume() }
+    }
+}
+
+/// The request suspension responds to cancellation; cleanup is a separate latch.
+private actor ProviderTestRequestGate {
+    private var isOpen = false
+    private var waiters: [UUID: CheckedContinuation<Void, Error>] = [:]
+
+    func wait() async throws {
+        try Task.checkCancellation()
+        guard !isOpen else { return }
+        let id = UUID()
+        try await withTaskCancellationHandler {
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                if Task.isCancelled { continuation.resume(throwing: CancellationError()) }
+                else if isOpen { continuation.resume() }
+                else { waiters[id] = continuation }
+            }
+        } onCancel: {
+            Task { await self.cancel(id) }
+        }
+    }
+
+    func open() {
+        isOpen = true
+        let pending = Array(waiters.values)
+        waiters.removeAll()
+        for waiter in pending { waiter.resume() }
+    }
+
+    private func cancel(_ id: UUID) {
+        waiters.removeValue(forKey: id)?.resume(throwing: CancellationError())
+    }
+}
+
+private actor GatedUsageProvider: UsageProviderClient {
+    nonisolated let id: ProviderID
+    nonisolated let requestEntered = ProviderTestLatch()
+    nonisolated let cancellationStarted = ProviderTestLatch()
+    private let request = ProviderTestRequestGate()
+    private let cleanup: ProviderTestLatch
+    private let response: FakeResponse
+    private(set) var callCount = 0
+    private(set) var activeCount = 0
+    private(set) var maximumActive = 0
+    private(set) var cancellationCount = 0
+
+    init(id: ProviderID, response: FakeResponse, holdCancellationCleanup: Bool = false) {
+        self.id = id
+        self.response = response
+        cleanup = ProviderTestLatch(isOpen: !holdCancellationCleanup)
+    }
+
+    func releaseRequest() async { await request.open() }
+    func releaseCleanup() async { await cleanup.open() }
+
+    func fetchUsage() async throws -> ProviderUsageSnapshot {
+        callCount += 1
+        activeCount += 1
+        maximumActive = max(maximumActive, activeCount)
+        defer { activeCount -= 1 }
+        await requestEntered.open()
+        do {
+            try await request.wait()
+        } catch {
+            cancellationCount += 1
+            await cancellationStarted.open()
+            await cleanup.wait()
+            throw error
+        }
+        switch response {
+        case let .success(snapshot): return snapshot
+        case let .failure(error): throw error
+        case .rawFailure: throw RawFixtureError()
+        }
+    }
 }
 
 private enum FakeResponse: Sendable {
