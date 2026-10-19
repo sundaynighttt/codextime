@@ -6,12 +6,12 @@
     {
       "key": "latest_candidate",
       "label": "iPhone 최신 후보",
-      "releaseId": "ios-10-b15"
+      "releaseId": "ios-10-b16"
     },
     {
       "key": "last_external",
       "label": "Apple 처리 확인 최신",
-      "releaseId": "ios-10-b15"
+      "releaseId": "ios-10-b16"
     },
     {
       "key": "latest_desktop_release",
@@ -439,13 +439,31 @@
       "build": "15",
       "date": "2026-10-19",
       "stage": "external_processed",
-      "status": "passed",
+      "status": "historical",
       "summary": "Claude 새창 제한 안내·화면 복귀·51 XCTest·Release 서명 통과; 22:38:48 KST 업로드·22:41:37 Apple 테스트 가능 알림 확인, Google OAuth 미지원·실계정 검증 대기",
       "evidence": [
         "ios/project.yml",
         "docs/releases/2026-10-19-claude-login-recovery.md",
         "docs/app-store/submission.md",
         "git:48015b5",
+        "https://testflight.apple.com/v1/app/6805935440"
+      ]
+    },
+    {
+      "id": "ios-10-b16",
+      "sequence": 30,
+      "version": "1.0",
+      "build": "16",
+      "date": "2026-10-19",
+      "stage": "external_processed",
+      "status": "passed",
+      "summary": "Claude 세션·공통주간 한 번 읽기·한도별 앱/위젯 표시; 80 XCTest·Release·서명, 23:40:44 업로드·23:43:46 KST Apple 테스트 가능 확인, iPhone 실계정 대조 대기",
+      "evidence": [
+        "ios/project.yml",
+        "docs/releases/2026-10-19-claude-usage-reader.md",
+        "docs/app-store/submission.md",
+        "git:9cd429d",
+        "git:0effad7",
         "https://testflight.apple.com/v1/app/6805935440"
       ]
     }
