@@ -47,7 +47,11 @@ struct ProviderWebUsageView: View {
                             .accessibilityIdentifier("web-usage-hide-keyboard")
                         } else {
                             Menu {
-                                Button("사용량 화면 열기") { model.openUsagePage() }
+                                Button("뒤로 가기", systemImage: "chevron.backward") { model.goBack() }
+                                    .disabled(!model.canGoBack)
+                                Button("새로고침", systemImage: "arrow.clockwise") { model.reload() }
+                                    .disabled(model.webView == nil)
+                                Button(model.provider == .claude ? "Claude 화면으로 돌아가기" : "사용량 화면 열기") { model.openUsagePage() }
                                     .disabled(model.webView == nil)
                                 Button("읽기 설정", systemImage: "slider.horizontal.3") { openPanel(.reading) }
                                 Button("도움말", systemImage: "questionmark.circle") { openPanel(.help) }
@@ -82,6 +86,17 @@ struct ProviderWebUsageView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
             isKeyboardVisible = false
+        }
+        .alert(item: $model.navigationIssue) { issue in
+            Alert(
+                title: Text(issue.title),
+                message: Text(issue.message),
+                primaryButton: .default(Text(model.provider == .claude ? "Claude로 돌아가기" : "사용량 다시 열기")) {
+                    endEditing()
+                    model.openUsagePage()
+                },
+                secondaryButton: .cancel(Text("닫기"))
+            )
         }
     }
 
@@ -124,7 +139,7 @@ struct ProviderWebUsageView: View {
                     .accessibilityIdentifier("grok-trial-read-usage")
                 } else {
                     if model.isLoading { ProgressView().controlSize(.small) }
-                    Text("로그인 후 사용량을 여세요")
+                    Text(model.provider == .claude ? "Claude 계정 이메일로 로그인" : "로그인 후 사용량을 여세요")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
@@ -192,6 +207,14 @@ struct ProviderWebUsageView: View {
     private var helpPanel: some View {
         NavigationStack {
             Form {
+                if model.provider == .claude {
+                    Section("Claude 이메일 로그인") {
+                        Text("기존 Claude 계정의 이메일 주소를 입력한 뒤 ‘이메일로 계속하기’를 선택하세요. Google 새 창 로그인은 이 앱 내 웹 화면에서 지원하지 않습니다.")
+                        Text("인증 메일을 다른 기기에서 열면 코드가 표시됩니다. 원래 Claude 웹 화면으로 돌아와 코드를 직접 입력하세요.")
+                        Text("메일 링크가 Safari에서 열려도 로그인 상태가 이 앱에 자동 연결되지는 않습니다.")
+                        Link("Claude 공식 로그인 도움말", destination: URL(string: "https://support.claude.com/en/articles/13189465-log-in-to-your-claude-account")!)
+                    }
+                }
                 Section("계정 연결") {
                     Text("공식 웹에서 본인 계정으로 로그인한 뒤 ‘사용량 열기’를 누르세요.")
                     Text("로그인은 앱 실행 중에만 유지됩니다. 화면을 닫아도 유지되지만 앱 종료·연결 해제 후에는 다시 로그인해야 합니다.")

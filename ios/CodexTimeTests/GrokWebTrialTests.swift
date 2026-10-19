@@ -1,5 +1,6 @@
 #if DEBUG
 import XCTest
+import Combine
 import JavaScriptCore
 import WebKit
 @testable import CodexTime
@@ -250,6 +251,228 @@ final class GrokWebTrialTests: XCTestCase {
         XCTAssertFalse(claude.userConfirmedUsageVisible)
     }
 
+    func testClaudeNavigationPolicyBlocksGoogleWithoutMatchingConfusableHosts() {
+        for host in ["accounts.google.com", "login.accounts.google.com", "ACCOUNTS.GOOGLE.COM", "accounts.google.com."] {
+            for isNewWindow in [false, true] {
+                XCTAssertEqual(ProviderWebUsageModel.navigationDisposition(for: URL(string: "https://" + host + "/fixture"),
+                                                                           provider: .claude, isNewWindow: isNewWindow),
+                               .cancel(.googleSignInUnsupported))
+            }
+        }
+        for host in ["claude.ai", "accounts.google.com.example", "notaccounts.google.com", "accounts-google.com"] {
+            XCTAssertEqual(ProviderWebUsageModel.navigationDisposition(for: URL(string: "https://" + host + "/fixture"),
+                                                                       provider: .claude, isNewWindow: false), .allow)
+        }
+        for value in ["https://claude.ai/login", "about:blank"] {
+            XCTAssertEqual(ProviderWebUsageModel.navigationDisposition(for: URL(string: value), provider: .claude,
+                                                                       isNewWindow: true), .cancel(.newWindowUnsupported))
+        }
+        XCTAssertEqual(ProviderWebUsageModel.navigationDisposition(for: URL(string: "about:blank"), provider: .claude,
+                                                                   isNewWindow: false), .allow)
+        for value in ["http://accounts.google.com/fixture", "claude://fixture", "javascript:void(0)", "about:srcdoc"] {
+            XCTAssertEqual(ProviderWebUsageModel.navigationDisposition(for: URL(string: value), provider: .claude,
+                                                                       isNewWindow: false), .cancel(.unsupportedNavigation))
+        }
+        XCTAssertEqual(ProviderWebUsageModel.navigationDisposition(for: nil, provider: .claude,
+                                                                   isNewWindow: true), .cancel(.newWindowUnsupported))
+        XCTAssertEqual(ProviderWebUsageModel.navigationDisposition(for: nil, provider: .claude,
+                                                                   isNewWindow: false), .cancel(.unsupportedNavigation))
+    }
+
+    func testGrokNavigationPolicyPreservesHTTPSAndKnownBlankBehavior() {
+        for value in ["https://grok.com/?_s=usage", "https://accounts.google.com/fixture", "about:blank"] {
+            for isNewWindow in [false, true] {
+                XCTAssertEqual(ProviderWebUsageModel.navigationDisposition(for: URL(string: value), provider: .grok,
+                                                                           isNewWindow: isNewWindow), .allow)
+            }
+        }
+        for value in ["http://grok.com", "grok://fixture", "about:srcdoc"] {
+            XCTAssertEqual(ProviderWebUsageModel.navigationDisposition(for: URL(string: value), provider: .grok,
+                                                                       isNewWindow: false), .cancel(.unsupportedNavigation))
+        }
+        XCTAssertEqual(ProviderWebUsageModel.navigationDisposition(for: nil, provider: .grok,
+                                                                   isNewWindow: false), .cancel(.unsupportedNavigation))
+    }
+
+    func testNavigationErrorClassifierIgnoresOnlyTheURLCancellationDomainAndCode() {
+        XCTAssertNil(ProviderWebUsageModel.navigationIssue(for: NSError(domain: NSURLErrorDomain, code: NSURLErrorCancelled)))
+        for error in [NSError(domain: NSURLErrorDomain, code: NSURLErrorTimedOut),
+                      NSError(domain: "LocalFixtureError", code: NSURLErrorCancelled),
+                      NSError(domain: "WKErrorDomain", code: 1)] {
+            XCTAssertEqual(ProviderWebUsageModel.navigationIssue(for: error), .loadFailed)
+        }
+        XCTAssertTrue(ProviderWebNavigationIssue.googleSignInUnsupported.message.contains("Claude 계정 이메일"))
+        XCTAssertTrue(ProviderWebNavigationIssue.newWindowUnsupported.message.contains("자동 연결되지 않습니다"))
+    }
+
+    @MainActor
+    func testClaudePopupRetainsParentAndCancelsThePendingReadWithoutLoading() {
+        let model = ProviderWebUsageModel(provider: .claude)
+        let parent = TrialRecordingWebView(fixtureURL: WebUsageProvider.claude.usageURL)
+        model.configureWebView(parent)
+        defer { model.close() }
+        var readings = 0, disconnections = 0
+        model.onReading = { _ in readings += 1 }
+        model.onDisconnect = { disconnections += 1 }
+        model.userConfirmedUsageVisible = true
+        model.armPointRead()
+        XCTAssertTrue(model.isReading)
+        XCTAssertTrue(model.isPointReadArmed)
+        model.handleNewWindowRequest(URLRequest(url: URL(string: "https://claude.ai/fixture-popup")!),
+                                     isNewWindow: true, from: parent)
+        XCTAssertTrue(model.webView === parent)
+        XCTAssertEqual(parent.loadRequests.count, 0)
+        XCTAssertEqual(model.navigationIssue, .newWindowUnsupported)
+        XCTAssertFalse(model.isReading)
+        XCTAssertFalse(model.isPointReadArmed)
+        XCTAssertFalse(model.userConfirmedUsageVisible)
+        XCTAssertFalse(model.isAtUsagePage)
+        XCTAssertNil(model.selectedPercent)
+        XCTAssertEqual(readings, 0)
+        XCTAssertEqual(disconnections, 0)
+        // The synchronous cancellation happens before the main-actor read task
+        // can start. Its underlying local blank view never loads an account.
+    }
+
+    @MainActor
+    func testClaudeBlockedGoogleNavigationPreservesTheSameSession() {
+        let model = ProviderWebUsageModel(provider: .claude)
+        let parent = TrialRecordingWebView(fixtureURL: WebUsageProvider.claude.usageURL)
+        model.configureWebView(parent)
+        defer { model.close() }
+        model.userConfirmedUsageVisible = true
+        XCTAssertEqual(model.navigationPolicy(for: URL(string: "https://accounts.google.com/fixture"),
+                                              isNewWindow: false, from: parent), .cancel)
+        XCTAssertEqual(model.navigationIssue, .googleSignInUnsupported)
+        XCTAssertTrue(model.webView === parent)
+        XCTAssertEqual(parent.loadRequests.count, 0)
+        XCTAssertFalse(model.canReadVisibleUsage)
+        XCTAssertFalse(model.userConfirmedUsageVisible)
+    }
+
+    @MainActor
+    func testGrokPopupStillLoadsHTTPSIntoItsParentOnlyForNewWindows() {
+        let model = ProviderWebUsageModel(provider: .grok)
+        let parent = TrialRecordingWebView()
+        model.configureWebView(parent)
+        defer { model.close() }
+        let request = URLRequest(url: URL(string: "https://grok.com/fixture-popup")!)
+        model.handleNewWindowRequest(request, isNewWindow: true, from: parent)
+        XCTAssertTrue(model.webView === parent)
+        XCTAssertEqual(parent.loadRequests.map(\.url), [request.url])
+        XCTAssertNil(model.navigationIssue)
+        model.handleNewWindowRequest(request, isNewWindow: false, from: parent)
+        model.handleNewWindowRequest(URLRequest(url: URL(string: "http://grok.com/fixture")!), isNewWindow: true, from: parent)
+        XCTAssertEqual(parent.loadRequests.count, 1)
+    }
+
+    @MainActor
+    func testLoadFailuresAndRecoveryControlsRetainTheParentView() throws {
+        let model = ProviderWebUsageModel(provider: .claude)
+        let parent = TrialRecordingWebView(fixtureURL: WebUsageProvider.claude.usageURL, canGoBack: true)
+        model.configureWebView(parent)
+        defer { model.close() }
+        XCTAssertTrue(model.canGoBack)
+        let navigation = try XCTUnwrap(parent.makeNavigationToken())
+        model.webView(parent, didStartProvisionalNavigation: navigation)
+        XCTAssertTrue(model.isLoading)
+        model.webView(parent, didFailProvisionalNavigation: navigation,
+                      withError: NSError(domain: NSURLErrorDomain, code: NSURLErrorCancelled))
+        XCTAssertTrue(model.isLoading)
+        XCTAssertNil(model.navigationIssue)
+        model.webView(parent, didFail: navigation, withError: NSError(domain: "LocalFixtureError", code: NSURLErrorCancelled))
+        XCTAssertEqual(model.navigationIssue, .loadFailed)
+        XCTAssertFalse(model.isLoading)
+        model.reload()
+        XCTAssertNil(model.navigationIssue)
+        XCTAssertEqual(parent.reloadCount, 1)
+        model.webViewWebContentProcessDidTerminate(parent)
+        XCTAssertEqual(model.navigationIssue, .webProcessTerminated)
+        XCTAssertFalse(model.userConfirmedUsageVisible)
+        model.goBack()
+        XCTAssertNil(model.navigationIssue)
+        XCTAssertEqual(parent.goBackCount, 1)
+        model.navigationIssue = .loadFailed
+        model.openUsagePage()
+        XCTAssertNil(model.navigationIssue)
+        XCTAssertEqual(parent.loadRequests.map(\.url), [WebUsageProvider.claude.usageURL])
+        XCTAssertTrue(model.webView === parent)
+    }
+
+    @MainActor
+    func testLateNavigationCompletionCannotOverwriteANewerNavigationOrPolicyIssue() throws {
+        let model = ProviderWebUsageModel(provider: .claude)
+        let parent = TrialRecordingWebView(fixtureURL: WebUsageProvider.claude.usageURL)
+        model.configureWebView(parent)
+        defer { model.close() }
+        let first = try XCTUnwrap(parent.makeNavigationToken())
+        model.webView(parent, didStartProvisionalNavigation: first)
+        model.reload()
+        let second = try XCTUnwrap(parent.navigationTokens.last)
+        // reload() already owns the new token, before its didStart arrives.
+        model.webView(parent, didFailProvisionalNavigation: first, withError: NSError(domain: "WKErrorDomain", code: 102))
+        XCTAssertNil(model.navigationIssue)
+        model.webView(parent, didStartProvisionalNavigation: second)
+        XCTAssertTrue(model.isLoading)
+        model.webView(parent, didFail: first, withError: NSError(domain: "LocalFixtureError", code: 1))
+        model.webView(parent, didFinish: first)
+        model.webView(parent, didFail: nil, withError: NSError(domain: "LocalFixtureError", code: 1))
+        model.webView(parent, didFinish: nil)
+        XCTAssertTrue(model.isLoading)
+        XCTAssertNil(model.navigationIssue)
+        XCTAssertEqual(model.navigationPolicy(for: URL(string: "https://accounts.google.com/fixture"),
+                                              isNewWindow: false, from: parent), .cancel)
+        model.webView(parent, didFailProvisionalNavigation: second, withError: NSError(domain: "WKErrorDomain", code: 102))
+        XCTAssertEqual(model.navigationIssue, .googleSignInUnsupported)
+        XCTAssertFalse(model.isLoading)
+        // Even a later callback for a newly started token cannot replace the
+        // precise policy issue with a generic WebKit cancellation message.
+        let third = try XCTUnwrap(parent.makeNavigationToken())
+        model.webView(parent, didStartProvisionalNavigation: third)
+        model.webView(parent, didFail: third, withError: NSError(domain: "WKErrorDomain", code: 102))
+        XCTAssertEqual(model.navigationIssue, .googleSignInUnsupported)
+        XCTAssertFalse(model.isLoading)
+        XCTAssertTrue(model.webView === parent)
+    }
+
+    @MainActor
+    func testObsoleteWebViewCallbacksAndQueuedHistoryCannotChangeTheCurrentModel() async throws {
+        let model = ProviderWebUsageModel(provider: .claude)
+        let old = TrialRecordingWebView(fixtureURL: WebUsageProvider.claude.usageURL)
+        model.configureWebView(old)
+        old.fixtureCanGoBack = true // Queue an observation before close().
+        model.close()
+        let current = TrialRecordingWebView()
+        model.configureWebView(current)
+        defer { model.close() }
+        XCTAssertFalse(model.canGoBack)
+        model.userConfirmedUsageVisible = true
+        let obsoleteNavigation = try XCTUnwrap(old.makeNavigationToken())
+        model.webView(old, didStartProvisionalNavigation: obsoleteNavigation)
+        model.webView(old, didFinish: obsoleteNavigation)
+        model.webView(old, didFail: obsoleteNavigation, withError: NSError(domain: "LocalFixtureError", code: 1))
+        model.webView(old, didFailProvisionalNavigation: obsoleteNavigation, withError: NSError(domain: "LocalFixtureError", code: 1))
+        model.webViewWebContentProcessDidTerminate(old)
+        XCTAssertEqual(model.navigationPolicy(for: URL(string: "https://accounts.google.com/fixture"),
+                                              isNewWindow: false, from: old), .cancel)
+        model.handleNewWindowRequest(URLRequest(url: URL(string: "https://claude.ai/fixture")!), isNewWindow: true, from: old)
+        await Task.yield()
+        XCTAssertTrue(model.webView === current)
+        XCTAssertTrue(model.userConfirmedUsageVisible)
+        XCTAssertFalse(model.isLoading)
+        XCTAssertFalse(model.canGoBack)
+        XCTAssertNil(model.navigationIssue)
+        XCTAssertEqual(old.loadRequests.count, 0)
+        XCTAssertEqual(current.loadRequests.count, 0)
+        // A live observation still updates history, unlike the detached view.
+        let historyUpdated = expectation(description: "Current view updates back navigation")
+        let observation = model.$canGoBack.dropFirst().filter { $0 }.prefix(1).sink { _ in historyUpdated.fulfill() }
+        current.fixtureCanGoBack = true
+        await fulfillment(of: [historyUpdated], timeout: 1)
+        XCTAssertTrue(model.canGoBack)
+        withExtendedLifetime(observation) {}
+    }
+
     /// A synthetic point target only. No website, WKWebView or network is used.
     @MainActor
     private func claudePointFixture(pieces: [String], rejection: String = "", kind: WebUsageValueKind = .used) throws -> JSContext {
@@ -392,6 +615,63 @@ final class GrokWebTrialTests: XCTestCase {
         """)
         XCTAssertNil(context.exception)
         return context
+    }
+}
+
+/// Every navigation is recorded and suppressed, including recovery methods.
+/// The URL override is synthetic test metadata, never a production URL bypass.
+@MainActor
+private final class TrialRecordingWebView: WKWebView {
+    var fixtureURL: URL?
+    var fixtureCanGoBack: Bool {
+        willSet { willChangeValue(forKey: #keyPath(WKWebView.canGoBack)) }
+        didSet { didChangeValue(forKey: #keyPath(WKWebView.canGoBack)) }
+    }
+    private(set) var loadRequests: [URLRequest] = []
+    private(set) var navigationTokens: [WKNavigation] = []
+    private(set) var reloadCount = 0
+    private(set) var goBackCount = 0
+    private lazy var navigationSource: WKWebView = {
+        let configuration = WKWebViewConfiguration()
+        configuration.websiteDataStore = .nonPersistent()
+        // This separate source has no model delegate and no network resource.
+        return WKWebView(frame: .zero, configuration: configuration)
+    }()
+
+    init(fixtureURL: URL? = nil, canGoBack: Bool = false) {
+        self.fixtureURL = fixtureURL
+        self.fixtureCanGoBack = canGoBack
+        let configuration = WKWebViewConfiguration()
+        configuration.websiteDataStore = .nonPersistent()
+        super.init(frame: .zero, configuration: configuration)
+    }
+    required init?(coder: NSCoder) { fatalError("No storyboard fixture") }
+    override var url: URL? { fixtureURL }
+    override var canGoBack: Bool { fixtureCanGoBack }
+    override func load(_ request: URLRequest) -> WKNavigation? {
+        loadRequests.append(request)
+        return recordNavigation()
+    }
+    override func reload() -> WKNavigation? {
+        reloadCount += 1
+        return recordNavigation()
+    }
+    override func goBack() -> WKNavigation? {
+        goBackCount += 1
+        return recordNavigation()
+    }
+    /// WKNavigation's inherited empty initializer does not create WebKit's
+    /// backing navigation and crashes at deallocation. Obtain a real token from
+    /// a separate offline HTML load without changing the model's parent view.
+    func makeNavigationToken() -> WKNavigation? {
+        let navigation = navigationSource.loadHTMLString("<!doctype html><html><body></body></html>", baseURL: nil)
+        navigationSource.stopLoading()
+        return navigation
+    }
+    private func recordNavigation() -> WKNavigation? {
+        guard let navigation = makeNavigationToken() else { return nil }
+        navigationTokens.append(navigation)
+        return navigation
     }
 }
 

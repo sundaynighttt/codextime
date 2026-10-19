@@ -90,6 +90,44 @@ enum GrokTrialScriptResult: Equatable {
     case unsupported(GrokTrialReadFailure)
 }
 
+enum ProviderWebNavigationIssue: String, Identifiable, Equatable {
+    case googleSignInUnsupported
+    case newWindowUnsupported
+    case unsupportedNavigation
+    case loadFailed
+    case webProcessTerminated
+
+    var id: String { rawValue }
+    var title: String {
+        switch self {
+        case .googleSignInUnsupported: return "Google 로그인 미지원"
+        case .newWindowUnsupported: return "새 창 로그인 미지원"
+        case .unsupportedNavigation: return "지원하지 않는 이동"
+        case .loadFailed: return "웹 화면을 불러오지 못했습니다"
+        case .webProcessTerminated: return "웹 화면이 종료되었습니다"
+        }
+    }
+    var message: String {
+        switch self {
+        case .googleSignInUnsupported:
+            return "Google 로그인은 앱 내 웹 화면에서 지원하지 않습니다. Claude 계정 이메일로 다시 진행해 주세요. Safari 로그인 상태는 이 앱에 자동 연결되지 않습니다."
+        case .newWindowUnsupported:
+            return "Claude의 새 창 로그인은 앱 내 웹 화면에서 지원하지 않습니다. Claude 계정 이메일로 다시 진행해 주세요. Safari 로그인 상태는 이 앱에 자동 연결되지 않습니다."
+        case .unsupportedNavigation:
+            return "이 앱에서는 HTTPS 웹 화면만 열 수 있습니다. 뒤로 가기나 사용량 화면 열기로 돌아가 주세요."
+        case .loadFailed:
+            return "웹 화면을 불러오지 못했습니다. 뒤로 가기나 새로고침으로 다시 진행해 주세요."
+        case .webProcessTerminated:
+            return "웹 화면이 종료되었습니다. 새로고침하거나 사용량 화면을 다시 열어 주세요. 다시 로그인이 필요할 수 있습니다."
+        }
+    }
+}
+
+enum ProviderWebNavigationDisposition: Equatable {
+    case allow
+    case cancel(ProviderWebNavigationIssue)
+}
+
 @MainActor
 final class ProviderWebUsageModel: NSObject, ObservableObject, WKNavigationDelegate, WKUIDelegate {
     static let usageURL = URL(string: "https://grok.com/?_s=usage")!
@@ -122,6 +160,8 @@ final class ProviderWebUsageModel: NSObject, ObservableObject, WKNavigationDeleg
     }
 
     @Published private(set) var webView: WKWebView?
+    @Published var navigationIssue: ProviderWebNavigationIssue?
+    @Published private(set) var canGoBack = false
     @Published private(set) var pageHost = "grok.com"
     @Published private(set) var isLoading = false
     @Published private(set) var isAtUsagePage = false
@@ -143,6 +183,8 @@ final class ProviderWebUsageModel: NSObject, ObservableObject, WKNavigationDeleg
     @Published private(set) var isPointReadArmed = false
 
     private var urlObservation: NSKeyValueObservation?
+    private var historyObservation: NSKeyValueObservation?
+    private var activeNavigation: WKNavigation?
     private var navigationGeneration: UInt64 = 0
     private var pointReadTask: Task<Void, Never>?
     private var pointReadRequestID: String?
@@ -156,38 +198,90 @@ final class ProviderWebUsageModel: NSObject, ObservableObject, WKNavigationDeleg
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .nonPersistent()
         let view = WKWebView(frame: .zero, configuration: configuration)
+        configureWebView(view)
+        openUsagePage()
+    }
+
+    /// Attaches one view without loading a page. Tests inject a local recording
+    /// view here; production always supplies the nonPersistent view from open().
+    func configureWebView(_ view: WKWebView) {
+        guard webView == nil else { return }
         view.navigationDelegate = self
         view.uiDelegate = self
         // Keep WebKit's standard user agent and challenge behavior unchanged.
         webView = view
-        urlObservation = view.observe(\.url, options: [.new]) { [weak self] _, _ in
-            Task { @MainActor [weak self] in self?.updateLocation() }
+        canGoBack = view.canGoBack
+        urlObservation = view.observe(\.url, options: [.new]) { [weak self, weak view] _, _ in
+            Task { @MainActor [weak self, weak view] in
+                guard let self, let view, view === self.webView else { return }
+                self.updateLocation()
+            }
         }
-        openUsagePage()
+        historyObservation = view.observe(\.canGoBack, options: [.new]) { [weak self, weak view] _, _ in
+            Task { @MainActor [weak self, weak view] in
+                guard let self, let view, view === self.webView else { return }
+                self.canGoBack = view.canGoBack
+            }
+        }
+        updateLocation()
     }
 
     func openUsagePage() {
+        navigationIssue = nil
         guard let webView else { return }
-        userConfirmedUsageVisible = false
-        selectedPercent = nil
+        invalidateNavigationReading()
+        activeNavigation = webView.load(URLRequest(url: provider.usageURL))
+    }
+
+    func goBack() {
+        guard let webView, webView.canGoBack else { return }
+        navigationIssue = nil
+        invalidateNavigationReading()
+        activeNavigation = webView.goBack()
+    }
+
+    func reload() {
+        guard let webView else { return }
+        navigationIssue = nil
+        invalidateNavigationReading()
+        activeNavigation = webView.reload()
+    }
+
+    private func invalidateNavigationReading() {
+        activeNavigation = nil
+        cancelPointRead(clearMessage: false)
         navigationGeneration &+= 1
-        webView.load(URLRequest(url: provider.usageURL))
+        selectedPercent = nil
+        userConfirmedUsageVisible = false
+        isAtUsagePage = false
+        isLoading = false
+    }
+
+    private func reportNavigationIssue(_ issue: ProviderWebNavigationIssue) {
+        invalidateNavigationReading()
+        navigationIssue = issue
+        navigationMessage = issue.message
     }
 
     func disconnect() { close() }
 
     func close() {
+        activeNavigation = nil
         cancelPointRead(clearMessage: false)
         navigationGeneration &+= 1
         selectedPercent = nil
         isReading = false
         urlObservation?.invalidate()
         urlObservation = nil
+        historyObservation?.invalidate()
+        historyObservation = nil
         webView?.stopLoading()
         webView?.navigationDelegate = nil
         webView?.uiDelegate = nil
         webView?.removeFromSuperview()
         webView = nil
+        canGoBack = false
+        navigationIssue = nil
         isLoading = false
         isAtUsagePage = false
         userConfirmedUsageVisible = false
@@ -537,7 +631,7 @@ final class ProviderWebUsageModel: NSObject, ObservableObject, WKNavigationDeleg
             selectedPercent = nil
             navigationGeneration &+= 1
         }
-        navigationMessage = isAtUsagePage ? "공식 사용량 주소입니다. 실제 패널 표시를 직접 확인해 주세요." : "공식 웹 로그인 흐름은 화면에서 직접 진행해 주세요."
+        navigationMessage = navigationIssue?.message ?? (isAtUsagePage ? "공식 사용량 주소입니다. 실제 패널 표시를 직접 확인해 주세요." : "공식 웹 로그인 흐름은 화면에서 직접 진행해 주세요.")
     }
 
     nonisolated static func isEligibleUsageURL(_ url: URL?, provider: WebUsageProvider = .grok) -> Bool {
@@ -555,20 +649,47 @@ final class ProviderWebUsageModel: NSObject, ObservableObject, WKNavigationDeleg
         }
     }
 
-    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
-                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        // Normal HTTPS provider/SSO redirects stay inside this same temporary web view.
-        // No custom-scheme callback interception or challenge bypass is attempted.
-        let scheme = navigationAction.request.url?.scheme?.lowercased()
-        if scheme == "https" || navigationAction.request.url?.absoluteString == "about:blank" {
-            decisionHandler(.allow)
-        } else {
-            navigationMessage = "이 실험은 HTTPS 웹 화면만 지원합니다. 외부 앱 인증은 처리하지 않습니다."
-            decisionHandler(.cancel)
+    /// Login policy inspects only scheme/host and the known blank-page literal.
+    /// Query/fragment values and error descriptions are never read or reported.
+    nonisolated static func navigationDisposition(for url: URL?, provider: WebUsageProvider,
+                                                  isNewWindow: Bool) -> ProviderWebNavigationDisposition {
+        let scheme = url?.scheme?.lowercased()
+        let isKnownBlank = url == URL(string: "about:blank")
+        if provider == .claude {
+            let host = url?.host?.lowercased().trimmingCharacters(in: CharacterSet(charactersIn: ".")) ?? ""
+            if scheme == "https", host == "accounts.google.com" || host.hasSuffix(".accounts.google.com") {
+                return .cancel(.googleSignInUnsupported)
+            }
+            if isNewWindow { return .cancel(.newWindowUnsupported) }
+        }
+        return scheme == "https" || isKnownBlank ? .allow : .cancel(.unsupportedNavigation)
+    }
+
+    nonisolated static func navigationIssue(for error: Error) -> ProviderWebNavigationIssue? {
+        let error = error as NSError
+        return error.domain == NSURLErrorDomain && error.code == NSURLErrorCancelled ? nil : .loadFailed
+    }
+
+    /// Shared by the delegate and local-only tests; this never loads a request.
+    func navigationPolicy(for url: URL?, isNewWindow: Bool, from source: WKWebView) -> WKNavigationActionPolicy {
+        guard source === webView else { return .cancel }
+        switch Self.navigationDisposition(for: url, provider: provider, isNewWindow: isNewWindow) {
+        case .allow: return .allow
+        case let .cancel(issue):
+            reportNavigationIssue(issue)
+            return .cancel
         }
     }
 
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
+                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        decisionHandler(navigationPolicy(for: navigationAction.request.url,
+                                        isNewWindow: navigationAction.targetFrame == nil, from: webView))
+    }
+
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        guard webView === self.webView, let navigation else { return }
+        activeNavigation = navigation
         isLoading = true
         navigationGeneration &+= 1
         selectedPercent = nil
@@ -577,29 +698,59 @@ final class ProviderWebUsageModel: NSObject, ObservableObject, WKNavigationDeleg
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        guard webView === self.webView, let navigation, let activeNavigation,
+              navigation === activeNavigation else { return }
+        self.activeNavigation = nil
         isLoading = false
         updateLocation()
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        guard webView === self.webView, let navigation, let activeNavigation,
+              navigation === activeNavigation else { return }
         loadingFailed(error)
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        guard webView === self.webView, let navigation, let activeNavigation,
+              navigation === activeNavigation else { return }
         loadingFailed(error)
     }
 
     private func loadingFailed(_ error: Error) {
-        isLoading = false
-        guard (error as NSError).code != NSURLErrorCancelled else { return }
-        navigationMessage = "웹 화면을 불러오지 못했습니다. 제공자가 웹뷰 로그인을 제한하면 여기서 중단합니다."
+        guard let issue = Self.navigationIssue(for: error) else { return }
+        // Policy cancellations may be followed by a WebKit error (including
+        // 102). Keep the precise recovery explanation instead of replacing it.
+        switch navigationIssue {
+        case .googleSignInUnsupported?, .newWindowUnsupported?, .unsupportedNavigation?:
+            if let navigationIssue { reportNavigationIssue(navigationIssue) }
+        default:
+            reportNavigationIssue(issue)
+        }
+    }
+
+    func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        guard webView === self.webView else { return }
+        reportNavigationIssue(.webProcessTerminated)
+    }
+
+    /// Claude declines the popup contract instead of navigating its parent view.
+    /// Grok retains the existing HTTPS popup flattening behavior unchanged.
+    func handleNewWindowRequest(_ request: URLRequest, isNewWindow: Bool, from source: WKWebView) {
+        guard source === webView else { return }
+        if provider == .claude {
+            reportNavigationIssue(.newWindowUnsupported)
+            return
+        }
+        if isNewWindow, request.url?.scheme == "https" {
+            invalidateNavigationReading()
+            activeNavigation = source.load(request)
+        }
     }
 
     func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration,
                  for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
-        if navigationAction.targetFrame == nil, navigationAction.request.url?.scheme == "https" {
-            webView.load(navigationAction.request)
-        }
+        handleNewWindowRequest(navigationAction.request, isNewWindow: navigationAction.targetFrame == nil, from: webView)
         return nil
     }
 }
