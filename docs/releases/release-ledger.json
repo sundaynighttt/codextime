@@ -6,12 +6,12 @@
     {
       "key": "latest_candidate",
       "label": "iPhone 최신 후보",
-      "releaseId": "ios-10-b11"
+      "releaseId": "ios-10-b13"
     },
     {
       "key": "last_external",
       "label": "Apple 처리 확인 최신",
-      "releaseId": "ios-10-b10"
+      "releaseId": "ios-10-b11"
     },
     {
       "key": "latest_desktop_release",
@@ -358,12 +358,57 @@
       "version": "1.0",
       "build": "11",
       "date": "2026-10-19",
-      "stage": "local_verified",
-      "status": "active",
-      "summary": "iPhone 앱·소형 위젯의 작은 3열 카드·17 tests·시뮬레이터·서명 검증 및 13:37 KST 업로드 성공; 실제 연결은 Codex, Grok·Claude는 미지원, Apple 처리 확인 대기",
+      "stage": "external_processed",
+      "status": "passed",
+      "summary": "3열 카드·Codex 직접 조회·17 tests 및 업로드/Apple 처리 확인; ASC CodexTime Internal 1명·빌드11 설치 표시1 확인, 실제 기능 smoke는 별도 미확인",
       "evidence": [
         "ios/project.yml",
         "docs/releases/2026-10-19-ios-three-provider-card.md",
+        "docs/app-store/submission.md"
+      ]
+    },
+    {
+      "id": "macos-031-b2026101907",
+      "sequence": 25,
+      "version": "0.3.1",
+      "build": "2026101907",
+      "date": "2026-10-19",
+      "stage": "candidate",
+      "status": "historical",
+      "summary": "중단·미배포 iCloud 후보: Mac102/shared20 tests·ad-hoc 패키징 통과; Developer ID export 프로비저닝 대기 후 종료, 정식 서명 배포·설치·실제 전송 없음",
+      "evidence": [
+        "docs/releases/2026-10-19-private-icloud-sync.md",
+        "git:f98bb6d",
+        "git:bdef8de"
+      ]
+    },
+    {
+      "id": "ios-10-b12",
+      "sequence": 26,
+      "version": "1.0",
+      "build": "12",
+      "date": "2026-10-19",
+      "stage": "failed",
+      "status": "historical",
+      "summary": "중단·미업로드 iCloud 후보:24 tests·시뮬레이터 통과, 앱/위젯 CloudKit 프로필 불일치로 두 Release archive 실패; TestFlight·실제 동기화 없음",
+      "evidence": [
+        "docs/releases/2026-10-19-private-icloud-sync.md",
+        "git:f98bb6d",
+        "git:bdef8de"
+      ]
+    },
+    {
+      "id": "ios-10-b13",
+      "sequence": 27,
+      "version": "1.0",
+      "build": "13",
+      "date": "2026-10-19",
+      "stage": "candidate",
+      "status": "pending",
+      "summary": "iPhone 단독 Grok·Claude 공식 웹 로그인과 수동 퍼센트 확인·앱/위젯 숫자 캐시 후보; 최종 테스트·서명·실계정 검증·TestFlight 업로드 대기",
+      "evidence": [
+        "ios/project.yml",
+        "docs/releases/2026-10-19-ios-web-usage.md",
         "docs/app-store/submission.md"
       ]
     }

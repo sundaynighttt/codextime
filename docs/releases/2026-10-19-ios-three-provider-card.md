@@ -18,7 +18,7 @@ iPhone 앱과 홈 화면 소형 위젯에 Codex·Grok·Claude 로고와 잔여�
 
 ## 배포 상태
 
-2026-10-19 **13:37:25 KST**, Xcode가 `Upload succeeded`, `Uploaded CodexTime`, `EXPORT SUCCEEDED`를 반환했다. 직전 응답은 `Uploaded package is processing`이었다. **빌드 11의 업로드 성공까지 확인했으며 Apple 처리 완료·테스트 그룹 배포·실기기 설치는 확인 전이다.** 정식 App Store 출시 동작은 수행하지 않았다. 이전 1.0(10)은 Codex 전용 화면이며, 2026-10-19 13:04:42 KST Apple의 테스트 가능 알림이 확인된 이력이다.
+2026-10-19 **13:37:25 KST**, Xcode가 `Upload succeeded`, `Uploaded CodexTime`, `EXPORT SUCCEEDED`를 반환했다. 직전 응답은 `Uploaded package is processing`이었다. **13:38:53 KST Apple 공식 메일의 빌드 1.0(11) ready-to-test 알림으로 처리 완료를 확인했다. 이후 ASC에서 CodexTime Internal 그룹 1명과 빌드 11의 설치 표시 1을 확인했다. 이 집계는 실제 계정 기능·위젯 smoke 통과를 뜻하지 않는다.** 정식 App Store 출시 동작은 수행하지 않았다. 이전 1.0(10)은 Codex 전용 화면이며, 2026-10-19 13:04:42 KST Apple의 테스트 가능 알림이 확인된 이력이다.
 
 ## 기존 macOS CI
 
