@@ -213,7 +213,13 @@ public static class ProviderClientSelfTests
         }
     }
 
-    private static string[] HashFiles(params string[] paths) => paths.Select(path => Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path)))).ToArray();
+    private static string[] HashFiles(params string[] paths) => paths.Select(path =>
+    {
+        // SQLite's separate writer already owns writable handles. The hash
+        // observer must share those handles without requesting write access.
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        return Convert.ToHexString(SHA256.HashData(stream));
+    }).ToArray();
     private static void Require(bool condition) { if (!condition) throw new InvalidOperationException("Synthetic provider assertion failed"); }
     private static void ExpectFailure(Action action, ProviderFailure expected)
     { try { action(); } catch (ProviderQueryException exception) when (exception.Failure == expected) { return; } throw new InvalidOperationException("Expected fixed provider failure"); }
