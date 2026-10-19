@@ -2,6 +2,7 @@
 """Render the production widget view on iOS Simulator with offline demo data."""
 from pathlib import Path
 import json
+import os
 import shutil
 import subprocess
 import tempfile
@@ -12,7 +13,8 @@ output = root / "docs/screenshots"
 bundle_id = "com.sundaynighttt.codextime.docs-preview"
 devices = json.loads(subprocess.check_output(
     ["xcrun", "simctl", "list", "devices", "available", "--json"]))["devices"]
-device = next(d for group in devices.values() for d in group
+runtime = os.environ.get("DOCS_IOS_RUNTIME")
+device = next(d for key, group in devices.items() if not runtime or key == runtime for d in group
               if "iPhone" in d["name"] and d.get("isAvailable"))
 simulator = device["udid"]
 booted_here = device["state"] != "Booted"
