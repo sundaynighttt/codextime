@@ -8,6 +8,7 @@ enum DocumentationPreview {
         let app = NSApplication.shared
         app.setActivationPolicy(.accessory)
         app.appearance = NSAppearance(named: .aqua)
+        app.finishLaunching()
         UserDefaults.standard.setVolatileDomain([
             MenuBarPreferences.showResetTimeKey: false,
             "showProviderInMenuBar.codex": true,
@@ -46,12 +47,17 @@ enum DocumentationPreview {
         let window = settings.window!
         window.appearance = NSAppearance(named: .aqua)
         window.setContentSize(NSSize(width: 660, height: 820))
+        window.orderFront(nil)
         let initial = Dictionary(uniqueKeysWithValues: ProviderID.allCases.map { id in
             (id, ProviderUsageState(id: id, failure: .authenticationRequired))
         })
         settings.update(states: initial, now: now, canConfirmGrok: false)
+        RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+        window.displayIfNeeded()
         try save(window.contentView!, to: output.appendingPathComponent("macos-setup-v0.3.1.png"))
         settings.update(states: states, now: now, canConfirmGrok: false)
+        RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+        window.displayIfNeeded()
         try save(window.contentView!, to: output.appendingPathComponent("macos-connected-v0.3.1.png"))
         print("Exported actual menu-bar renderer and setup views with documentation fixtures.")
     }
@@ -59,12 +65,13 @@ enum DocumentationPreview {
     private static func save(_ view: NSView, to url: URL) throws {
         view.layoutSubtreeIfNeeded()
         let bounds = view.bounds
-        let bitmap = NSBitmapImageRep(bitmapDataPlanes: nil,
-            pixelsWide: Int(bounds.width * 2), pixelsHigh: Int(bounds.height * 2),
-            bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
-            colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)!
-        bitmap.size = bounds.size
-        view.cacheDisplay(in: bounds, to: bitmap)
+        let image = NSImage(size: bounds.size)
+        image.lockFocus()
+        NSColor.windowBackgroundColor.setFill()
+        bounds.fill()
+        view.displayIgnoringOpacity(bounds, in: NSGraphicsContext.current!)
+        image.unlockFocus()
+        let bitmap = NSBitmapImageRep(data: image.tiffRepresentation!)!
         try bitmap.representation(using: .png, properties: [:])!.write(to: url)
     }
 }
