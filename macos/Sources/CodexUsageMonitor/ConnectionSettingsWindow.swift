@@ -66,7 +66,8 @@ final class ConnectionSettingsWindow: NSWindowController {
 
     func update(states: [ProviderID: ProviderUsageState], now: Date, canConfirmGrok: Bool,
                 loginProvider: ProviderID? = nil, messages: [ProviderID: String] = [:],
-                startupError: String? = nil, installedProviders: Set<ProviderID> = Set(ProviderID.allCases)) {
+                startupError: String? = nil, installedProviders: Set<ProviderID> = Set(ProviderID.allCases),
+                awaitingGrokConfirmation: Bool = false) {
         menuBarPreview.image = MenuBarPresentation.image(states: states, now: now,
             showResetTime: MenuBarPreferences.showResetTime, visibleProviders: MenuBarPreferences.visibleProviders)
         menuBarPreview.setAccessibilityLabel(MenuBarPresentation.summary(states: states, now: now,
@@ -78,13 +79,13 @@ final class ConnectionSettingsWindow: NSWindowController {
             let state = states[id] ?? ProviderUsageState(id: id)
             let visible = MenuBarPreferences.isVisible(id)
             let presentation = SetupRowPresentation(state: state,
-                awaitingGrokConfirmation: id == .grok && canConfirmGrok,
+                awaitingGrokConfirmation: id == .grok && awaitingGrokConfirmation,
                 dependencyInstalled: installedProviders.contains(id))
             if visible && presentation.connected { connectedCount += 1 }
             row.visible.state = visible ? .on : .off
             let status = state.connectionIsPending ? "OS 권한 확인 중"
                 : MenuBarPresentation.status(for: state, now: now)
-            setText(!visible ? "표시 꺼짐 · 자동 조회 중지" : id == .grok && canConfirmGrok ? "웹 대조 대기 · 자동 갱신 꺼짐" : status, on: row.status)
+            setText(!visible ? "표시 꺼짐 · 자동 조회 중지" : id == .grok && awaitingGrokConfirmation ? "웹 대조 대기 · 자동 갱신 꺼짐" : status, on: row.status)
             let window = state.snapshot?.displayWindow ?? state.snapshot?.windows.first
             if let window {
                 let value = window.displayRemainingPercent.map { "\($0)% 남음" } ?? "—"

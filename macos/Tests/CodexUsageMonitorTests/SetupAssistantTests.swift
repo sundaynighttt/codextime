@@ -34,6 +34,8 @@ import Testing
     #expect(!pending.connected)
     #expect(!pending.showLogin)
     #expect(pending.guidance.contains("리셋"))
+    state.isRefreshing = true
+    #expect(!SetupRowPresentation(state: state, awaitingGrokConfirmation: true).connected)
     #expect(SetupRowPresentation(state: state, awaitingGrokConfirmation: false).connected)
 }
 
@@ -120,9 +122,10 @@ import Testing
 
 @Test @MainActor func setupLoginLaunchFailureAllowsRetry() async throws {
     let controller = SetupLoginController()
-    #expect(throws: (any Error).self) {
+    do {
         try controller.start(executable: "/nonexistent/\(UUID())", arguments: []) { _ in }
-    }
+        Issue.record("Missing login executable must fail")
+    } catch {}
     #expect(!controller.isRunning)
     let result: Result<Void, SetupLoginFailure> = await withCheckedContinuation { continuation in
         do {

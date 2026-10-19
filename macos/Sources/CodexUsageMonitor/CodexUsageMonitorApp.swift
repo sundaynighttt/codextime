@@ -148,7 +148,7 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
             canConfirmGrok: grokAwaitingWebConfirmation && store.states[.grok]?.failure == nil
                 && store.states[.grok]?.snapshot != nil && store.states[.grok]?.isRefreshing != true,
             loginProvider: loginProvider, messages: setupMessages, startupError: loginItemError,
-            installedProviders: installedSetupProviders())
+            installedProviders: installedSetupProviders(), awaitingGrokConfirmation: grokAwaitingWebConfirmation)
     }
 
     private func rebuildMenu() {
