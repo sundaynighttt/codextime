@@ -12,7 +12,7 @@ let package = Package(
         .executable(name: "CodexTimeScreenshotPreview", targets: ["CodexTimeScreenshotPreview"])
     ],
     targets: [
-        .executableTarget(name: "CodexUsageMonitor"),
+        .executableTarget(name: "CodexUsageMonitor", resources: [.process("Resources")]),
         .executableTarget(name: "CodexTimeScreenshotPreview"),
         .testTarget(
             name: "CodexUsageMonitorTests",

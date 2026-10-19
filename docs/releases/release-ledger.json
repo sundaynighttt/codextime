@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "project": "codextime",
-  "updatedAt": "2026-09-04",
+  "updatedAt": "2026-10-19",
   "pointers": [
     {
       "key": "latest_candidate",
@@ -17,6 +17,11 @@
       "key": "latest_desktop_release",
       "label": "데스크톱 공개 최신",
       "releaseId": "v0.2.3"
+    },
+    {
+      "key": "last_installed_smoke",
+      "label": "macOS 로컬 설치·실행 확인",
+      "releaseId": "macos-030-b2026101906"
     }
   ],
   "releases": [
@@ -235,6 +240,98 @@
       "evidence": [
         "ios/project.yml",
         "docs/app-store/submission.md"
+      ]
+    },
+    {
+      "id": "macos-024-b2026101901",
+      "sequence": 17,
+      "version": "0.2.4",
+      "build": "2026101901",
+      "date": "2026-10-19",
+      "stage": "installed_smoke",
+      "status": "historical",
+      "summary": "macOS 세 로고·독립 상태 처리 로컬 설치·실행 및 42 tests/Codex 실조회 통과; Grok Bot·Claude quota 미연결, 실제 메뉴 클릭 검수는 Computer Use timeout으로 미완료",
+      "evidence": [
+        "docs/releases/2026-10-19-macos-local.md",
+        "docs/protocol.md",
+        "macos/scripts/build-macos.sh"
+      ]
+    },
+    {
+      "version": "0.2.4",
+      "date": "2026-10-19",
+      "stage": "installed_smoke",
+      "evidence": [
+        "docs/releases/2026-10-19-macos-local.md",
+        "docs/protocol.md",
+        "macos/scripts/build-macos.sh"
+      ],
+      "id": "macos-024-b2026101902",
+      "sequence": 18,
+      "build": "2026101902",
+      "status": "historical",
+      "summary": "승인된 Grok Bot·Claude 연결 구현·설치 및 75 tests; Codex·Claude 실제 조회 성공, Grok 인증 필요"
+    },
+    {
+      "version": "0.2.4",
+      "date": "2026-10-19",
+      "stage": "installed_smoke",
+      "evidence": [
+        "docs/releases/2026-10-19-macos-local.md",
+        "docs/protocol.md",
+        "macos/scripts/build-macos.sh"
+      ],
+      "id": "macos-024-b2026101903",
+      "sequence": 19,
+      "build": "2026101903",
+      "status": "historical",
+      "summary": "Grok 고정 인증 단계 진단·설치 및 78 tests; Codex·Claude 실제 조회 성공, Grok 지정 Keychain 항목 부재로 HTTP 전 중단, 메뉴 육안 검수는 Computer Use timeout으로 미완료"
+    },
+    {
+      "id": "macos-024-b2026101904",
+      "sequence": 20,
+      "version": "0.2.4",
+      "build": "2026101904",
+      "date": "2026-10-19",
+      "stage": "installed_smoke",
+      "status": "historical",
+      "summary": "일반 Grok 구독으로 전환 준비·Bot 조회 중단; 79 tests 및 설치본 Codex·Claude 실조회 통과, 일반 Grok 새 인증 연결 승인 대기",
+      "evidence": [
+        "docs/releases/2026-10-19-macos-local.md",
+        "docs/protocol.md",
+        "macos/scripts/build-macos.sh"
+      ]
+    },
+    {
+      "id": "macos-024-b2026101905",
+      "sequence": 21,
+      "version": "0.2.4",
+      "build": "2026101905",
+      "date": "2026-10-19",
+      "stage": "installed_smoke",
+      "status": "historical",
+      "summary": "승인된 Cursor 단일 키로 Grok 공유 quota 연결·웹 표시 정밀도 및 reset 대조 후 10분 갱신 활성화; 90 tests·설치·서명·세 로고 실제 검수 창 readback 통과",
+      "evidence": [
+        "docs/releases/2026-10-19-macos-local.md",
+        "docs/protocol.md",
+        "macos/Sources/CodexUsageMonitor/CursorGrokCredentialSource.swift",
+        "macos/scripts/build-macos.sh"
+      ]
+    },
+    {
+      "id": "macos-030-b2026101906",
+      "sequence": 22,
+      "version": "0.3.0",
+      "build": "2026101906",
+      "date": "2026-10-19",
+      "stage": "installed_smoke",
+      "status": "active",
+      "summary": "세 서비스 표시·조회 선택과 본인 계정 설정 UI; 99 tests 및 universal 로컬 설치·숨김/복원 검수 통과, Claude OS 권한 응답·GitHub 서명 공증 공개 대기",
+      "evidence": [
+        "docs/releases/2026-10-19-v0.3.0.md",
+        "docs/macos-setup.md",
+        "macos/scripts/build-macos.sh",
+        ".github/workflows/release.yml"
       ]
     }
   ]

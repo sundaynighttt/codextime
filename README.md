@@ -8,21 +8,21 @@ Codex를 쓰다 보면 남은 사용량과 리셋 시간을 확인하기 위해 
 
 **그게 불편해서 만들었습니다.**
 
-CodexTime은 Codex의 남은 사용량과 리셋까지 남은 시간을 항상 짧게 보여주는 무료 오픈소스 앱입니다.
+CodexTime은 지원하는 AI 서비스의 남은 사용량과 리셋까지 남은 시간을 짧게 보여주는 무료 오픈소스 앱입니다.
 
-- **macOS:** 상단 메뉴바에 `Codex 95%` 표시, 필요하면 리셋 시간도 함께 표시
-- **Windows:** 작업표시줄에 `Codex 95% · 6d 16h` 표시
+- **macOS:** Codex · Grok · Claude를 기본 표시하고 서비스별 숨김·조회 중지 선택, 필요하면 리셋 시간도 함께 표시
+- **Windows — Codex 전용:** 작업표시줄에 `Codex 95% · 6d 16h` 표시
 - **iPhone:** 홈 화면 소형 위젯에 `Codex (갱신 시각) / 95% / 3d 17h / 누적 토큰` 표시
 - Windows에서는 우상단 미니 위젯으로 전환 가능
 - 별도 OpenAI API 키 불필요
 - 광고·분석·텔레메트리 없음
 
-> CodexTime은 OpenAI의 공식 제품이 아닌 커뮤니티 프로젝트입니다. 데스크톱은 Codex의 `app-server`, iPhone은 기기 로그인·계정 사용량 인터페이스를 사용합니다. 외부 서비스 변경에 따라 수정이 필요할 수 있습니다.
+> CodexTime은 서비스 제공자의 공식 제품이 아닌 커뮤니티 프로젝트입니다. Codex CLI·계정 사용량 인터페이스와 macOS의 추가 공급자 연결을 사용하며, 외부 서비스 변경에 따라 수정이 필요할 수 있습니다.
 
 <!-- project-release-ledger:start -->
 ## 릴리스 기준과 전체 버전 흐름
 
-> 자동 관리 원장: [`docs/releases/release-ledger.json`](docs/releases/release-ledger.json) · 갱신일: `2026-09-04`
+> 자동 관리 원장: [`docs/releases/release-ledger.json`](docs/releases/release-ledger.json) · 갱신일: `2026-10-19`
 
 ### 현재 기준선
 
@@ -31,6 +31,7 @@ CodexTime은 Codex의 남은 사용량과 리셋까지 남은 시간을 항상 �
 | iPhone 최신 후보<br>`latest_candidate` | **`1.0 (9)`** | `external_processed` | `active` | 예시 모드·개인정보·이용 안내, 14개 테스트 및 CI 통과; 2026-09-04 09:55 KST App Store 심사 제출 완료·심사 대기 중, 승인 및 수동 출시 전 | [project.yml](ios/project.yml)<br>[submission.md](docs/app-store/submission.md) |
 | Apple 처리 확인 최신<br>`last_external` | **`1.0 (9)`** | `external_processed` | `active` | 예시 모드·개인정보·이용 안내, 14개 테스트 및 CI 통과; 2026-09-04 09:55 KST App Store 심사 제출 완료·심사 대기 중, 승인 및 수동 출시 전 | [project.yml](ios/project.yml)<br>[submission.md](docs/app-store/submission.md) |
 | 데스크톱 공개 최신<br>`latest_desktop_release` | **`v0.2.3`** | `released` | `historical` | macOS 메뉴바 표시 복구 | `git:v0.2.3`<br>[외부 근거](https://github.com/sundaynighttt/codextime/releases/tag/v0.2.3) |
+| macOS 로컬 설치·실행 확인<br>`last_installed_smoke` | **`0.3.0 (2026101906)`** | `installed_smoke` | `active` | 세 서비스 표시·조회 선택과 본인 계정 설정 UI; 99 tests 및 universal 로컬 설치·숨김/복원 검수 통과, Claude OS 권한 응답·GitHub 서명 공증 공개 대기 | [2026-10-19-v0.3.0.md](docs/releases/2026-10-19-v0.3.0.md)<br>[macos-setup.md](docs/macos-setup.md)<br>[build-macos.sh](macos/scripts/build-macos.sh)<br>[release.yml](.github/workflows/release.yml) |
 
 ### 전체 버전 흐름
 
@@ -52,6 +53,12 @@ CodexTime은 Codex의 남은 사용량과 리셋까지 남은 시간을 항상 �
 | 14 | 2026-09-03 | `0.3.0 (7)` | `external_processed` | `historical` | 위젯 새로고침 버튼 정렬; 2026-09-04 ASC 처리 상태 확인, 설치 수만으로 smoke 통과를 추정하지 않음 | `git:d9f37ad`<br>[submission.md](docs/app-store/submission.md) |
 | 15 | 2026-09-03 | `0.3.0 (8)` | `external_processed` | `historical` | 위젯 갱신 시각을 제목 오른쪽 괄호로 이동; 2026-09-04 ASC 처리 상태 확인, 설치 수만으로 smoke 통과를 추정하지 않음 | `git:df03b4d`<br>[submission.md](docs/app-store/submission.md) |
 | 16 | 2026-09-04 | `1.0 (9)` | `external_processed` | `active` | 예시 모드·개인정보·이용 안내, 14개 테스트 및 CI 통과; 2026-09-04 09:55 KST App Store 심사 제출 완료·심사 대기 중, 승인 및 수동 출시 전 | [project.yml](ios/project.yml)<br>[submission.md](docs/app-store/submission.md) |
+| 17 | 2026-10-19 | `0.2.4 (2026101901)` | `installed_smoke` | `historical` | macOS 세 로고·독립 상태 처리 로컬 설치·실행 및 42 tests/Codex 실조회 통과; Grok Bot·Claude quota 미연결, 실제 메뉴 클릭 검수는 Computer Use timeout으로 미완료 | [2026-10-19-macos-local.md](docs/releases/2026-10-19-macos-local.md)<br>[protocol.md](docs/protocol.md)<br>[build-macos.sh](macos/scripts/build-macos.sh) |
+| 18 | 2026-10-19 | `0.2.4 (2026101902)` | `installed_smoke` | `historical` | 승인된 Grok Bot·Claude 연결 구현·설치 및 75 tests; Codex·Claude 실제 조회 성공, Grok 인증 필요 | [2026-10-19-macos-local.md](docs/releases/2026-10-19-macos-local.md)<br>[protocol.md](docs/protocol.md)<br>[build-macos.sh](macos/scripts/build-macos.sh) |
+| 19 | 2026-10-19 | `0.2.4 (2026101903)` | `installed_smoke` | `historical` | Grok 고정 인증 단계 진단·설치 및 78 tests; Codex·Claude 실제 조회 성공, Grok 지정 Keychain 항목 부재로 HTTP 전 중단, 메뉴 육안 검수는 Computer Use timeout으로 미완료 | [2026-10-19-macos-local.md](docs/releases/2026-10-19-macos-local.md)<br>[protocol.md](docs/protocol.md)<br>[build-macos.sh](macos/scripts/build-macos.sh) |
+| 20 | 2026-10-19 | `0.2.4 (2026101904)` | `installed_smoke` | `historical` | 일반 Grok 구독으로 전환 준비·Bot 조회 중단; 79 tests 및 설치본 Codex·Claude 실조회 통과, 일반 Grok 새 인증 연결 승인 대기 | [2026-10-19-macos-local.md](docs/releases/2026-10-19-macos-local.md)<br>[protocol.md](docs/protocol.md)<br>[build-macos.sh](macos/scripts/build-macos.sh) |
+| 21 | 2026-10-19 | `0.2.4 (2026101905)` | `installed_smoke` | `historical` | 승인된 Cursor 단일 키로 Grok 공유 quota 연결·웹 표시 정밀도 및 reset 대조 후 10분 갱신 활성화; 90 tests·설치·서명·세 로고 실제 검수 창 readback 통과 | [2026-10-19-macos-local.md](docs/releases/2026-10-19-macos-local.md)<br>[protocol.md](docs/protocol.md)<br>[CursorGrokCredentialSource.swift](macos/Sources/CodexUsageMonitor/CursorGrokCredentialSource.swift)<br>[build-macos.sh](macos/scripts/build-macos.sh) |
+| 22 | 2026-10-19 | `0.3.0 (2026101906)` | `installed_smoke` | `active` | 세 서비스 표시·조회 선택과 본인 계정 설정 UI; 99 tests 및 universal 로컬 설치·숨김/복원 검수 통과, Claude OS 권한 응답·GitHub 서명 공증 공개 대기 | [2026-10-19-v0.3.0.md](docs/releases/2026-10-19-v0.3.0.md)<br>[macos-setup.md](docs/macos-setup.md)<br>[build-macos.sh](macos/scripts/build-macos.sh)<br>[release.yml](.github/workflows/release.yml) |
 <!-- project-release-ledger:end -->
 
 ## 화면
@@ -68,31 +75,35 @@ iPhone 소형 위젯:
 
 ## 다운로드
 
-최신 버전은 [GitHub Releases](https://github.com/sundaynighttt/codextime/releases/latest)에서 받을 수 있습니다.
+이미 공개된 버전은 [GitHub Releases](https://github.com/sundaynighttt/codextime/releases/latest)에서 받을 수 있습니다.
 
-| 운영체제 | 파일 | 지원 환경 |
+**다음 macOS 공개 버전 v0.3.0 (2026101906)은 준비 중이며 아직 게시되지 않았습니다.** macOS 13 이상에서 Intel·Apple Silicon을 함께 지원하는 Universal DMG를 준비하고 있습니다. 서명·공증과 패키지 검증이 끝난 뒤 Releases에 설치 파일을 게시합니다.
+
+| 운영체제 | 설치 파일 | 사용량 연결 |
 | --- | --- | --- |
-| macOS | `CodexTime-macOS-<버전>.dmg` | macOS 13 이상 |
-| Windows | `CodexTime-Windows-<버전>.zip` | Windows 10/11 |
+| macOS | `CodexTime-macOS-<버전>.dmg` | Codex·Claude, 조건을 확인한 Cursor 기반 Grok 연결 |
+| Windows | `CodexTime-Windows-<버전>.zip` | Codex 전용, Windows 10/11 |
 
-두 버전 모두 [Codex CLI](https://learn.chatgpt.com/docs/codex/cli)가 설치되어 있고 ChatGPT 계정으로 로그인되어 있어야 합니다.
-
-```text
-codex --version
-codex login status
-```
+각 사용자가 자신의 Mac·PC에서 본인 계정으로 로그인해야 합니다. 배포 파일에 개발자의 인증정보나 계정 캐시가 들어 있지 않습니다. Codex 연결에는 [공식 Codex CLI](https://github.com/openai/codex#installation)가 필요하고, macOS의 다른 서비스는 각각 별도로 연결합니다. [macOS 설치·계정 연결 안내](docs/macos-setup.md)를 참고하세요.
 
 iPhone은 **1.0(9) App Store 심사 대기 중**이며 아직 일반 공개되지 않았습니다. 2026-09-04 정식 심사에 제출했으며, 기존 0.3.0(1–8)은 TestFlight 내부 테스트 이력입니다. 정식 설치 링크는 Apple 승인 및 수동 출시 후 추가합니다. Codex CLI나 켜져 있는 Mac 없이 본인의 ChatGPT 계정을 직접 연결하며, 로그인 없는 **예시 데이터로 둘러보기**도 제공합니다. 예시는 앱과 위젯에 명확히 표시되고 실제 계정 캐시와 분리됩니다. [iPhone 안내](ios/README.md) · [제출 현황](docs/app-store/submission.md)
 
 ## macOS 설치
 
-1. DMG 파일을 엽니다.
-2. **Codex Usage Monitor**를 Applications 폴더로 옮깁니다.
-3. 앱을 실행하면 상단 메뉴바에 사용량이 표시됩니다. 메뉴에서 리셋 시간 표시 여부를 선택할 수 있습니다.
+1. 공개가 완료된 DMG를 열어 **Codex Usage Monitor**를 **Applications**로 옮깁니다.
+2. 앱을 처음 실행하면 **계정 연결 및 표시** 창에서 사용할 서비스를 설정합니다. 다시 열려면 메뉴 막대의 **계정 연결 및 표시 설정…**을 선택합니다.
+3. Codex는 공식 CLI에서 `codex login`, Claude는 Claude Code에서 `claude auth login --claudeai`를 본인 계정으로 완료합니다. Claude는 앱의 **Claude 연결…** 동의와 필요한 OS 권한 허용도 완료합니다.
+4. Grok은 Cursor에서 본인의 같은 구독 계정으로 로그인한 뒤 **Cursor로 연결…**을 선택합니다. 조회된 사용률·리셋을 **웹 사용량 열기**에서 대조한 후 일치할 때만 자동 갱신을 시작합니다.
 
-기본 표시는 메뉴바 공간을 적게 쓰는 `Codex 95%` 형식입니다. 화면 연결 상태가 바뀌거나 잠자기에서 돌아오면 메뉴바 항목을 다시 표시합니다. 항목이 보이지 않을 때 앱을 한 번 더 열어도 복원됩니다. 공개 DMG는 Developer ID로 서명하고 Apple 공증을 완료했습니다. 로그인 시 자동 실행은 메뉴에서 켜고 끌 수 있습니다.
+세 로고는 기본으로 모두 보입니다. 메뉴나 설정 창에서 **메뉴 막대에 표시**를 끄면 해당 서비스의 표시와 자동·수동·잠자기 복귀 조회가 중지됩니다. 이전 성공 값은 앱 메모리에만 유지합니다. 모두 끄면 **사용량** 표시가 남아 메뉴에서 다시 켤 수 있습니다.
+
+연결된 서비스는 10분마다 독립 갱신하며 `—`는 미연결·미확인, `*`는 20분 경과 또는 재조회 실패로 남은 이전 성공 값입니다. Claude·Grok 계정을 바꿀 때는 앱에서 **연결 해제**한 뒤 다시 연결하세요. 이 동작은 앱의 연결 상태와 캐시만 지우며 공식 앱·CLI의 인증정보를 삭제하지 않습니다. 자세한 절차와 조건은 [macOS 설정 안내](docs/macos-setup.md), 처리 범위는 [통신 규약](docs/protocol.md#macos-공급자별-상태)을 따릅니다.
+
+화면 연결 변경이나 잠자기 복귀 후 메뉴 막대 항목을 복원하며, 앱을 다시 열어도 메뉴를 복구할 수 있습니다. 로그인 시 자동 실행은 메뉴에서 선택합니다.
 
 ## Windows 설치
+
+현재 Windows 앱은 Codex 전용입니다. 본인의 ChatGPT 계정으로 Codex CLI 로그인을 완료한 뒤 사용하세요.
 
 1. ZIP 파일의 압축을 풉니다.
 2. 해당 폴더에서 PowerShell을 엽니다.
@@ -114,11 +125,14 @@ powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\CodexUsageMonitor\un
 
 ## 개인정보와 보안
 
-- macOS와 Windows는 설치된 Codex CLI의 기존 로그인을 사용합니다.
-- macOS와 Windows는 `auth.json`, 브라우저 쿠키, 액세스 토큰을 직접 읽지 않습니다.
+- macOS와 Windows의 Codex 조회는 설치된 Codex CLI의 기존 로그인을 사용하며, `auth.json`이나 Codex 액세스 토큰을 직접 읽지 않습니다.
+- macOS에서 Claude·Grok의 기존 인증정보 접근은 사용자별 앱 연결 동의 후 시작합니다. Claude는 기본 Claude Code Keychain 항목, Grok은 Cursor 저장소의 `cursorAuth/accessToken` 한 항목만 앱 메모리에서 사용합니다. 배포 파일에 인증정보를 동봉하거나 별도 인증 파일로 저장하지 않습니다.
+- Claude는 `api.anthropic.com`의 고정 usage 경로, Cursor 기반 Grok은 `api2.cursor.sh`의 고정 `GetSandUsageStatus` RPC만 호출합니다. Grok은 최초 웹 사용률·리셋 대조가 끝나기 전 자동 접근을 차단합니다. 이 내부 인터페이스의 지원 여부는 계정·구독과 서비스 변경에 따라 달라질 수 있습니다.
+- 세 서비스 표시의 기본값은 켜짐이며, 숨긴 서비스는 자동·수동·잠자기 복귀 조회를 중지합니다. 연결된 표시 서비스만 기본 600초마다 갱신합니다. macOS 연결 해제는 앱 플래그와 메모리 캐시만 지우고 공식 앱·CLI의 원본 인증정보는 유지합니다.
+- Claude의 OS 확인창은 명시적인 연결 요청에서만 허용하며 백그라운드 갱신은 확인창을 띄우지 않습니다. 로그인·토큰 갱신·인증정보 수정·쿠키·대화 원문·다른 DB 항목 읽기를 하지 않고 비밀값·원시 응답·원시 오류를 로그에 남기지 않습니다.
 - iPhone은 OpenAI 기기 로그인으로 받은 토큰을 동기화되지 않는 iOS Keychain에 저장합니다. ID 토큰에는 계정 정보가 포함될 수 있습니다.
-- 개발자 자체 서버는 없습니다. 실제 계정 연결 시 OpenAI에 인증·사용량 요청과 네트워크 정보가 전달됩니다.
-- 예시 모드는 인증 정보와 네트워크 요청 없이 동작합니다. 실제 계정 연결 해제는 기기의 토큰과 캐시를 지우며 외부 계정을 삭제하지 않습니다.
+- 개발자 자체 서버는 없습니다. 실제 계정 연결 시 해당 서비스 제공자에 인증·사용량 요청과 네트워크 정보가 직접 전달됩니다.
+- iPhone 예시 모드는 인증정보와 네트워크 요청 없이 동작합니다. iPhone 연결 해제는 이 앱의 기기 내 토큰과 캐시를 지우며 외부 계정을 삭제하지 않습니다.
 - 광고·사용자 분석·텔레메트리가 없습니다.
 - 소스 코드와 빌드 과정이 모두 공개되어 있습니다.
 
@@ -150,10 +164,10 @@ xcodegen generate
 xcodebuild -project CodexTime.xcodeproj -scheme CodexTime -sdk iphonesimulator build CODE_SIGNING_ALLOWED=NO
 ```
 
-macOS와 Windows는 `codex app-server`를 짧게 실행해 `account/rateLimits/read` 결과만 읽습니다. iPhone은 기기 로그인 후 ChatGPT 사용량 엔드포인트에서 같은 메타데이터를 직접 읽습니다. 모두 사용한 비율을 남은 비율로 바꾸고, 리셋 시각을 남은 시간으로 표시합니다. 기본 한도 구간을 표시하며 모든 구간이나 API 결제 잔액을 표시하지는 않습니다. 자세한 필드와 통신 순서는 [docs/protocol.md](docs/protocol.md)에 정리되어 있습니다.
+macOS와 Windows의 Codex 조회는 `codex app-server`를 짧게 실행해 `account/rateLimits/read` 결과만 읽습니다. iPhone은 기기 로그인 후 ChatGPT 사용량 엔드포인트에서 같은 메타데이터를 직접 읽습니다. 모두 사용한 비율을 남은 비율로 바꾸고, 리셋 시각을 남은 시간으로 표시합니다. 기본 한도 구간을 표시하며 모든 구간이나 API 결제 잔액을 표시하지는 않습니다. 자세한 필드와 통신 순서는 [docs/protocol.md](docs/protocol.md)에 정리되어 있습니다.
 
 기여 방법은 [CONTRIBUTING.md](CONTRIBUTING.md), 전체 라이선스는 [MIT License](LICENSE)를 참고하세요.
 
 ## English
 
-CodexTime is a free, open-source app for macOS, Windows, and iPhone that shows your remaining Codex allowance and reset countdown. Download desktop builds from [GitHub Releases](https://github.com/sundaynighttt/codextime/releases/latest). iPhone 1.0(9) was submitted on September 4, 2026 and is waiting for App Store review; approval and manual release are still pending. Its clearly labeled offline example mode is available without an account. Live account access communicates directly with OpenAI; there is no developer-operated backend, advertising, or analytics SDK.
+CodexTime is a free, open-source app for macOS, Windows, and iPhone that shows your remaining Codex allowance and reset countdown. Download desktop builds from [GitHub Releases](https://github.com/sundaynighttt/codextime/releases/latest). iPhone 1.0(9) was submitted on September 4, 2026 and is waiting for App Store review; approval and manual release are still pending. Its clearly labeled offline example mode is available without an account. macOS adds opt-in Claude and conditional Cursor-backed Grok usage, with per-provider visibility controls; Windows remains Codex-only. Users connect their own accounts, and no credentials are included in downloads. Account access communicates directly with the connected provider; there is no developer-operated backend, advertising, or analytics SDK.
