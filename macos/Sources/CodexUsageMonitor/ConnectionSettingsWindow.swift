@@ -7,6 +7,8 @@ final class ConnectionSettingsWindow: NSWindowController {
         let visible: NSButton
         let status: NSTextField
         let quota: NSTextField
+        let guidance: NSTextField
+        let login: NSButton
         let connect: NSButton
         let disconnect: NSButton?
         let confirm: NSButton?
@@ -16,29 +18,43 @@ final class ConnectionSettingsWindow: NSWindowController {
     private let onConnect: (ProviderID) -> Void
     private let onDisconnect: (ProviderID) -> Void
     private let onOpenHelp: (ProviderID) -> Void
+    private let onLogin: (ProviderID) -> Void
+    private let onCancelLogin: () -> Void
+    private let onLaunchAtLoginChanged: (Bool) -> Void
     private let onConfirmGrok: () -> Void
     private var rows: [ProviderID: Row] = [:]
     private let menuBarPreview = NSImageView()
+    private let heading = NSTextField(labelWithString: "계정 연결을 시작하세요")
+    private let setupSummary = NSTextField(wrappingLabelWithString: "")
+    private let startup = NSButton(checkboxWithTitle: "로그인 시 자동 실행", target: nil, action: nil)
+    private let finish = NSButton(title: "나중에 설정", target: nil, action: nil)
+    private let cancelLogin = NSButton(title: "로그인 취소", target: nil, action: nil)
 
     init(
         onVisibilityChanged: @escaping (ProviderID, Bool) -> Void,
         onConnect: @escaping (ProviderID) -> Void,
         onDisconnect: @escaping (ProviderID) -> Void,
         onOpenHelp: @escaping (ProviderID) -> Void,
+        onLogin: @escaping (ProviderID) -> Void,
+        onCancelLogin: @escaping () -> Void,
+        onLaunchAtLoginChanged: @escaping (Bool) -> Void,
         onConfirmGrok: @escaping () -> Void
     ) {
         self.onVisibilityChanged = onVisibilityChanged
         self.onConnect = onConnect
         self.onDisconnect = onDisconnect
         self.onOpenHelp = onOpenHelp
+        self.onLogin = onLogin
+        self.onCancelLogin = onCancelLogin
+        self.onLaunchAtLoginChanged = onLaunchAtLoginChanged
         self.onConfirmGrok = onConfirmGrok
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 600, height: 620),
+            contentRect: NSRect(x: 0, y: 0, width: 660, height: 720),
             styleMask: [.titled, .closable, .resizable], backing: .buffered, defer: false
         )
-        window.title = "계정 연결 및 표시"
+        window.title = "CodexTime 간편 설정"
         window.level = .normal
-        window.minSize = NSSize(width: 540, height: 420)
+        window.minSize = NSSize(width: 600, height: 480)
         window.isReleasedWhenClosed = false
         super.init(window: window)
         configureContent(in: window)
@@ -48,15 +64,23 @@ final class ConnectionSettingsWindow: NSWindowController {
 
     required init?(coder: NSCoder) { return nil }
 
-    func update(states: [ProviderID: ProviderUsageState], now: Date, canConfirmGrok: Bool) {
+    func update(states: [ProviderID: ProviderUsageState], now: Date, canConfirmGrok: Bool,
+                loginProvider: ProviderID? = nil, messages: [ProviderID: String] = [:],
+                startupError: String? = nil, installedProviders: Set<ProviderID> = Set(ProviderID.allCases)) {
         menuBarPreview.image = MenuBarPresentation.image(states: states, now: now,
             showResetTime: MenuBarPreferences.showResetTime, visibleProviders: MenuBarPreferences.visibleProviders)
         menuBarPreview.setAccessibilityLabel(MenuBarPresentation.summary(states: states, now: now,
             visibleProviders: MenuBarPreferences.visibleProviders))
+        var connectedCount = 0
+        let selected = MenuBarPreferences.visibleProviders
         for id in ProviderID.allCases {
             guard let row = rows[id] else { continue }
             let state = states[id] ?? ProviderUsageState(id: id)
             let visible = MenuBarPreferences.isVisible(id)
+            let presentation = SetupRowPresentation(state: state,
+                awaitingGrokConfirmation: id == .grok && canConfirmGrok,
+                dependencyInstalled: installedProviders.contains(id))
+            if visible && presentation.connected { connectedCount += 1 }
             row.visible.state = visible ? .on : .off
             let status = state.connectionIsPending ? "OS 권한 확인 중"
                 : MenuBarPresentation.status(for: state, now: now)
@@ -70,17 +94,45 @@ final class ConnectionSettingsWindow: NSWindowController {
             } else {
                 setText("잔여 한도 · —\n리셋 · —", on: row.quota)
             }
-            let busy = state.isRefreshing || state.connectionIsPending
+            let busy = state.isRefreshing || state.connectionIsPending || loginProvider == id
             row.connect.isEnabled = !busy
-            row.connect.title = busy ? "확인 중…" : connectTitle(for: id)
+            row.connect.title = busy ? "확인 중…" : presentation.connectTitle
+            row.login.title = presentation.loginTitle
+            row.login.isHidden = !presentation.showLogin
+            row.login.isEnabled = !busy && loginProvider == nil
+            setText(messages[id] ?? presentation.guidance, on: row.guidance)
+            if loginProvider == id { setText("공식 로그인 완료 대기 중", on: row.status) }
             row.disconnect?.isEnabled = !busy
             row.confirm?.isEnabled = canConfirmGrok && !busy
         }
+        let complete = !selected.isEmpty && connectedCount == selected.count
+        heading.stringValue = complete ? "설정이 완료됐습니다" : "계정 연결을 시작하세요"
+        setText(startupError ?? (selected.isEmpty ? "표시할 서비스를 선택하세요."
+            : complete ? "설정 완료 · 선택한 \(selected.count)개 서비스를 자동 갱신합니다."
+            : "\(selected.count)개 중 \(connectedCount)개 연결 완료 · 아래에서 필요한 단계만 진행하세요."), on: setupSummary)
+        startup.state = LoginItemManager.isEnabled ? .on : .off
+        finish.title = complete ? "설정 완료" : "나중에 설정"
+        cancelLogin.isHidden = loginProvider == nil
     }
 
     private func configureContent(in window: NSWindow) {
         let content = NSView()
         window.contentView = content
+        let footer = NSStackView(views: [startup, NSView(), cancelLogin, finish])
+        footer.translatesAutoresizingMaskIntoConstraints = false
+        footer.spacing = 12
+        content.addSubview(footer)
+        startup.target = self
+        startup.action = #selector(startupChanged(_:))
+        startup.setAccessibilityIdentifier("CodexTimeSetup-startup")
+        finish.target = self
+        finish.action = #selector(finishSetup)
+        finish.bezelStyle = .rounded
+        finish.setAccessibilityIdentifier("CodexTimeSetup-finish")
+        cancelLogin.target = self
+        cancelLogin.action = #selector(cancelSetupLogin)
+        cancelLogin.bezelStyle = .rounded
+        cancelLogin.isHidden = true
         let scroll = NSScrollView()
         scroll.translatesAutoresizingMaskIntoConstraints = false
         scroll.drawsBackground = false
@@ -96,6 +148,12 @@ final class ConnectionSettingsWindow: NSWindowController {
         stack.alignment = .leading
         stack.spacing = 18
         document.addSubview(stack)
+        heading.font = .systemFont(ofSize: 22, weight: .bold)
+        stack.addArrangedSubview(heading)
+        setupSummary.font = .systemFont(ofSize: 13, weight: .medium)
+        setupSummary.setAccessibilityIdentifier("CodexTimeSetup-summary")
+        stack.addArrangedSubview(setupSummary)
+        setupSummary.widthAnchor.constraint(equalTo: stack.widthAnchor).isActive = true
         menuBarPreview.imageAlignment = .alignLeft
         menuBarPreview.imageScaling = .scaleProportionallyDown
         menuBarPreview.contentTintColor = .labelColor
@@ -106,7 +164,7 @@ final class ConnectionSettingsWindow: NSWindowController {
             menuBarPreview.heightAnchor.constraint(equalToConstant: 24)
         ])
         let introduction = text(
-            "표시를 끄면 자동 조회도 멈춥니다. 계정 변경 후에는 연결을 해제하고 다시 연결하세요.",
+            "① 사용할 서비스 선택  →  ② 기존 계정 연결 또는 로그인  →  ③ 사용량 확인\n로그인과 macOS 권한 승인만 직접 완료해 주세요. 표시를 끈 서비스는 조회하지 않습니다.",
             font: .systemFont(ofSize: 12), color: .secondaryLabelColor
         )
         stack.addArrangedSubview(introduction)
@@ -124,7 +182,10 @@ final class ConnectionSettingsWindow: NSWindowController {
             scroll.leadingAnchor.constraint(equalTo: content.leadingAnchor, constant: 24),
             scroll.trailingAnchor.constraint(equalTo: content.trailingAnchor, constant: -20),
             scroll.topAnchor.constraint(equalTo: content.topAnchor, constant: 22),
-            scroll.bottomAnchor.constraint(equalTo: content.bottomAnchor, constant: -20),
+            scroll.bottomAnchor.constraint(equalTo: footer.topAnchor, constant: -16),
+            footer.leadingAnchor.constraint(equalTo: content.leadingAnchor, constant: 24),
+            footer.trailingAnchor.constraint(equalTo: content.trailingAnchor, constant: -24),
+            footer.bottomAnchor.constraint(equalTo: content.bottomAnchor, constant: -18),
             document.leadingAnchor.constraint(equalTo: scroll.contentView.leadingAnchor),
             document.topAnchor.constraint(equalTo: scroll.contentView.topAnchor),
             document.widthAnchor.constraint(equalTo: scroll.contentView.widthAnchor),
@@ -161,10 +222,12 @@ final class ConnectionSettingsWindow: NSWindowController {
         quota.setAccessibilityIdentifier("CodexTimeConnection-\(id.rawValue)-quota")
         let guidance = text(guidance(for: id), font: .systemFont(ofSize: 12), color: .secondaryLabelColor)
         let help = button(helpTitle(for: id), index: index, action: #selector(openHelp(_:)))
+        let login = button("로그인하기", index: index, action: #selector(loginProvider(_:)))
+        login.setAccessibilityIdentifier("CodexTimeConnection-\(id.rawValue)-login")
         let connect = button(connectTitle(for: id), index: index, action: #selector(connectProvider(_:)))
         connect.setAccessibilityIdentifier("CodexTimeConnection-\(id.rawValue)-connect")
         let disconnect = id == .codex ? nil : button("연결 해제", index: index, action: #selector(disconnectProvider(_:)))
-        let buttons = NSStackView(views: [help, connect] + (disconnect.map { [$0] } ?? []))
+        let buttons = NSStackView(views: [connect, login, help] + (disconnect.map { [$0] } ?? []))
         buttons.spacing = 8
         buttons.alignment = .centerY
         let row = NSStackView(views: [header, status, quota, guidance, buttons])
@@ -181,7 +244,7 @@ final class ConnectionSettingsWindow: NSWindowController {
             row.addArrangedSubview(control)
             confirm = control
         }
-        rows[id] = Row(visible: visible, status: status, quota: quota, connect: connect,
+        rows[id] = Row(visible: visible, status: status, quota: quota, guidance: guidance, login: login, connect: connect,
                        disconnect: disconnect, confirm: confirm)
         return row
     }
@@ -224,6 +287,12 @@ final class ConnectionSettingsWindow: NSWindowController {
     @objc private func openHelp(_ sender: NSButton) {
         if let id = provider(for: sender) { onOpenHelp(id) }
     }
+    @objc private func loginProvider(_ sender: NSButton) {
+        if let id = provider(for: sender) { onLogin(id) }
+    }
+    @objc private func startupChanged(_ sender: NSButton) { onLaunchAtLoginChanged(sender.state == .on) }
+    @objc private func finishSetup() { close() }
+    @objc private func cancelSetupLogin() { onCancelLogin() }
     @objc private func confirmGrok() { onConfirmGrok() }
 
     private func connectTitle(for id: ProviderID) -> String {
