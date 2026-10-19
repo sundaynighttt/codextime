@@ -6,12 +6,12 @@
     {
       "key": "latest_candidate",
       "label": "iPhone 최신 후보",
-      "releaseId": "ios-10-b13"
+      "releaseId": "ios-10-b14"
     },
     {
       "key": "last_external",
       "label": "Apple 처리 확인 최신",
-      "releaseId": "ios-10-b13"
+      "releaseId": "ios-10-b14"
     },
     {
       "key": "latest_desktop_release",
@@ -404,7 +404,7 @@
       "build": "13",
       "date": "2026-10-19",
       "stage": "external_processed",
-      "status": "passed",
+      "status": "historical",
       "summary": "iPhone 웹 수동 사용량·42 XCTest/96 Node cases·Release UI/서명 통과; 21:13업로드·약21:18 Apple 처리와Internal1명배정 확인, 실계정 검증은 사용자 TestFlight 예정",
       "evidence": [
         "ios/project.yml",
@@ -413,6 +413,23 @@
         "git:bdb1bb6",
         "git:6943976",
         "https://appstoreconnect.apple.com/teams/8874948e-3fee-4bea-a414-67a4c0f0e7d8/apps/6805935440/testflight/ios/4e556a52-67f9-4190-a95a-09dca4272252"
+      ]
+    },
+    {
+      "id": "ios-10-b14",
+      "sequence": 28,
+      "version": "1.0",
+      "build": "14",
+      "date": "2026-10-19",
+      "stage": "external_processed",
+      "status": "passed",
+      "summary": "웹 로그인 영역 확대·조작 패널 접기·키보드 대응; iPhone17e 빈 폼·42 XCTest·Release 서명, 21:39업로드·21:42~43 Apple 처리/Internal1명·21:44안내 저장 확인",
+      "evidence": [
+        "ios/project.yml",
+        "docs/releases/2026-10-19-ios-web-height.md",
+        "docs/app-store/submission.md",
+        "git:da7d762",
+        "https://appstoreconnect.apple.com/teams/8874948e-3fee-4bea-a414-67a4c0f0e7d8/apps/6805935440/testflight/ios/9b6de1a7-c183-4198-a084-9dfe9be7182a"
       ]
     }
   ]

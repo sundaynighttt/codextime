@@ -1,5 +1,12 @@
 # CodexTime App Store 제출 현황
 
+## TestFlight 처리 완료 1.0(14) — 웹 로그인 영역 확대
+
+- 빌드13 공통 연결 화면의 긴 안내·숫자 설정 때문에 로그인 웹 영역이 좁아지는 문제를 수리했다. 네이티브 상단 공급자/호스트, 도움말·읽기 설정 시트, 기본 한 줄 하단, 키보드 시 하단 숨김·키보드 닫기를 적용했다.
+- 같은 WKWebView 세션과 네이티브 웹 폼 스크롤을 유지한다. View와 빌드 설정만 변경하고 인증·사용량 모델·Coordinator·파서·캐시·권한은 변경하지 않았다. 정책 고정 커밋 `6943976`을 유지한다.
+- **external_processed/passed:** iPhone 17e / iOS 26.5의 빈 Claude·Grok 로그인 폼·소프트웨어 키보드·버튼 접근·설정/도움말 복원, XCTest42·Debug/Release·Release archive·엄격 서명을 통과했다. 앱/위젯 1.0(14), App Group·Keychain만 사용하며 CloudKit 권한은 없다.
+- 로그인 정보 입력·제출은 수행하지 않았다. 실제 계정 인증·숫자 대조·실기기 smoke 통과로 확대하지 않는다. **2026-10-19 21:39:25 KST 빌드14 TestFlight 업로드에 성공**했다. Xcode의 `Uploaded package is processing`·`Upload succeeded`·`Uploaded CodexTime`·`EXPORT SUCCEEDED`를 확인했다. **21:42~21:43 KST** ASC에서 업로드 상태 완료·제출 준비 완료·90일 유효를 확인하고 [빌드14 상세](https://appstoreconnect.apple.com/teams/8874948e-3fee-4bea-a414-67a4c0f0e7d8/apps/6805935440/testflight/ios/9b6de1a7-c183-4198-a084-9dfe9be7182a)에서 **CodexTime Internal 내부 1명 배정**을 확인했다. 기존 내부 테스터가 설치·업데이트할 수 있다. **21:44 KST** 새 UI 테스트 안내의 저장 완료 상태도 확인했다. 사용자 기기의 설치·실계정 기능 smoke를 완료했다고 추정하지 않는다. 최신 후보·외부 처리 포인터는14다. [UI 수리 근거](../releases/2026-10-19-ios-web-height.md).
+
 ## TestFlight 처리 완료 1.0(13) — iPhone 단독 공식 웹 사용량
 
 - Codex 직접 로그인·조회와 3열 카드·위젯을 유지하고, Grok·Claude 각각의 공식 웹을 nonPersistent WKWebView에서 열어 직접 로그인·수동 퍼센트 확인을 추가한다. Mac·iCloud·Cursor·새 서버·API 키는 필요하지 않다.
