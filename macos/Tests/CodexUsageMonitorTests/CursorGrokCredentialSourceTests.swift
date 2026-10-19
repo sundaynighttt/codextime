@@ -226,7 +226,8 @@ private final class CursorWalCredentialFixture {
         do {
             try process.run()
             var descriptor = pollfd(fd: output.fileHandleForReading.fileDescriptor, events: Int16(POLLIN), revents: 0)
-            guard poll(&descriptor, 1, 3_000) > 0, descriptor.revents & Int16(POLLIN) != 0,
+            // CI may cold-start the system Python shim; wait for its explicit ready byte.
+            guard poll(&descriptor, 1, 15_000) > 0, descriptor.revents & Int16(POLLIN) != 0,
                   try output.fileHandleForReading.read(upToCount: 1) == Data("R".utf8) else {
                 throw CursorFixtureFailure.operationFailed
             }
