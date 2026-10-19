@@ -13,6 +13,14 @@ import Testing
     #expect(row.guidance.contains("완료 후"))
 }
 
+@Test func codexLoginErrorsOfferRecoveryWithoutDisplayingServerText() {
+    for message in ["Authentication required", "Not logged in. Please log in.", "Unauthorized"] {
+        #expect(CodexUsageProviderClient.failure(for: .server(message)) == .authenticationRequired)
+    }
+    #expect(CodexUsageProviderClient.failure(for: .server("private server detail")) == .queryFailed)
+    #expect(CodexUsageProviderClient.failure(for: .timeout) == .timeout)
+}
+
 @Test func connectedSetupDoesNotTellUserToReinstallOrLogInDuringRefresh() {
     var state = ProviderUsageState(id: .claude)
     state.snapshot = ProviderUsageSnapshot(provider: .claude,
