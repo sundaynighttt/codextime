@@ -154,14 +154,24 @@ struct CodexUsageProviderClient: UsageProviderClient {
         } catch let failure as ProviderUsageFailure {
             throw failure
         } catch let error as MonitorError {
-            switch error {
-            case .codexNotFound: throw ProviderUsageFailure.notInstalled
-            case .timeout: throw ProviderUsageFailure.timeout
-            case .invalidResponse: throw ProviderUsageFailure.invalidResponse
-            case .launchFailed, .server: throw ProviderUsageFailure.queryFailed
-            }
+            throw Self.failure(for: error)
         } catch {
             throw ProviderUsageFailure.queryFailed
+        }
+    }
+
+    static func failure(for error: MonitorError) -> ProviderUsageFailure {
+        switch error {
+        case .codexNotFound: return .notInstalled
+        case .timeout: return .timeout
+        case .invalidResponse: return .invalidResponse
+        case .launchFailed: return .queryFailed
+        case .server(let message):
+            let normalized = message.lowercased()
+            let loginMessages = ["not logged in", "not authenticated", "authentication required",
+                "unauthorized", "login required", "please log in", "please login"]
+            return loginMessages.contains(where: { normalized.contains($0) })
+                ? .authenticationRequired : .queryFailed
         }
     }
 

@@ -4,7 +4,7 @@ set -euo pipefail
 script_dir=${0:A:h}
 macos_dir=${script_dir:h}
 repo_dir=${macos_dir:h}
-version=${1:-${CODEXTIME_VERSION:-0.3.0}}
+version=${1:-${CODEXTIME_VERSION:-0.3.1}}
 version_pattern='^[0-9]+[.][0-9]+[.][0-9]+$'
 if [[ ! "$version" =~ $version_pattern ]]; then
   print -u2 'Version must be x.y.z.'
@@ -66,6 +66,7 @@ mkdir -p "$stage_dir" "$repo_dir/dist"
 /usr/bin/ditto "$app_path" "$stage_dir/Codex Usage Monitor.app"
 ln -s /Applications "$stage_dir/Applications"
 cp "$repo_dir/LICENSE" "$stage_dir/LICENSE.txt"
+cp "$macos_dir/Resources/GettingStarted.html" "$stage_dir/시작하기.html"
 
 rm -f "$dmg_path"
 hdiutil create \

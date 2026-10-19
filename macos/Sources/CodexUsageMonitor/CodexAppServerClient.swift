@@ -49,22 +49,8 @@ struct CodexAppServerClient: Sendable {
     }
 
     private func resolveCodexPath() throws -> String {
-        let environmentPath = explicitPath?.trimmingCharacters(in: .whitespacesAndNewlines)
-        let candidates = [
-            environmentPath,
-            "/Applications/ChatGPT.app/Contents/Resources/codex",
-            "/Applications/Codex.app/Contents/Resources/codex",
-            FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".local/bin/codex").path,
-            "/opt/homebrew/bin/codex",
-            "/usr/local/bin/codex"
-        ].compactMap { $0 }
-
-        if let match = candidates.first(where: {
-            FileManager.default.isExecutableFile(atPath: $0)
-        }) {
-            return match
-        }
-        throw MonitorError.codexNotFound
+        do { return try SetupCLI.resolve(.codex, explicitPath: explicitPath) }
+        catch { throw MonitorError.codexNotFound }
     }
 
     private func requestData() throws -> Data {

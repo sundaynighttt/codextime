@@ -84,22 +84,23 @@ iPhone 소형 위젯:
 | macOS | [CodexTime-macOS-0.3.0.dmg](https://github.com/sundaynighttt/codextime/releases/download/v0.3.0/CodexTime-macOS-0.3.0.dmg) | Codex·Claude, 조건을 확인한 Cursor 기반 Grok 연결 |
 | Windows | [CodexTime-Windows-0.3.0.zip](https://github.com/sundaynighttt/codextime/releases/download/v0.3.0/CodexTime-Windows-0.3.0.zip) | Codex 전용, Windows 10/11 |
 
-각 사용자가 자신의 Mac·PC에서 본인 계정으로 로그인해야 합니다. 배포 파일에 개발자의 인증정보나 계정 캐시가 들어 있지 않습니다. Codex 연결에는 [공식 Codex CLI](https://github.com/openai/codex#installation)가 필요하고, macOS의 다른 서비스는 각각 별도로 연결합니다. [macOS 설치·계정 연결 안내](docs/macos-setup.md)를 참고하세요.
+각 사용자가 자신의 Mac·PC에서 본인 계정으로 로그인해야 합니다. 배포 파일에 개발자의 인증정보나 계정 캐시가 들어 있지 않습니다. macOS Codex 연결은 설치된 ChatGPT/Codex 앱의 지원되는 내장 CLI 또는 [공식 Codex CLI](https://github.com/openai/codex#installation)를 사용하며, 다른 서비스는 각각 별도로 연결합니다. [macOS 설치·계정 연결 안내](docs/macos-setup.md)를 참고하세요.
 
 iPhone은 **1.0(9) App Store 심사 대기 중**이며 아직 일반 공개되지 않았습니다. 2026-09-04 정식 심사에 제출했으며, 기존 0.3.0(1–8)은 TestFlight 내부 테스트 이력입니다. 정식 설치 링크는 Apple 승인 및 수동 출시 후 추가합니다. Codex CLI나 켜져 있는 Mac 없이 본인의 ChatGPT 계정을 직접 연결하며, 로그인 없는 **예시 데이터로 둘러보기**도 제공합니다. 예시는 앱과 위젯에 명확히 표시되고 실제 계정 캐시와 분리됩니다. [iPhone 안내](ios/README.md) · [제출 현황](docs/app-store/submission.md)
 
-## macOS 설치
+## macOS 설치와 간편 설정
 
-1. 공개가 완료된 DMG를 열어 **Codex Usage Monitor**를 **Applications**로 옮깁니다.
-2. 앱을 처음 실행하면 **계정 연결 및 표시** 창에서 사용할 서비스를 설정합니다. 다시 열려면 메뉴 막대의 **계정 연결 및 표시 설정…**을 선택합니다.
-3. Codex는 공식 CLI에서 `codex login`, Claude는 Claude Code에서 `claude auth login --claudeai`를 본인 계정으로 완료합니다. Claude는 앱의 **Claude 연결…** 동의와 필요한 OS 권한 허용도 완료합니다.
-4. Grok은 Cursor에서 본인의 같은 구독 계정으로 로그인한 뒤 **Cursor로 연결…**을 선택합니다. 조회된 사용률·리셋을 **웹 사용량 열기**에서 대조한 후 일치할 때만 자동 갱신을 시작합니다.
+**v0.3.1부터 앱 안에서 로그인과 연결 확인을 진행할 수 있습니다.** 필요한 공식 앱·CLI가 없으면 공식 설치 안내를 엽니다.
 
-세 로고는 기본으로 모두 보입니다. 메뉴나 설정 창에서 **메뉴 막대에 표시**를 끄면 해당 서비스의 표시와 자동·수동·잠자기 복귀 조회가 중지됩니다. 이전 성공 값은 앱 메모리에만 유지합니다. 모두 끄면 **사용량** 표시가 남아 메뉴에서 다시 켤 수 있습니다.
+1. DMG를 열어 **Codex Usage Monitor**를 **Applications**로 옮기고 실행합니다.
+2. **CodexTime 간편 설정**에서 사용할 서비스를 선택합니다. 이미 로그인했다면 **기존 계정 연결**, 처음이거나 로그인이 만료됐다면 **로그인하기**를 누릅니다.
+3. Codex·Claude는 공식 브라우저 로그인이 완료되면 사용량 연결을 자동 확인합니다. 최초 연결의 조회 동의와 macOS Keychain 권한 승인은 본인이 완료합니다.
+4. Grok은 열린 Cursor의 **General → Sign In**에서 같은 계정으로 로그인한 뒤 설정 창으로 돌아옵니다. **웹 사용량 열기**에서 사용률·리셋을 대조하고 일치할 때 자동 갱신을 시작합니다.
+5. **설정 완료**를 누릅니다. 필요하면 **로그인 시 자동 실행**도 선택하세요. 이후 연결된 서비스는 **10분마다** 갱신됩니다.
 
-연결된 서비스는 10분마다 독립 갱신하며 `—`는 미연결·미확인, `*`는 20분 경과 또는 재조회 실패로 남은 이전 성공 값입니다. Claude·Grok 계정을 바꿀 때는 앱에서 **연결 해제**한 뒤 다시 연결하세요. 이 동작은 앱의 연결 상태와 캐시만 지우며 공식 앱·CLI의 인증정보를 삭제하지 않습니다. 자세한 절차와 조건은 [macOS 설정 안내](docs/macos-setup.md), 처리 범위는 [통신 규약](docs/protocol.md#macos-공급자별-상태)을 따릅니다.
+[설치·업데이트·서비스별 로그인과 문제 해결 안내](docs/macos-setup.md) · [v0.3.1 변경 및 검증](docs/releases/2026-10-19-v0.3.1.md)
 
-화면 연결 변경이나 잠자기 복귀 후 메뉴 막대 항목을 복원하며, 앱을 다시 열어도 메뉴를 복구할 수 있습니다. 로그인 시 자동 실행은 메뉴에서 선택합니다.
+표시 선택을 끄면 해당 서비스의 표시와 조회가 멈춥니다. 모두 꺼도 복구용 **사용량** 메뉴가 남습니다. `—`는 미연결·미확인, `*`는 이전 성공 값입니다. 연결 설정은 다음 실행에도 유지되며, 계정 변경은 Claude·Grok의 **연결 해제** 후 진행합니다. 언제든 메뉴의 **간편 설정 및 계정 연결…**에서 다시 설정할 수 있습니다.
 
 ## Windows 설치
 

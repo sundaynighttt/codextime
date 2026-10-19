@@ -17,6 +17,10 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
     private var settingsWindow: ConnectionSettingsWindow?
     private var grokAwaitingWebConfirmation = false
     private var connectionAttempts: [ProviderID: UUID] = [:]
+    private let setupLogin = SetupLoginController()
+    private var loginProvider: ProviderID?
+    private var awaitingCursorLogin = false
+    private var setupMessages: [ProviderID: String] = [:]
 
     static func main() {
         if CommandLine.arguments.contains("--check-usage") {
@@ -57,7 +61,9 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         guard !terminating else { return .terminateLater }
         terminating = true
+        setupLogin.cancel()
         Task {
+            await setupLogin.shutdown()
             await store.shutdown()
             sender.reply(toApplicationShouldTerminate: true)
         }
@@ -74,6 +80,18 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
         ensureStatusItemVisible(reason: "application reopen")
         showConnectionSettings()
         return false
+    }
+
+    func applicationDidBecomeActive(_ notification: Notification) {
+        guard awaitingCursorLogin else { return }
+        awaitingCursorLogin = false
+        Task { @MainActor in
+            await store.refreshAndWait(.grok)
+            guard loginProvider == .grok, !terminating else { return }
+            loginProvider = nil
+            setupMessages[.grok] = nil
+            connectProvider(.grok)
+        }
     }
 
     func menuWillOpen(_ menu: NSMenu) { rebuildMenu() }
@@ -128,12 +146,14 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
         reviewWindow?.update(states: store.states, now: store.now)
         settingsWindow?.update(states: store.states, now: store.now,
             canConfirmGrok: grokAwaitingWebConfirmation && store.states[.grok]?.failure == nil
-                && store.states[.grok]?.snapshot != nil && store.states[.grok]?.isRefreshing != true)
+                && store.states[.grok]?.snapshot != nil && store.states[.grok]?.isRefreshing != true,
+            loginProvider: loginProvider, messages: setupMessages, startupError: loginItemError,
+            installedProviders: installedSetupProviders(), awaitingGrokConfirmation: grokAwaitingWebConfirmation)
     }
 
     private func rebuildMenu() {
         statusMenu.removeAllItems()
-        statusMenu.addItem(actionItem(title: "계정 연결 및 표시 설정…",
+        statusMenu.addItem(actionItem(title: "간편 설정 및 계정 연결…",
             action: #selector(showConnectionSettings)))
         statusMenu.addItem(.separator())
         addInfoItem("표시할 서비스 · 끄면 자동 조회도 중지", to: statusMenu)
@@ -231,6 +251,7 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
     private func setProviderVisible(_ id: ProviderID, visible: Bool) {
         MenuBarPreferences.setVisible(visible, for: id)
         if !visible {
+            if loginProvider == id { cancelSetupLogin() }
             connectionAttempts[id] = nil
             if id == .grok { grokAwaitingWebConfirmation = false }
         }
@@ -246,6 +267,9 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
                 onConnect: { [weak self] id in self?.connectProvider(id) },
                 onDisconnect: { [weak self] id in self?.disconnectProvider(id) },
                 onOpenHelp: { [weak self] id in self?.openHelp(for: id) },
+                onLogin: { [weak self] id in self?.startSetupLogin(id) },
+                onCancelLogin: { [weak self] in self?.cancelSetupLogin() },
+                onLaunchAtLoginChanged: { [weak self] enabled in self?.setLaunchAtLogin(enabled) },
                 onConfirmGrok: { [weak self] in self?.confirmGrokWebMatch() })
         }
         updateStatusTitle()
@@ -256,21 +280,30 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
 
     private func connectProvider(_ id: ProviderID) {
         guard connectionAttempts[id] == nil, store.states[id]?.isRefreshing != true else { return }
-        if id == .codex {
+        setupMessages[id] = nil
+        let alreadyConnected = id == .claude
+            ? UserDefaults.standard.bool(forKey: ClaudeSubscriptionUsageProviderClient.connectionEnabledKey)
+            : UserDefaults.standard.bool(forKey: "grokCursorUsageVerified")
+        let needsAccess = [.authenticationRequired, .permissionRequired, .permissionDenied]
+            .contains(store.states[id]?.failure)
+        if id == .codex || (alreadyConnected && !needsAccess) {
             setProviderVisible(id, visible: true)
             store.refresh(id)
             return
         }
-        let alert = NSAlert()
-        alert.messageText = "\(id.name) 계정 연결"
-        if id == .grok {
-            alert.informativeText = "이 Mac의 Cursor 로그인 토큰 한 항목만 앱 메모리에서 읽어 공유 사용량과 리셋을 조회합니다. 토큰을 별도 저장하거나 대화·쿠키·갱신 토큰을 읽지 않습니다. 조회 후 본인의 Grok 웹 사용량과 대조해야 자동 갱신이 시작됩니다."
-        } else {
-            alert.informativeText = "이 Mac의 Claude Code Keychain 항목을 앱 메모리에서 사용해 구독 사용량과 리셋만 조회합니다. OS 권한창이 나타날 수 있습니다. 연결하면 10분마다 갱신하며 토큰을 별도 저장하거나 갱신하지 않습니다."
+        if !SetupConsent.isGranted(id) {
+            let alert = NSAlert()
+            alert.messageText = "\(id.name) 계정 연결"
+            if id == .grok {
+                alert.informativeText = "이 Mac의 Cursor 로그인 토큰 한 항목만 앱 메모리에서 읽어 공유 사용량과 리셋을 조회합니다. 토큰을 별도 저장하거나 대화·쿠키·갱신 토큰을 읽지 않습니다. 조회 후 본인의 Grok 웹 사용량과 대조해야 자동 갱신이 시작됩니다."
+            } else {
+                alert.informativeText = "이 Mac의 Claude Code Keychain 항목을 앱 메모리에서 사용해 구독 사용량과 리셋만 조회합니다. OS 권한창이 나타날 수 있습니다. 연결하면 10분마다 갱신하며 토큰을 별도 저장하거나 갱신하지 않습니다."
+            }
+            alert.addButton(withTitle: "사용량 조회 허용")
+            alert.addButton(withTitle: "취소")
+            guard alert.runModal() == .alertFirstButtonReturn else { return }
         }
-        alert.addButton(withTitle: "사용량 조회 허용")
-        alert.addButton(withTitle: "취소")
-        guard alert.runModal() == .alertFirstButtonReturn else { return }
+        SetupConsent.setGranted(true, for: id)
         let attempt = UUID()
         connectionAttempts[id] = attempt
         if id == .grok {
@@ -323,6 +356,8 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
     private func disconnectProvider(_ id: ProviderID) {
         guard id != .codex else { return }
         connectionAttempts[id] = nil
+        SetupConsent.setGranted(false, for: id)
+        setupMessages[id] = nil
         if id == .grok {
             UserDefaults.standard.set(false, forKey: "grokCursorUsageVerified")
             grokAwaitingWebConfirmation = false
@@ -349,6 +384,105 @@ final class CodexUsageMonitorApp: NSObject, NSApplicationDelegate, NSMenuDelegat
         case .claude: address = "https://code.claude.com/docs/en/setup"
         }
         if let url = URL(string: address) { NSWorkspace.shared.open(url) }
+    }
+
+    private func startSetupLogin(_ id: ProviderID) {
+        guard loginProvider == nil, connectionAttempts[id] == nil else { return }
+        setProviderVisible(id, visible: true)
+        if id == .grok {
+            UserDefaults.standard.set(false, forKey: "grokCursorUsageVerified")
+            grokAwaitingWebConfirmation = false
+            let candidates = ["/Applications/Cursor.app",
+                FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Applications/Cursor.app").path]
+            let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.todesktop.230313mzl4w4u92")
+                ?? candidates.first(where: { FileManager.default.fileExists(atPath: $0) }).map { URL(fileURLWithPath: $0) }
+            guard let url else {
+                setupMessages[id] = "Cursor 설치가 필요합니다. 설치하고 본인 계정으로 로그인한 뒤 ‘기존 계정 연결’을 누르세요."
+                NSWorkspace.shared.open(URL(string: "https://cursor.com/downloads")!)
+                updateStatusTitle()
+                return
+            }
+            awaitingCursorLogin = true
+            loginProvider = id
+            setupMessages[id] = "Cursor 설정의 General → Sign In에서 Grok과 같은 계정으로 로그인하세요. 이 창으로 돌아오면 자동으로 연결을 확인합니다."
+            updateStatusTitle()
+            let configuration = NSWorkspace.OpenConfiguration()
+            NSWorkspace.shared.openApplication(at: url, configuration: configuration) { [weak self] _, error in
+                guard error != nil else { return }
+                Task { @MainActor in
+                    self?.awaitingCursorLogin = false
+                    self?.loginProvider = nil
+                    self?.setupMessages[id] = "Cursor를 열지 못했습니다. 직접 실행한 뒤 ‘기존 계정 연결’을 눌러 주세요."
+                    self?.updateStatusTitle()
+                }
+            }
+            return
+        }
+        let executable: String
+        do { executable = try SetupCLI.resolve(id,
+            explicitPath: id == .codex ? ProcessInfo.processInfo.environment["CODEX_CLI_PATH"] : nil) }
+        catch {
+            setupMessages[id] = "공식 CLI 설치가 필요합니다. 설치 안내에 따라 설치한 뒤 다시 로그인해 주세요."
+            openHelp(for: id)
+            updateStatusTitle()
+            return
+        }
+        loginProvider = id
+        setupMessages[id] = "브라우저에서 공식 로그인을 완료해 주세요. 완료 후 이 창에서 사용량 연결을 자동으로 확인합니다."
+        updateStatusTitle()
+        do {
+            try setupLogin.start(executable: executable, arguments: SetupCLI.loginArguments(for: id)) { [weak self] result in
+                guard let self else { return }
+                self.loginProvider = nil
+                guard !self.terminating else { return }
+                switch result {
+                case .success:
+                    self.setupMessages[id] = nil
+                    Task { @MainActor in
+                        await self.store.refreshAndWait(id)
+                        self.connectProvider(id)
+                        self.showConnectionSettings()
+                    }
+                case .failure(let failure):
+                    self.setupMessages[id] = failure.message
+                }
+                self.updateStatusTitle()
+            }
+        } catch {
+            loginProvider = nil
+            setupMessages[id] = "공식 로그인 프로그램을 실행하지 못했습니다. 설치 안내를 확인해 주세요."
+            updateStatusTitle()
+        }
+    }
+
+    private func installedSetupProviders() -> Set<ProviderID> {
+        var installed = Set([ProviderID.codex, .claude].filter { (try? SetupCLI.resolve($0)) != nil })
+        if NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.todesktop.230313mzl4w4u92") != nil
+            || FileManager.default.fileExists(atPath: "/Applications/Cursor.app")
+            || FileManager.default.fileExists(atPath: FileManager.default.homeDirectoryForCurrentUser
+                .appendingPathComponent("Applications/Cursor.app").path) {
+            installed.insert(.grok)
+        }
+        return installed
+    }
+
+    private func cancelSetupLogin() {
+        if awaitingCursorLogin {
+            awaitingCursorLogin = false
+            loginProvider = nil
+            setupMessages[.grok] = "로그인 확인을 취소했습니다. ‘기존 계정 연결’로 다시 확인할 수 있습니다."
+        }
+        setupLogin.cancel()
+        updateStatusTitle()
+    }
+
+    private func setLaunchAtLogin(_ enabled: Bool) {
+        do {
+            try LoginItemManager.setEnabled(enabled)
+            loginItemError = nil
+        } catch { loginItemError = "자동 실행을 설정하지 못했습니다. 시스템 설정의 로그인 항목을 확인해 주세요." }
+        updateStatusTitle()
+        rebuildMenu()
     }
 
     @objc private func toggleResetTime() {

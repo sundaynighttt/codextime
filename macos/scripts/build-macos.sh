@@ -6,8 +6,8 @@ macos_dir=${script_dir:h}
 app_name='Codex Usage Monitor'
 bundle_dir="$macos_dir/dist/$app_name.app"
 contents_dir="$bundle_dir/Contents"
-version=${CODEXTIME_VERSION:-0.3.0}
-build_number=${CODEXTIME_BUILD_NUMBER:-2026101906}
+version=${CODEXTIME_VERSION:-0.3.1}
+build_number=${CODEXTIME_BUILD_NUMBER:-2026101907}
 # A single architecture can be requested for local development only.
 archs=(${=CODEXTIME_ARCHS:-arm64 x86_64})
 version_pattern='^[0-9]+[.][0-9]+[.][0-9]+$'
