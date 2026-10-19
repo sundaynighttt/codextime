@@ -2,6 +2,8 @@
 
 ## CodexBar provider logos
 
+The same PNG marks are also bundled in `ios/Shared/ProviderAssets.xcassets` for the iPhone app and widget. The complete notice is included in both bundles as `ThirdPartyNotices.txt`.
+
 The monochrome provider marks below are derived from [CodexBar](https://github.com/steipete/CodexBar), pinned to commit [`6480977b47f6e4ffd5dcaae1cb0c7fdf34ee449e`](https://github.com/steipete/CodexBar/tree/6480977b47f6e4ffd5dcaae1cb0c7fdf34ee449e).
 
 | Bundled asset | Original SVG |

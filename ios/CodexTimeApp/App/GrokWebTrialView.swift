@@ -1,0 +1,319 @@
+import SwiftUI
+import UIKit
+import WebKit
+
+@MainActor
+struct ProviderWebUsageView: View {
+    @ObservedObject var model: ProviderWebUsageModel
+    @Environment(\.dismiss) private var dismiss
+    @State private var presentedPanel: Panel?
+    @State private var isKeyboardVisible = false
+    @State private var didAttemptRead = false
+
+    private enum Panel: String, Identifiable {
+        case reading, help
+        var id: String { rawValue }
+    }
+
+    init(model: ProviderWebUsageModel) {
+        _model = ObservedObject(wrappedValue: model)
+    }
+
+    var body: some View {
+        NavigationStack {
+            webContent
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .safeAreaInset(edge: .bottom, spacing: 0) {
+                    if !isKeyboardVisible { compactControls }
+                }
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .principal) {
+                        VStack(spacing: 0) {
+                            Text(model.provider.name).font(.headline)
+                            Text(model.pageHost)
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                                .accessibilityIdentifier("grok-trial-page-host")
+                        }
+                    }
+                    ToolbarItem(placement: .topBarLeading) {
+                        if isKeyboardVisible {
+                            Button("키보드 닫기", systemImage: "keyboard.chevron.compact.down") {
+                                endEditing()
+                            }
+                            .labelStyle(.iconOnly)
+                            .accessibilityIdentifier("web-usage-hide-keyboard")
+                        } else {
+                            Menu {
+                                Button("뒤로 가기", systemImage: "chevron.backward") { model.goBack() }
+                                    .disabled(!model.canGoBack)
+                                Button("새로고침", systemImage: "arrow.clockwise") { model.reload() }
+                                    .disabled(model.webView == nil)
+                                Button(model.provider == .claude ? "Claude 화면으로 돌아가기" : "사용량 화면 열기") { model.openUsagePage() }
+                                    .disabled(model.webView == nil)
+                                if model.provider == .grok {
+                                    Button("읽기 설정", systemImage: "slider.horizontal.3") { openPanel(.reading) }
+                                }
+                                Button("도움말", systemImage: "questionmark.circle") { openPanel(.help) }
+                                Divider()
+                                Button("연결 해제·기록 삭제", role: .destructive) { model.disconnect() }
+                                    .accessibilityIdentifier("web-usage-disconnect")
+                            } label: {
+                                Label("더 보기", systemImage: "ellipsis.circle")
+                            }
+                            .accessibilityIdentifier("web-usage-menu")
+                        }
+                    }
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("완료") {
+                            endEditing()
+                            dismiss()
+                        }
+                        .accessibilityIdentifier("grok-trial-close")
+                    }
+                }
+                .sheet(item: $presentedPanel) { panel in
+                    switch panel {
+                    case .reading: readingPanel
+                    case .help: helpPanel
+                    }
+                }
+        }
+        .onAppear { model.open() }
+        .onDisappear { model.cancelPointRead(clearMessage: model.isPointReadArmed || model.isReading) }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
+            isKeyboardVisible = true
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            isKeyboardVisible = false
+        }
+        .alert(item: $model.navigationIssue) { issue in
+            Alert(
+                title: Text(issue.title),
+                message: Text(issue.message),
+                primaryButton: .default(Text(model.provider == .claude ? "Claude로 돌아가기" : "사용량 다시 열기")) {
+                    endEditing()
+                    model.openUsagePage()
+                },
+                secondaryButton: .cancel(Text("닫기"))
+            )
+        }
+    }
+
+    @ViewBuilder
+    private var webContent: some View {
+        if let webView = model.webView {
+            GrokTrialWebContent(webView: webView)
+                .accessibilityIdentifier("grok-trial-webview")
+        } else {
+            VStack(spacing: 12) {
+                ContentUnavailableView("웹 세션 종료", systemImage: "xmark.circle",
+                                       description: Text("다시 연결하면 새 메모리 세션을 엽니다."))
+                Button("웹 세션 다시 열기") { model.open() }
+                    .buttonStyle(.bordered)
+                    .accessibilityIdentifier("grok-trial-reopen")
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var compactControls: some View {
+        if model.provider == .claude {
+            claudeControls
+        } else {
+            grokControls
+        }
+    }
+
+    private var claudeControls: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            HStack(spacing: 12) {
+                if model.isLoading { ProgressView().controlSize(.small) }
+                Text(model.hasRecognizedClaudeUsage ? "사용량 확인됨" : "사용량 화면에서 읽어 주세요")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .accessibilityIdentifier("claude-usage-recognition-status")
+                Spacer(minLength: 4)
+                Button(model.isReading ? "읽는 중…" : "사용량 읽기") {
+                    didAttemptRead = true
+                    Task { await model.readClaudeUsage() }
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(!model.canReadClaudeUsage)
+                .accessibilityIdentifier("claude-read-usage")
+            }
+            .font(.subheadline)
+            .frame(minHeight: 44)
+            if model.hasRecognizedClaudeUsage || didAttemptRead {
+                Text(claudeResultText ?? model.readMessage)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .accessibilityIdentifier("claude-usage-read-result")
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 4)
+        .background(.bar)
+    }
+
+    private var claudeResultText: String? {
+        guard model.hasRecognizedClaudeUsage,
+              let session = model.claudeReadings[.claudeSession],
+              let weekly = model.claudeReadings[.claudeWeekly],
+              session.isValid, weekly.isValid else { return nil }
+        return "세션 잔여 " + WebUsageReading.percentText(session.remainingPercent)
+            + " · 주간 잔여 " + WebUsageReading.percentText(weekly.remainingPercent)
+    }
+
+    private var grokControls: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            HStack(spacing: 12) {
+                Button("사용량 열기") { model.openUsagePage() }
+                    .disabled(model.webView == nil)
+                    .accessibilityIdentifier("grok-trial-open-usage")
+                Spacer(minLength: 4)
+                if model.isAtUsagePage {
+                    Button("읽기 설정", systemImage: "slider.horizontal.3") { openPanel(.reading) }
+                        .labelStyle(.iconOnly)
+                        .frame(minWidth: 44, minHeight: 44)
+                        .contentShape(Rectangle())
+                        .accessibilityIdentifier("web-usage-read-settings")
+                    Button(model.isPointReadArmed ? "취소" : "숫자 읽기") {
+                        didAttemptRead = true
+                        if model.isPointReadArmed { model.cancelPointRead() }
+                        else { model.armPointRead() }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(!model.canReadVisibleUsage && !model.isPointReadArmed)
+                    .accessibilityIdentifier("grok-trial-read-usage")
+                } else {
+                    if model.isLoading { ProgressView().controlSize(.small) }
+                    Text("로그인 후 사용량을 여세요")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+            }
+            .font(.subheadline)
+            .frame(minHeight: 44)
+            if didAttemptRead {
+                Button { openPanel(.reading) } label: {
+                    Text(model.readMessage)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("grok-trial-read-status")
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 4)
+        .background(.bar)
+    }
+
+    private var readingPanel: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    Toggle("사용량 숫자가 화면에 보입니다", isOn: $model.userConfirmedUsageVisible)
+                        .disabled(!model.isAtUsagePage)
+                        .accessibilityIdentifier("grok-trial-confirm-usage")
+                    Picker("숫자 의미", selection: $model.valueKind) {
+                        Text("사용함").tag(WebUsageValueKind.used)
+                        Text("남음").tag(WebUsageValueKind.remaining)
+                    }
+                    .pickerStyle(.segmented)
+                    .accessibilityIdentifier("web-usage-value-kind")
+                    LabeledContent("읽는 한도", value: "주간")
+                } footer: {
+                    Text("설정을 마친 뒤 ‘숫자 읽기’를 누르고 웹 화면의 %를 한 번 탭하세요.")
+                }
+                Section("최근 결과") { Text(model.readMessage).font(.footnote) }
+            }
+            .navigationTitle("읽기 설정")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("완료") { presentedPanel = nil }
+                        .accessibilityIdentifier("web-usage-settings-done")
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+    }
+
+    private var helpPanel: some View {
+        NavigationStack {
+            Form {
+                if model.provider == .claude {
+                    Section("Claude 이메일 로그인") {
+                        Text("기존 Claude 계정의 이메일 주소를 입력한 뒤 ‘이메일로 계속하기’를 선택하세요. Google 새 창 로그인은 이 앱 내 웹 화면에서 지원하지 않습니다.")
+                        Text("인증 메일을 다른 기기에서 열면 코드가 표시됩니다. 원래 Claude 웹 화면으로 돌아와 코드를 직접 입력하세요.")
+                        Text("메일 링크가 Safari에서 열려도 로그인 상태가 이 앱에 자동 연결되지는 않습니다.")
+                        Link("Claude 공식 로그인 도움말", destination: URL(string: "https://support.claude.com/en/articles/13189465-log-in-to-your-claude-account")!)
+                    }
+                }
+                Section("계정 연결") {
+                    if model.provider == .claude {
+                        Text("공식 웹에서 본인 계정으로 로그인한 뒤 Claude의 사용량 화면을 여세요. 이미 사용량이 보이면 다시 로그인할 필요가 없습니다.")
+                    } else {
+                        Text("공식 웹에서 본인 계정으로 로그인한 뒤 ‘사용량 열기’를 누르세요.")
+                    }
+                    Text("로그인은 앱 실행 중에만 유지됩니다. 화면을 닫아도 유지되지만 앱 종료·연결 해제 후에는 다시 로그인해야 합니다.")
+                }
+                Section("사용량 확인") {
+                    if model.provider == .claude {
+                        Text("현재 세션과 주간 한도가 보이는 사용량 화면에서 ‘사용량 읽기’를 한 번 누르세요. 확인된 두 구간의 사용률을 각각 잔여율로 바꿔 표시합니다. 읽기 설정이나 숫자 위치 지정은 필요하지 않습니다.")
+                        Text("화면 구조나 두 한도를 확인하지 못하면 읽기를 중단합니다. 이는 로그인 실패를 뜻하지 않으며 기존 수동 확인 값은 유지됩니다.")
+                    } else {
+                        Text("사용량 화면에서 ‘읽기 설정’을 열어 숫자 의미와 한도를 고르세요. ‘숫자 읽기’를 누르고 15초 안에 해당 %를 한 번 탭하면 잔여율로 표시합니다.")
+                    }
+                    Text("웹 사용량은 자동 갱신되지 않습니다. 앱과 위젯에는 마지막 수동 확인 값과 시각이 남습니다.")
+                }
+                Section("개인정보") {
+                    Text("앱은 비밀번호·쿠키·토큰을 읽거나 전송하지 않습니다. 해당 서비스의 연결 해제는 임시 웹 세션과 저장된 사용량 숫자를 지웁니다.")
+                }
+                Section("현재 화면") {
+                    Text(model.pageHost)
+                    Text(model.navigationMessage).foregroundStyle(.secondary)
+                }
+            }
+            .navigationTitle("도움말")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("완료") { presentedPanel = nil }
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+    }
+
+    private func endEditing() {
+        model.cancelPointRead(clearMessage: model.isPointReadArmed || model.isReading)
+        model.webView?.endEditing(true)
+    }
+
+    private func openPanel(_ panel: Panel) {
+        endEditing()
+        presentedPanel = panel
+    }
+}
+
+private struct GrokTrialWebContent: UIViewRepresentable {
+    let webView: WKWebView
+    func makeUIView(context: Context) -> WKWebView { webView }
+    func updateUIView(_ uiView: WKWebView, context: Context) {}
+    // Hiding the sheet keeps the model's same in-memory WKWebView/session alive.
+    static func dismantleUIView(_ uiView: WKWebView, coordinator: ()) {}
+}
+
+typealias GrokWebTrialView = ProviderWebUsageView

@@ -12,7 +12,7 @@ README 이미지는 현재 제품의 화면 코드에 **오프라인 예시 데�
 
 macOS는 AppKit 화면 내용을 PNG로 내보냅니다. iPhone은 별도의 오프라인 iOS Simulator 호스트에서 원본 위젯 뷰를 `ImageRenderer`로 렌더링합니다. 위젯 영역만 보여 주는 UI 미리보기이며 iPhone 홈 화면 전체를 촬영한 스크린샷은 아닙니다. 문서용 호스트는 사용자 앱의 인증정보·캐시를 사용하지 않습니다.
 
-macOS 이미지는 2026-10-19에 M2 MacBook Air에서 생성했으며 소스 기준은 [v0.3.1](https://github.com/sundaynighttt/codextime/tree/v0.3.1)입니다. iPhone 이미지는 2026-10-20에 iOS 26.5 Simulator에서 [빌드 16 소스 커밋](https://github.com/sundaynighttt/codextime/tree/0effad7c2f703638a0a97d6b066dc6ea93d89114)을 고정해 새로 생성했습니다. 원본 `UsageEntry`, `CodexTimeWidgetView`, 공유 표시 뷰를 그대로 사용하며 네트워크 타임라인 공급자는 문서 호스트에서 제외합니다. 예시 모드는 Grok·Claude 숫자를 만들지 않습니다. 빌드 16은 별도 브랜치의 TestFlight 배포본이며, 문서 그림 교체는 main의 앱 코드·제품 버전·App Store 심사 상태를 변경하지 않습니다.
+macOS 이미지는 2026-10-19에 M2 MacBook Air에서 생성했으며 소스 기준은 [v0.3.1](https://github.com/sundaynighttt/codextime/tree/v0.3.1)입니다. iPhone 이미지는 2026-10-20에 iOS 26.5 Simulator에서 [빌드 16 소스 커밋](https://github.com/sundaynighttt/codextime/tree/0effad7c2f703638a0a97d6b066dc6ea93d89114)을 고정해 새로 생성했습니다. 원본 `UsageEntry`, `CodexTimeWidgetView`, 공유 표시 뷰를 그대로 사용하며 네트워크 타임라인 공급자는 문서 호스트에서 제외합니다. 예시 모드는 Grok·Claude 숫자를 만들지 않습니다. 빌드 16은 TestFlight 배포본이며 해당 iPhone 소스는 main에 통합했습니다. 이미지에는 예시 데이터만 사용하며 App Store 정식 출시와는 별도입니다.
 
 ## 다시 생성하기
 

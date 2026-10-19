@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
   "project": "codextime",
-  "updatedAt": "2026-10-19",
+  "updatedAt": "2026-10-20",
   "pointers": [
     {
       "key": "latest_candidate",
       "label": "iPhone 최신 후보",
-      "releaseId": "ios-10-b9"
+      "releaseId": "ios-10-b16"
     },
     {
       "key": "last_external",
       "label": "Apple 처리 확인 최신",
-      "releaseId": "ios-10-b9"
+      "releaseId": "ios-10-b16"
     },
     {
       "key": "latest_desktop_release",
@@ -235,8 +235,8 @@
       "build": "9",
       "date": "2026-09-04",
       "stage": "external_processed",
-      "status": "active",
-      "summary": "예시 모드·개인정보·이용 안내, 14개 테스트 및 CI 통과; 2026-09-04 09:55 KST App Store 심사 제출 완료·심사 대기 중, 승인 및 수동 출시 전",
+      "status": "historical",
+      "summary": "2026-09-04 당시 예시 모드·14 tests·업로드 처리·App Store 심사 제출 확인 이력; 2026-10-19 현재 심사 대기로 단정하지 않음",
       "evidence": [
         "ios/project.yml",
         "docs/app-store/submission.md"
@@ -338,8 +338,38 @@
       ]
     },
     {
-      "id": "macos-031-b2026101907",
+      "id": "ios-10-b10",
       "sequence": 23,
+      "version": "1.0",
+      "build": "10",
+      "date": "2026-10-19",
+      "stage": "external_processed",
+      "status": "historical",
+      "summary": "Codex 전용 iPhone 앱·위젯, 14 tests·서명 검증·13:02 KST 업로드 및 13:04 KST Apple 테스트 가능 알림 확인; 그룹 배포·실기기 설치 미확인",
+      "evidence": [
+        "ios/project.yml",
+        "docs/releases/2026-10-19-ios-testflight.md",
+        "docs/app-store/submission.md"
+      ]
+    },
+    {
+      "id": "ios-10-b11",
+      "sequence": 24,
+      "version": "1.0",
+      "build": "11",
+      "date": "2026-10-19",
+      "stage": "external_processed",
+      "status": "historical",
+      "summary": "3열 카드·Codex 직접 조회·17 tests 및 업로드/Apple 처리 확인; ASC CodexTime Internal 1명·빌드11 설치 표시1 확인, 실제 기능 smoke는 별도 미확인",
+      "evidence": [
+        "ios/project.yml",
+        "docs/releases/2026-10-19-ios-three-provider-card.md",
+        "docs/app-store/submission.md"
+      ]
+    },
+    {
+      "id": "macos-031-b2026101907",
+      "sequence": 25,
       "version": "0.3.1",
       "build": "2026101907",
       "date": "2026-10-19",
@@ -354,6 +384,105 @@
         "https://github.com/sundaynighttt/codextime/actions/runs/39216253992",
         "https://github.com/sundaynighttt/codextime/releases/tag/v0.3.1",
         "https://github.com/sundaynighttt/codextime/actions/runs/39216176410"
+      ]
+    },
+    {
+      "id": "macos-private-icloud-candidate",
+      "sequence": 26,
+      "version": "iCloud 동기화 실험",
+      "date": "2026-10-19",
+      "stage": "abandoned",
+      "status": "abandoned",
+      "summary": "별도 브랜치에서 macOS 0.3.1(2026101907)을 재사용한 중단·미배포 iCloud 후보; Mac102/shared20 tests·ad-hoc 패키징 통과, Developer ID export 프로비저닝 대기 후 종료, 공개 v0.3.1과 다른 산출물이며 정식 서명 배포·설치·실제 전송 없음",
+      "evidence": [
+        "docs/releases/2026-10-19-private-icloud-sync.md",
+        "git:f98bb6d",
+        "git:bdef8de"
+      ]
+    },
+    {
+      "id": "ios-10-b12",
+      "sequence": 27,
+      "version": "1.0",
+      "build": "12",
+      "date": "2026-10-19",
+      "stage": "failed",
+      "status": "historical",
+      "summary": "중단·미업로드 iCloud 후보:24 tests·시뮬레이터 통과, 앱/위젯 CloudKit 프로필 불일치로 두 Release archive 실패; TestFlight·실제 동기화 없음",
+      "evidence": [
+        "docs/releases/2026-10-19-private-icloud-sync.md",
+        "git:f98bb6d",
+        "git:bdef8de"
+      ]
+    },
+    {
+      "id": "ios-10-b13",
+      "sequence": 28,
+      "version": "1.0",
+      "build": "13",
+      "date": "2026-10-19",
+      "stage": "external_processed",
+      "status": "historical",
+      "summary": "iPhone 웹 수동 사용량·42 XCTest/96 Node cases·Release UI/서명 통과; 21:13업로드·약21:18 Apple 처리와Internal1명배정 확인, 실계정 검증은 사용자 TestFlight 예정",
+      "evidence": [
+        "ios/project.yml",
+        "docs/releases/2026-10-19-ios-web-usage.md",
+        "docs/app-store/submission.md",
+        "git:bdb1bb6",
+        "git:6943976",
+        "https://appstoreconnect.apple.com/teams/8874948e-3fee-4bea-a414-67a4c0f0e7d8/apps/6805935440/testflight/ios/4e556a52-67f9-4190-a95a-09dca4272252"
+      ]
+    },
+    {
+      "id": "ios-10-b14",
+      "sequence": 29,
+      "version": "1.0",
+      "build": "14",
+      "date": "2026-10-19",
+      "stage": "external_processed",
+      "status": "historical",
+      "summary": "웹 로그인 영역 확대·조작 패널 접기·키보드 대응; iPhone17e 빈 폼·42 XCTest·Release 서명, 21:39업로드·21:42~43 Apple 처리/Internal1명·21:44안내 저장 확인",
+      "evidence": [
+        "ios/project.yml",
+        "docs/releases/2026-10-19-ios-web-height.md",
+        "docs/app-store/submission.md",
+        "git:da7d762",
+        "https://appstoreconnect.apple.com/teams/8874948e-3fee-4bea-a414-67a4c0f0e7d8/apps/6805935440/testflight/ios/9b6de1a7-c183-4198-a084-9dfe9be7182a"
+      ]
+    },
+    {
+      "id": "ios-10-b15",
+      "sequence": 30,
+      "version": "1.0",
+      "build": "15",
+      "date": "2026-10-19",
+      "stage": "external_processed",
+      "status": "historical",
+      "summary": "Claude 새창 제한 안내·화면 복귀·51 XCTest·Release 서명 통과; 22:38:48 KST 업로드·22:41:37 Apple 테스트 가능 알림 확인, Google OAuth 미지원·실계정 검증 대기",
+      "evidence": [
+        "ios/project.yml",
+        "docs/releases/2026-10-19-claude-login-recovery.md",
+        "docs/app-store/submission.md",
+        "git:48015b5",
+        "https://testflight.apple.com/v1/app/6805935440"
+      ]
+    },
+    {
+      "id": "ios-10-b16",
+      "sequence": 31,
+      "version": "1.0",
+      "build": "16",
+      "date": "2026-10-19",
+      "stage": "external_processed",
+      "status": "passed",
+      "summary": "Claude 세션·공통주간 한 번 읽기·한도별 앱/위젯 표시; 80 XCTest·Release·서명, 23:40:44 업로드·23:43:46 KST Apple 테스트 가능 확인, iPhone 실계정 대조 대기",
+      "evidence": [
+        "ios/project.yml",
+        "docs/releases/2026-10-19-claude-usage-reader.md",
+        "docs/app-store/submission.md",
+        "git:9cd429d",
+        "git:0effad7",
+        "https://testflight.apple.com/v1/app/6805935440"
       ]
     }
   ]

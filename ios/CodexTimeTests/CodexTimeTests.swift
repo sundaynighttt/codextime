@@ -175,6 +175,38 @@ final class CodexTimeTests: XCTestCase {
         XCTAssertNil(store.load())
     }
 
+    func testProviderDisplayDistinguishesMissingValueFromZero() {
+        let missing = ProviderUsageDisplay(provider: .codex, snapshot: nil)
+        XCTAssertEqual(missing.percentText, "—")
+        XCTAssertEqual(missing.statusText, "연결 필요")
+        let zero = UsageSnapshot(remainingPercent: 0, resetAt: .distantFuture,
+                                 updatedAt: .distantPast, lifetimeTokens: nil)
+        XCTAssertEqual(ProviderUsageDisplay(provider: .codex, snapshot: zero).percentText, "0%")
+    }
+
+    func testWebProvidersNeverReuseCodexValues() {
+        let real = UsageSnapshot(remainingPercent: 42, resetAt: .distantFuture,
+                                 updatedAt: .distantPast, lifetimeTokens: nil)
+        for snapshot in [real, .demo()] {
+            for provider in [PhoneUsageProvider.grok, .claude] {
+                let display = ProviderUsageDisplay(provider: provider, snapshot: snapshot)
+                XCTAssertEqual(display.percentText, "—")
+                XCTAssertEqual(display.statusText, snapshot.isDemo == true ? "예시 없음" : "웹 연결")
+                XCTAssertTrue(display.accessibilityText.contains("잔여량 없음"))
+            }
+        }
+    }
+
+    func testCodexDisplayPreservesRealAndExplicitDemoStates() {
+        let real = UsageSnapshot(remainingPercent: 42, resetAt: .distantFuture,
+                                 updatedAt: .distantPast, lifetimeTokens: nil)
+        XCTAssertEqual(ProviderUsageDisplay(provider: .codex, snapshot: real).percentText, "42%")
+        XCTAssertEqual(ProviderUsageDisplay(provider: .codex, snapshot: real).statusText, "연결됨")
+        let demo = ProviderUsageDisplay(provider: .codex, snapshot: .demo())
+        XCTAssertEqual(demo.statusText, "예시")
+        XCTAssertTrue(demo.accessibilityText.contains("예시 데이터"))
+    }
+
     func testReleaseKeepsAppIdentity() {
         XCTAssertEqual(CodexConfiguration.appGroupID, "group.com.sundaynighttt.codextime")
         XCTAssertEqual(CodexConfiguration.keychainGroupSuffix, "com.sundaynighttt.codextime.auth")
