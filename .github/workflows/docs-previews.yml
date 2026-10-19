@@ -1,0 +1,27 @@
+name: Documentation previews
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: macos-latest
+    timeout-minutes: 15
+    env:
+      TZ: Asia/Seoul
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install preview project generator
+        run: command -v xcodegen || brew install xcodegen
+      - name: Render production macOS views with sample data
+        run: python3 docs/screenshots/render-macos.py
+      - name: Render production iPhone widget on Simulator
+        run: python3 docs/screenshots/render-ios.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: documentation-previews
+          path: docs/screenshots/*.png
+          if-no-files-found: error
