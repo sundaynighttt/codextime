@@ -16,7 +16,7 @@
     {
       "key": "latest_desktop_release",
       "label": "데스크톱 공개 최신",
-      "releaseId": "v0.2.3"
+      "releaseId": "macos-030-b2026101906"
     },
     {
       "key": "last_installed_smoke",
@@ -324,15 +324,17 @@
       "version": "0.3.0",
       "build": "2026101906",
       "date": "2026-10-19",
-      "stage": "external_processed",
+      "stage": "released",
       "status": "active",
-      "summary": "세 서비스 실제 연결·표시 선택과 99 tests; 서명·공증 universal DMG 다운로드·체크섬·Gatekeeper 검증 통과, 최종 공개 대기",
+      "summary": "macOS 세 서비스 표시·조회 선택과 본인 계정 설정 공개; 99 tests·전체 CI·서명·공증 universal DMG·비로그인 다운로드 및 체크섬 검증 통과",
       "evidence": [
         "docs/releases/2026-10-19-v0.3.0.md",
         "docs/macos-setup.md",
         "macos/scripts/build-macos.sh",
         ".github/workflows/release.yml",
-        "https://github.com/sundaynighttt/codextime/actions/runs/39195054137"
+        "https://github.com/sundaynighttt/codextime/actions/runs/39195054137",
+        "https://github.com/sundaynighttt/codextime/releases/tag/v0.3.0",
+        "https://github.com/sundaynighttt/codextime/actions/runs/39195689279"
       ]
     }
   ]

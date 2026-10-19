@@ -1,6 +1,6 @@
 # macOS 설치와 본인 계정 연결
 
-이 안내는 **v0.3.0 (2026101906) 공개 준비 버전** 기준입니다. 아직 게시되지 않았으며 서명·공증·패키지 검증 후 [GitHub Releases](https://github.com/sundaynighttt/codextime/releases/latest)에 설치 파일을 제공합니다. macOS 13 이상, Intel·Apple Silicon Universal DMG 지원을 준비하고 있습니다.
+이 안내는 **v0.3.0 (2026101906) 공개 버전** 기준입니다. [macOS DMG 다운로드](https://github.com/sundaynighttt/codextime/releases/download/v0.3.0/CodexTime-macOS-0.3.0.dmg) · [릴리스와 체크섬](https://github.com/sundaynighttt/codextime/releases/tag/v0.3.0). macOS 13 이상, Intel·Apple Silicon Universal 앱이며 Developer ID 서명과 앱·DMG Apple 공증을 완료했습니다.
 
 ## 설치
 
