@@ -4,6 +4,7 @@ import UIKit
 struct ContentView: View {
     let model: AppModel
     @Environment(\.openURL) private var openURL
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var copiedUserCode: String?
     @State private var presentedSheet: SheetDestination?
 
@@ -20,13 +21,15 @@ struct ContentView: View {
               VStack(spacing: 24) {
                 Spacer(minLength: 32)
 
-                Image(systemName: "clock.badge.checkmark")
-                    .font(.system(size: 42, weight: .semibold))
-                    .foregroundStyle(.blue)
-                    .accessibilityHidden(true)
-
                 Text("CodexTime")
-                    .font(.largeTitle.bold())
+                    .font(.title2.bold())
+
+                usageCard
+
+                Text("Grok·Claude는 iPhone 연결을 아직 지원하지 않습니다.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
 
                 content
                     .frame(maxWidth: 380)
@@ -57,7 +60,7 @@ struct ContentView: View {
 
         case .signedOut:
             VStack(spacing: 20) {
-                Text("남은 Codex 사용량과 리셋 시간을\n위젯에서 바로 확인합니다.")
+                Text("ChatGPT를 연결하면 Codex 잔여량이 표시됩니다.")
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.secondary)
 
@@ -162,54 +165,75 @@ struct ContentView: View {
         }
     }
 
+    private var currentSnapshot: UsageSnapshot? {
+        guard case let .connected(snapshot) = model.state else { return nil }
+        return snapshot
+    }
+
+    private var usageCard: some View {
+        RoundedRectangle(cornerRadius: 16)
+            .fill(Color(.secondarySystemGroupedBackground))
+            .aspectRatio(dynamicTypeSize.isAccessibilitySize ? 0.6 : 1, contentMode: .fit)
+            .overlay {
+              VStack(spacing: 16) {
+            HStack {
+                Text(currentSnapshot?.isDemo == true ? "예시 데이터" : "잔여 사용량")
+                    .font(.subheadline.weight(.medium))
+                Spacer()
+                if currentSnapshot != nil {
+                    Button {
+                        Task { await model.refresh() }
+                    } label: {
+                        if model.isRefreshing {
+                            ProgressView()
+                        } else {
+                            Image(systemName: "arrow.clockwise")
+                        }
+                    }
+                    .frame(width: 44, height: 44)
+                    .disabled(model.isRefreshing)
+                    .accessibilityLabel("Codex 사용량 새로고침")
+                    .accessibilityIdentifier("refresh-usage")
+                }
+            }
+            Spacer(minLength: 0)
+            ProviderUsageColumns(snapshot: currentSnapshot, now: .now)
+                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+            Spacer(minLength: 0)
+            Text(currentSnapshot.map { "업데이트 " + UsageFormatter.updateTime($0.updatedAt) } ?? "계정을 연결해 주세요")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+              }
+              .padding(20)
+            }
+        .frame(maxWidth: 280)
+        .accessibilityIdentifier("provider-usage-card")
+    }
+
     private func connectedView(_ snapshot: UsageSnapshot) -> some View {
         VStack(spacing: 18) {
             if snapshot.isDemo == true {
                 Text("예시 데이터 · 실제 계정 사용량이 아닙니다")
-                    .font(.footnote.bold())
-                    .foregroundStyle(.orange)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }
-            TimelineView(.periodic(from: .now, by: 60)) { context in
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Codex")
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
 
-                    Text("\(snapshot.remainingPercent)%")
-                        .font(.system(size: 54, weight: .bold, design: .rounded))
-
-                    Text(UsageFormatter.remainingTime(until: snapshot.resetAt, now: context.date))
-                        .font(.title3.bold())
-                        .foregroundStyle(.blue)
-
-                    if let tokens = snapshot.lifetimeTokens {
-                        Text("누적 토큰 \(UsageFormatter.compactTokenCount(tokens))")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+            DisclosureGroup("Codex 상세") {
+                TimelineView(.periodic(from: .now, by: 60)) { context in
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("리셋까지 " + UsageFormatter.remainingTime(until: snapshot.resetAt, now: context.date))
+                        if let tokens = snapshot.lifetimeTokens {
+                            Text("누적 토큰 " + UsageFormatter.compactTokenCount(tokens))
+                        }
                     }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(22)
-                .background(.background, in: RoundedRectangle(cornerRadius: 22))
-            }
-
-            Text("마지막 업데이트 \(snapshot.updatedAt.formatted(date: .omitted, time: .shortened))")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-
-            Button {
-                Task { await model.refresh() }
-            } label: {
-                if model.isRefreshing {
-                    ProgressView()
-                } else {
-                    Label("새로고침", systemImage: "arrow.clockwise")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.top, 8)
                 }
             }
-            .buttonStyle(.bordered)
-            .disabled(model.isRefreshing)
-            .accessibilityIdentifier("refresh-usage")
+            .frame(maxWidth: 280)
 
             Button(snapshot.isDemo == true ? "예시 끝내기" : "연결 해제", role: .destructive) {
                 Task { await model.signOut() }
@@ -218,6 +242,7 @@ struct ContentView: View {
             .accessibilityIdentifier("disconnect-chatgpt")
         }
     }
+
 }
 
 #Preview("연결 전") {

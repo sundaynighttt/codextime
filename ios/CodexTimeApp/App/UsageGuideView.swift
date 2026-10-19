@@ -3,12 +3,29 @@ import SwiftUI
 struct UsageGuideView: View {
     @Environment(\.dismiss) private var dismiss
 
+    private var thirdPartyNotices: String {
+        guard let url = Bundle.main.url(forResource: "ThirdPartyNotices", withExtension: "txt"),
+              let text = try? String(contentsOf: url, encoding: .utf8) else { return "라이선스 파일을 불러올 수 없습니다." }
+        return text
+    }
+
     var body: some View {
         NavigationStack {
             List {
                 Section("남은 사용량 확인") {
                     Text("ChatGPT 계정을 연결하면 계정 응답의 기본 사용량 한도, 다음 리셋 시각과 제공되는 경우 누적 토큰을 표시합니다. 모든 한도 구간이나 API 결제 잔액을 표시하는 것은 아닙니다.")
                     Text("예시 데이터로 둘러보기는 누구나 사용할 수 있는 오프라인 기능입니다. 예시 값은 실제 계정이나 실시간 조회 결과가 아니며 앱과 위젯에 ‘예시’로 표시됩니다.")
+                }
+                Section("3열 카드") {
+                    Text("Codex·Grok·Claude를 한 카드에 표시합니다. 현재 iPhone에서 실제 조회를 지원하는 서비스는 Codex이며, Grok·Claude는 ‘— / 미지원’으로 표시합니다. Mac의 사용량이나 계정 정보를 가져오지 않습니다.")
+                }
+                Section("로고 라이선스") {
+                    Text("서비스 로고는 CodexBar의 MIT 라이선스 리소스를 사용합니다. 각 서비스의 상표는 해당 소유자에게 있습니다.")
+                    DisclosureGroup("라이선스 전문") {
+                        Text(thirdPartyNotices)
+                            .font(.footnote)
+                            .textSelection(.enabled)
+                    }
                 }
                 Section("홈 화면 위젯") {
                     Text("홈 화면을 길게 누른 뒤 편집 → 위젯 추가 → CodexTime을 선택하세요. 앱에서 먼저 연결하거나 예시 보기를 시작하면 위젯에도 표시됩니다.")

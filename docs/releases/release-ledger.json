@@ -6,12 +6,12 @@
     {
       "key": "latest_candidate",
       "label": "iPhone 최신 후보",
-      "releaseId": "ios-10-b10"
+      "releaseId": "ios-10-b11"
     },
     {
       "key": "last_external",
       "label": "Apple 처리 확인 최신",
-      "releaseId": "ios-10-b9"
+      "releaseId": "ios-10-b10"
     },
     {
       "key": "latest_desktop_release",
@@ -343,12 +343,27 @@
       "version": "1.0",
       "build": "10",
       "date": "2026-10-19",
-      "stage": "local_verified",
-      "status": "active",
-      "summary": "Codex 전용 iPhone 앱·위젯 재빌드, 14 tests·서명 검증 및 13:02 KST 업로드 성공; Apple 처리·TestFlight 설치 가능 상태는 확인 대기",
+      "stage": "external_processed",
+      "status": "historical",
+      "summary": "Codex 전용 iPhone 앱·위젯, 14 tests·서명 검증·13:02 KST 업로드 및 13:04 KST Apple 테스트 가능 알림 확인; 그룹 배포·실기기 설치 미확인",
       "evidence": [
         "ios/project.yml",
         "docs/releases/2026-10-19-ios-testflight.md",
+        "docs/app-store/submission.md"
+      ]
+    },
+    {
+      "id": "ios-10-b11",
+      "sequence": 24,
+      "version": "1.0",
+      "build": "11",
+      "date": "2026-10-19",
+      "stage": "local_verified",
+      "status": "active",
+      "summary": "iPhone 앱·소형 위젯의 작은 3열 카드·17 tests·시뮬레이터·서명 검증 및 13:37 KST 업로드 성공; 실제 연결은 Codex, Grok·Claude는 미지원, Apple 처리 확인 대기",
+      "evidence": [
+        "ios/project.yml",
+        "docs/releases/2026-10-19-ios-three-provider-card.md",
         "docs/app-store/submission.md"
       ]
     }

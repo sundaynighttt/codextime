@@ -40,6 +40,14 @@ The profile response can contain a display name, username, and profile image URL
 
 프로필 JSON의 이름·사진을 저장하지 않는다는 것은 인증 토큰에 개인정보가 없다는 뜻이 아닙니다. ID 토큰에는 계정 정보가 포함될 수 있습니다. 실제 조회의 외부 전송, 로컬 저장, 연결 해제 범위는 [개인정보 처리방침](privacy-policy.md)을 따릅니다. 이 구현 자체가 외부 서비스의 독립 앱 이용 허가를 증명하지는 않습니다.
 
+### 1.0(11) iPhone 3열 표시와 데이터 범위
+
+앱의 작은 사각 카드와 `systemSmall` 위젯은 `Codex / Grok / Claude` 순서로 각 로고·이름·잔여 비율·상태를 가로 3열에 표시한다. 이 변경은 표시 계층만 확장하며, 실제 사용량은 기존 `CodexAccountClient`의 OpenAI 직접 인증·조회와 단일 `UsageSnapshot` 경로를 유지한다. Codex 스냅샷이 없으면 `— / 연결 필요`, 실제 잔여량이 0이면 `0%`로 구분한다. 앱의 Codex 상세에는 리셋·누적 토큰을 유지하고 소형 위젯 하단에는 리셋·갱신 시각을 표시한다.
+
+Grok·Claude는 iPhone 인증·조회 구현이 없어 `— / 미지원`으로 표시한다. Codex의 실제 값이나 예시 값을 다른 공급자에 복제하지 않으며, 예시 모드에서도 두 칸은 미지원 상태를 유지한다. 로고가 보인다는 사실이 해당 계정 연결을 의미하지 않는다.
+
+`SharedUsageStore`의 App Group은 같은 iPhone의 앱과 위젯 사이 저장소다. macOS의 다중 공급자 상태를 전달하는 서버·Mac 연결·기기 간 동기화 경로는 없다. 이번 UI 변경은 macOS Keychain·Cursor 인증정보를 읽거나 iPhone으로 전송하지 않으며 새 자격증명 접근·네트워크 공급자·지속 권한을 추가하지 않는다. Grok·Claude 실제 조회를 추가하려면 iPhone에서 사용할 인증 경로와 개인정보 처리 범위를 별도로 확정해야 한다.
+
 ## Compatibility boundary
 
 `app-server`, `account/rateLimits/read`, and the iPhone usage and profile paths are compatibility-sensitive interfaces. CodexTime's desktop parser ignores unrelated JSON-RPC notifications and initialization responses, but a renamed method, authentication change, or materially changed response shape will require a compatibility update.

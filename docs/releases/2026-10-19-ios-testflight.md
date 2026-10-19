@@ -4,7 +4,7 @@
 
 2026-10-19 **13:02:56 KST**, Xcode가 `Upload succeeded`, `Uploaded CodexTime`, `EXPORT SUCCEEDED`를 반환했다. 직전 응답은 `Uploaded package is processing`이었다. 앱·위젯은 모두 버전 `1.0`, 빌드 `10`, iOS 17 이상이다.
 
-**업로드 성공까지 확인했으며 Apple 처리 완료·TestFlight 그룹 배포·실기기 설치·App Store 심사 또는 정식 출시를 완료했다고 주장하지 않는다.** App Store Connect 웹 세션은 다시 로그인이 필요한 상태여서 업로드 후 빌드 처리 상태 확인이 남아 있다. [TestFlight](https://appstoreconnect.apple.com/teams/8874948e-3fee-4bea-a414-67a4c0f0e7d8/apps/6805935440/testflight)에서 빌드 10을 확인하는 것이 다음 단계다.
+이후 **13:04:42 KST Apple의 테스트 가능 알림으로 빌드 10의 처리 완료를 확인했다.** TestFlight 그룹 배포·실기기 설치·App Store 심사·정식 출시는 별도로 확인하지 않았다. 빌드 10에는 Codex 전용 화면이 들어 있으며, 후속 [3열 UI 후보 1.0(11)](2026-10-19-ios-three-provider-card.md)과 구분한다. [TestFlight](https://appstoreconnect.apple.com/teams/8874948e-3fee-4bea-a414-67a4c0f0e7d8/apps/6805935440/testflight).
 
 ## 범위
 
