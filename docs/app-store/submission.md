@@ -1,6 +1,13 @@
 # CodexTime App Store 제출 현황
 
-## 현재 상태 — 2026-09-04
+## 현재 확인 — 2026-10-19
+
+- iPhone Codex 앱·위젯 **1.0(10)**을 13:02:56 KST TestFlight/App Store Connect에 재업로드했다. Xcode `Upload succeeded`와 `EXPORT SUCCEEDED` 확인.
+- 14 tests·시뮬레이터 실행·Release archive·앱/위젯 서명 검증 통과. macOS의 Claude·Grok 기능은 포함하지 않는다.
+- 업로드 직후 Apple은 처리 중을 반환했다. 처리 완료·TestFlight 그룹 배포·실기기 설치는 아직 확인하지 않았다. [이번 빌드 근거](../releases/2026-10-19-ios-testflight.md).
+- ASC 앱 목록은 1.0을 ‘제출 준비 중’으로 표시했다. 아래 2026-09-04의 ‘심사 대기 중’은 당시 이력이며 현재 상태가 아니다.
+
+## 2026-09-04 확인 이력
 
 - 앱: CodexTime, Apple ID `6805935440`
 - iPhone 전용, iOS 17 이상, 버전 `1.0`, 빌드 `9`
@@ -8,7 +15,7 @@
 - 한국어, 유틸리티, 연령 등급 4+, 무료, 175개 국가·지역, 수동 출시 설정. Apple Silicon Mac·Vision Pro 호환 배포는 끄고 iPhone만 대상으로 한다.
 - 설명·영문 심사 메모·개인정보 레이블 저장 및 6.9형 실제 스크린샷 2장 등록 완료. 6.5형도 6.9형 이미지를 상속한다.
 - 사용자에게 ‘타사 콘텐츠를 사용하며 필요한 권한이 있음’이라는 선언 문구를 설명하고 권한 보유 확인을 받은 뒤, 해당 항목을 선택·저장했다. ‘타사 콘텐츠에 접근하지 않음’으로 우회하지 않았다. 권한 근거의 독립적인 법률 검증을 완료했다는 뜻은 아니다.
-- **09:55 KST 정식 App Store 심사 제출 완료, 현재 ‘심사 대기 중’.** 제출 ID는 `08be042e-7fc3-4b69-b52f-250dcbbf00d8`이며 [접수 상세](https://appstoreconnect.apple.com/apps/6805935440/distribution/reviewsubmissions/details/08be042e-7fc3-4b69-b52f-250dcbbf00d8)에서 `1.0 (9)`를 확인했다. 심사 승인·일반 공개는 아직 이루어지지 않았다.
+- **09:55 KST 정식 App Store 심사 제출 완료, 당시 ‘심사 대기 중’.** 제출 ID는 `08be042e-7fc3-4b69-b52f-250dcbbf00d8`이며 [접수 상세](https://appstoreconnect.apple.com/apps/6805935440/distribution/reviewsubmissions/details/08be042e-7fc3-4b69-b52f-250dcbbf00d8)에서 `1.0 (9)`를 확인했다. 심사 승인·일반 공개는 아직 이루어지지 않았다.
 - 이전 TestFlight 0.3.0(1–8)은 내부 테스트 이력이다. 2026-09-04 App Store Connect에서 빌드 1은 내부 테스트 중, 2–8은 제출 준비 완료로 확인했다. 설치 건수만으로 실기기 검증 통과를 추정하지 않는다.
 
 ## 이번 변경

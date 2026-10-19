@@ -6,7 +6,7 @@
     {
       "key": "latest_candidate",
       "label": "iPhone 최신 후보",
-      "releaseId": "ios-10-b9"
+      "releaseId": "ios-10-b10"
     },
     {
       "key": "last_external",
@@ -235,8 +235,8 @@
       "build": "9",
       "date": "2026-09-04",
       "stage": "external_processed",
-      "status": "active",
-      "summary": "예시 모드·개인정보·이용 안내, 14개 테스트 및 CI 통과; 2026-09-04 09:55 KST App Store 심사 제출 완료·심사 대기 중, 승인 및 수동 출시 전",
+      "status": "historical",
+      "summary": "2026-09-04 당시 예시 모드·14 tests·업로드 처리·App Store 심사 제출 확인 이력; 2026-10-19 현재 심사 대기로 단정하지 않음",
       "evidence": [
         "ios/project.yml",
         "docs/app-store/submission.md"
@@ -335,6 +335,21 @@
         "https://github.com/sundaynighttt/codextime/actions/runs/39195054137",
         "https://github.com/sundaynighttt/codextime/releases/tag/v0.3.0",
         "https://github.com/sundaynighttt/codextime/actions/runs/39195689279"
+      ]
+    },
+    {
+      "id": "ios-10-b10",
+      "sequence": 23,
+      "version": "1.0",
+      "build": "10",
+      "date": "2026-10-19",
+      "stage": "local_verified",
+      "status": "active",
+      "summary": "Codex 전용 iPhone 앱·위젯 재빌드, 14 tests·서명 검증 및 13:02 KST 업로드 성공; Apple 처리·TestFlight 설치 가능 상태는 확인 대기",
+      "evidence": [
+        "ios/project.yml",
+        "docs/releases/2026-10-19-ios-testflight.md",
+        "docs/app-store/submission.md"
       ]
     }
   ]
