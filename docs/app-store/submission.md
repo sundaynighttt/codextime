@@ -1,12 +1,13 @@
 # CodexTime App Store 제출 현황
 
-## 현재 후보 1.0(15) — Claude 로그인 제한 안내·복구
+## TestFlight 처리 완료 1.0(15) — Claude 로그인 제한 안내·복구
 
-- **local_verified/pending:** 사용자 빌드14 실기기 Grok 로그인 성공·Claude Google 로그인 후 흰 화면/복귀 불가 보고에 대응한다. Grok 사용량·위젯까지 통과한 것으로 추정하지 않는다.
+- **external_processed/passed:** 사용자 빌드14 실기기 Grok 로그인 성공·Claude Google 로그인 후 흰 화면/복귀 불가 보고에 대응한다. Grok 사용량·위젯까지 통과한 것으로 추정하지 않는다.
 - 빌드14 시뮬레이터는 Google 빈 이메일 페이지까지 열렸으나 로그인 정보를 입력하지 않아 로그인 이후 흰 화면은 직접 재현하지 못했다. 정적 새창/opener 계약 손실과 복귀 조작 부재를 확인했고 전체 원인은 미확정이다.
 - Google의 [embedded OAuth 제한](https://developers.google.com/identity/protocols/oauth2/policies#use-secure-browsers)에 따라 Google/Claude 새창 진입을 안내 후 중단하고 부모 페이지를 덮어쓰지 않는다. Google OAuth 완료는 미지원이며 제한 안내와 Claude 화면 복귀를 검증했다. 공식 이메일 대안과 뒤로·새로고침·고정 사용량 복귀·오류/프로세스 종료 복구를 추가한다.
 - [Claude 공식 이메일 경로](https://support.claude.com/en/articles/13189465-log-in-to-your-claude-account)는 같은 계정 이메일을 사용한다. 실제 앱 내 완료는 미검증이다. 외부 브라우저 세션 자동 이전·쿠키/토큰 복사·Google 연결 해제나 계정 권한 변경을 요구하지 않는다.
-- **51개 XCTest·Release 컴파일(실패/건너뜀/경고/오류0), iPhone17e의 Google 제한 안내·부모 보존·Claude 복귀·빈 이메일/키보드, Release archive·엄격 서명을 통과했다.** 앱·위젯 모두1.0(15)와 각 번들 식별자를 확인했다. Grok Release의 공식 로그인 선택 화면도 로그인 정보 입력 없이 표시됨을 확인했다. **2026-10-19 22:38:48 KST** 단일 업로드 프로세스 exit0과 Xcode `Upload succeeded`·`Uploaded CodexTime`·`EXPORT SUCCEEDED`를 확인했다. 직전 상태는 `Uploaded package is processing`이며 Apple 처리·내부 그룹 배정은 확인 대기다. 22:41~22:44 KST ASC가 로그인 페이지로 돌아가 한 번 새로고침 후에도 로딩 상태가 남아 **사용자 웹 재로그인 응답 대기**로 확인을 보류했다. 기존 업로드 성공은 유지하며 재업로드하지 않았다. 최신 외부 처리 포인터는14를 유지한다. [조사·후보 근거](../releases/2026-10-19-claude-login-recovery.md). 정책 고정 링크694는 유지한다.
+- **51개 XCTest·Release 컴파일(실패/건너뜀/경고/오류0), iPhone17e의 Google 제한 안내·부모 보존·Claude 복귀·빈 이메일/키보드, Release archive·엄격 서명을 통과했다.** 앱·위젯 모두1.0(15)와 각 번들 식별자를 확인했다. Grok Release의 공식 로그인 선택 화면도 로그인 정보 입력 없이 표시됨을 확인했다. **2026-10-19 22:38:48 KST** 단일 업로드 프로세스 exit0과 Xcode `Upload succeeded`·`Uploaded CodexTime`·`EXPORT SUCCEEDED`를 확인했다. **22:41:37 KST Apple 테스트 가능 알림**으로 처리 완료와 기존 테스터 설치·업데이트 가능을 확인했다. iOS17 이상 iPhone의 [기존 테스터용 TestFlight](https://testflight.apple.com/v1/app/6805935440)를 이용한다. ASC 웹 세션이 로그인 화면으로 돌아가 빌드15의 정확한 그룹 UI·인원은 미확인이지만 이메일 근거로 설치 가능 확인의 차단은 해소됐다. 이를 위한 사용자 재로그인·재업로드는 필요하지 않으며 최신 외부 처리 포인터는15로 갱신했다. [시각·알림 제목·검증 근거](../releases/2026-10-19-claude-login-recovery.md). 정책 고정 링크694는 유지한다.
+- 사용자 사진의 새창 로그인 미지원은 navigation guard와 일치하며 사용량 숫자 추출이 지원 구조를 확인하지 못해 읽기를 중단하는 경로와는 별개다. 사진만으로 정확한 설치 버전을 확정하지 않는다. 이후 Claude 링크 확인 오류가 보고됐으며 요청 웹뷰/외부 브라우저·만료·이미 사용 여부는 미확정이다. 실제 Claude 이메일 로그인·사용량 대조·위젯은 사용자 TestFlight 검증 대기이며 연결 완료나 Google OAuth 정상화로 기록하지 않는다. 계정 정보·인증 URL·사진은 저장하지 않는다.
 
 ## TestFlight 처리 완료 1.0(14) — 웹 로그인 영역 확대
 

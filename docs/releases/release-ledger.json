@@ -11,7 +11,7 @@
     {
       "key": "last_external",
       "label": "Apple 처리 확인 최신",
-      "releaseId": "ios-10-b14"
+      "releaseId": "ios-10-b15"
     },
     {
       "key": "latest_desktop_release",
@@ -422,7 +422,7 @@
       "build": "14",
       "date": "2026-10-19",
       "stage": "external_processed",
-      "status": "passed",
+      "status": "historical",
       "summary": "웹 로그인 영역 확대·조작 패널 접기·키보드 대응; iPhone17e 빈 폼·42 XCTest·Release 서명, 21:39업로드·21:42~43 Apple 처리/Internal1명·21:44안내 저장 확인",
       "evidence": [
         "ios/project.yml",
@@ -438,14 +438,15 @@
       "version": "1.0",
       "build": "15",
       "date": "2026-10-19",
-      "stage": "local_verified",
-      "status": "pending",
-      "summary": "Claude Google/새창 제한 안내·화면 복귀·51 XCTest·Release 서명 통과; Google OAuth 미지원, 22:38:48 KST 업로드 성공·Apple 처리 대기",
+      "stage": "external_processed",
+      "status": "passed",
+      "summary": "Claude 새창 제한 안내·화면 복귀·51 XCTest·Release 서명 통과; 22:38:48 KST 업로드·22:41:37 Apple 테스트 가능 알림 확인, Google OAuth 미지원·실계정 검증 대기",
       "evidence": [
         "ios/project.yml",
         "docs/releases/2026-10-19-claude-login-recovery.md",
         "docs/app-store/submission.md",
-        "git:48015b5"
+        "git:48015b5",
+        "https://testflight.apple.com/v1/app/6805935440"
       ]
     }
   ]
