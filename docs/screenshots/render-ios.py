@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render the production widget view on iOS Simulator with offline demo data."""
+"""Render the pinned TestFlight widget view with offline demo data only."""
 from pathlib import Path
 import json
 import os
@@ -11,11 +11,14 @@ import time
 root = Path(__file__).resolve().parents[2]
 output = root / "docs/screenshots"
 bundle_id = "com.sundaynighttt.codextime.docs-preview"
+# Keep this preview reproducible while the TestFlight source is on its own branch.
+source_ref = "0effad7c2f703638a0a97d6b066dc6ea93d89114"
 devices = json.loads(subprocess.check_output(
     ["xcrun", "simctl", "list", "devices", "available", "--json"]))["devices"]
 runtime = os.environ.get("DOCS_IOS_RUNTIME")
-device = next(d for key, group in devices.items() if not runtime or key == runtime for d in group
-              if "iPhone" in d["name"] and d.get("isAvailable"))
+candidates = [d for key, group in devices.items() if not runtime or key == runtime for d in group
+              if "iPhone" in d["name"] and d.get("isAvailable")]
+device = next((d for d in candidates if d["state"] == "Booted"), candidates[0])
 simulator = device["udid"]
 booted_here = device["state"] != "Booted"
 if booted_here:
@@ -24,8 +27,17 @@ try:
     with tempfile.TemporaryDirectory(prefix="codextime-docs-ios-") as temp:
         project = Path(temp)
         source = project / "Sources"
-        shutil.copytree(root / "ios/Shared", source / "Shared")
-        widget = (root / "ios/CodexTimeWidget/CodexTimeWidget.swift").read_text()
+        files = subprocess.check_output(
+            ["git", "-C", str(root), "ls-tree", "-r", "--name-only", source_ref, "ios/Shared"],
+            text=True).splitlines()
+        for name in files:
+            target = source / Path(name).relative_to("ios")
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(subprocess.check_output(
+                ["git", "-C", str(root), "show", source_ref + ":" + name]))
+        widget = subprocess.check_output(
+            ["git", "-C", str(root), "show",
+             source_ref + ":ios/CodexTimeWidget/CodexTimeWidget.swift"], text=True)
         # Keep the production view and entry verbatim; omit the extension's @main
         # and network timeline provider from this separate offline preview host.
         entry = widget[widget.index("struct UsageEntry:"):widget.index("struct UsageTimelineProvider:")]
@@ -57,7 +69,7 @@ struct DocsPreviewApp: App {
         renderer.scale = 3
         let data = renderer.uiImage!.pngData()!
         let folder = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        try! data.write(to: folder.appendingPathComponent("ios-widget-v1.0-b9.png"))
+        try! data.write(to: folder.appendingPathComponent("ios-widget-v1.0-b16.png"))
     }
 }
 ''')
@@ -83,7 +95,8 @@ targets:
         build = project / "DerivedData"
         subprocess.run(["xcodebuild", "-project", str(project / "DocsPreview.xcodeproj"),
                         "-scheme", "DocsPreview", "-destination", "platform=iOS Simulator,id=" + simulator,
-                        "-derivedDataPath", str(build), "CODE_SIGNING_ALLOWED=NO", "build"], check=True)
+                        "-derivedDataPath", str(build), "CODE_SIGNING_ALLOWED=NO",
+                        "ASSETCATALOG_COMPILER_APPICON_NAME=", "build"], check=True)
         try:
             subprocess.run(["xcrun", "simctl", "bootstatus", simulator, "-b"],
                            check=True, timeout=30)
@@ -93,13 +106,14 @@ targets:
             print("Background migration continues; checking app install/launch.", flush=True)
         app = build / "Build/Products/Debug-iphonesimulator/DocsPreview.app"
         subprocess.run(["xcrun", "simctl", "install", simulator, str(app)], check=True)
-        subprocess.run(["xcrun", "simctl", "spawn", simulator, "launchctl", "setenv", "TZ", "Asia/Seoul"], check=True)
-        subprocess.run(["xcrun", "simctl", "launch", simulator, bundle_id], check=True)
+        preview_env = {**os.environ, "SIMCTL_CHILD_TZ": "Asia/Seoul"}
+        subprocess.run(["xcrun", "simctl", "launch", simulator, bundle_id],
+                       env=preview_env, check=True)
         container = Path(subprocess.check_output(
             ["xcrun", "simctl", "get_app_container", simulator, bundle_id, "data"], text=True).strip())
-        image = container / "Documents/ios-widget-v1.0-b9.png"
+        image = container / "Documents/ios-widget-v1.0-b16.png"
         for _ in range(60):
-            if image.exists():
+            if image.exists() and image.stat().st_size > 0:
                 shutil.copy2(image, output / image.name)
                 print("Exported production iOS widget view with offline demo data:", output / image.name)
                 break

@@ -90,11 +90,11 @@ macOS **v0.3.1 (2026101907)** — Codex · Grok · Claude 기본 메뉴바:
 
 </details>
 
-iPhone **1.0 (9)** — 예시·갱신 시각·누적 토큰이 표시되는 현재 소형 위젯:
+iPhone **1.0 (16) · TestFlight** — 세 서비스와 Claude 주간·세션을 표시하는 소형 위젯 미리보기:
 
-<img src="docs/screenshots/ios-widget-v1.0-b9.png" width="170" alt="iPhone 1.0 빌드 9 위젯: 예시, 갱신 시각, 73%, 리셋까지 3d 17h, 누적 토큰">
+<img src="docs/screenshots/ios-widget-v1.0-b16.png" width="170" alt="iPhone 1.0 빌드 16 소형 위젯: Codex·Grok·Claude 세 로고, Codex 예시 73%, Grok 예시 없음, Claude 주간·세션 예시 없음, 리셋 3d 17h, 갱신 10:24">
 
-수치는 모두 문서용 예시입니다. macOS는 리셋 시간 표시를 끈 기본 설정이며, iPhone은 iOS Simulator에서 현재 위젯 뷰를 렌더링한 미리보기입니다. 2026-10-19 갱신. [이미지 기준과 다시 생성하는 방법](docs/screenshots/README.md)
+수치는 문서용 예시입니다. iPhone은 [빌드 16 소스](https://github.com/sundaynighttt/codextime/tree/0effad7c2f703638a0a97d6b066dc6ea93d89114)의 실제 위젯 뷰를 iOS Simulator에서 렌더링했습니다. 예시 모드에는 Grok·Claude 샘플 숫자가 없으므로 `—`로 표시합니다. 빌드 16은 TestFlight 배포본이며 소스는 별도 작업 브랜치에 있습니다. 이 이미지 갱신은 main의 iPhone 코드 통합이나 App Store 정식 출시를 뜻하지 않습니다. macOS는 리셋 시간 표시를 끈 기본 설정입니다. [이미지 기준과 다시 생성하는 방법](docs/screenshots/README.md)
 
 ## 다운로드
 
