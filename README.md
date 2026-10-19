@@ -1,23 +1,36 @@
 # CodexTime
 
+**AI 구독 사용량과 리셋 시간을 한눈에.**
+
 [![CI](https://github.com/sundaynighttt/codextime/actions/workflows/ci.yml/badge.svg)](https://github.com/sundaynighttt/codextime/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/sundaynighttt/codextime?display_name=tag)](https://github.com/sundaynighttt/codextime/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Codex를 쓰다 보면 남은 사용량과 리셋 시간을 확인하기 위해 매번 설정 화면을 열어야 합니다.
+> [!NOTE]
+> **새 소식 · 2026-10-19 · macOS v0.3.1 공개**
+>
+> **v0.3.0부터 macOS에서 Codex · Grok · Claude를 함께 표시합니다.**
+> 이번 v0.3.1에는 **간편 설정·공식 로그인·연결 완료 확인**을 추가했습니다. 사용할 서비스를 고르고 **로그인하기**로 공식 로그인을 시작한 뒤 연결 상태를 확인할 수 있습니다.
+>
+> Grok은 Cursor 로그인과 웹 사용량 대조가 필요한 조건부 연결입니다. **Windows·iPhone은 Codex 전용**입니다.
+>
+> **[macOS 설치 파일](https://github.com/sundaynighttt/codextime/releases/download/v0.3.1/CodexTime-macOS-0.3.1.dmg)** · **[Windows 설치 파일](https://github.com/sundaynighttt/codextime/releases/download/v0.3.1/CodexTime-Windows-0.3.1.zip)** · [처음 설치·계정 연결하기](docs/macos-setup.md) · [전체 변경 내용](docs/releases/2026-10-19-v0.3.1.md)
 
-**그게 불편해서 만들었습니다.**
+서비스마다 남은 사용량과 리셋 시간을 따로 확인하는 게 불편해서 만들었습니다.
 
 CodexTime은 지원하는 AI 서비스의 남은 사용량과 리셋까지 남은 시간을 짧게 보여주는 무료 오픈소스 앱입니다.
 
-- **macOS:** Codex · Grok · Claude를 기본 표시하고 서비스별 숨김·조회 중지 선택, 필요하면 리셋 시간도 함께 표시
+- **macOS — Codex · Grok · Claude:** 기본 표시와 서비스별 숨김·조회 중지 선택, 필요하면 리셋 시간도 함께 표시
 - **Windows — Codex 전용:** 작업표시줄에 `Codex 95% · 6d 16h` 표시
-- **iPhone:** 홈 화면 소형 위젯에 `Codex (갱신 시각) / 95% / 3d 17h / 누적 토큰` 표시
+- **iPhone — Codex 전용:** 홈 화면 소형 위젯에 `Codex (갱신 시각) / 95% / 3d 17h / 누적 토큰` 표시
 - Windows에서는 우상단 미니 위젯으로 전환 가능
 - 별도 OpenAI API 키 불필요
 - 광고·분석·텔레메트리 없음
 
 > CodexTime은 서비스 제공자의 공식 제품이 아닌 커뮤니티 프로젝트입니다. Codex CLI·계정 사용량 인터페이스와 macOS의 추가 공급자 연결을 사용하며, 외부 서비스 변경에 따라 수정이 필요할 수 있습니다.
+
+<details>
+<summary>릴리스 기준과 전체 버전 흐름 펼치기</summary>
 
 <!-- project-release-ledger:start -->
 ## 릴리스 기준과 전체 버전 흐름
@@ -61,6 +74,8 @@ CodexTime은 지원하는 AI 서비스의 남은 사용량과 리셋까지 남�
 | 22 | 2026-10-19 | `0.3.0 (2026101906)` | `released` | `historical` | macOS 세 서비스 표시·조회 선택과 본인 계정 설정 공개; 99 tests·전체 CI·서명·공증 universal DMG·비로그인 다운로드 및 체크섬 검증 통과 | [2026-10-19-v0.3.0.md](docs/releases/2026-10-19-v0.3.0.md)<br>[macos-setup.md](docs/macos-setup.md)<br>[build-macos.sh](macos/scripts/build-macos.sh)<br>[release.yml](.github/workflows/release.yml)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39195054137)<br>[외부 근거](https://github.com/sundaynighttt/codextime/releases/tag/v0.3.0)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39195689279) |
 | 23 | 2026-10-19 | `0.3.1 (2026101907)` | `released` | `active` | macOS 간편 설정·공식 로그인·자동 연결 확인 공개; 109 tests·전체 CI·서명·공증 universal DMG·비로그인 다운로드 및 체크섬 검증 통과 | [2026-10-19-v0.3.1.md](docs/releases/2026-10-19-v0.3.1.md)<br>[macos-setup.md](docs/macos-setup.md)<br>[build-macos.sh](macos/scripts/build-macos.sh)<br>[release.yml](.github/workflows/release.yml)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39216253992)<br>[외부 근거](https://github.com/sundaynighttt/codextime/releases/tag/v0.3.1)<br>[외부 근거](https://github.com/sundaynighttt/codextime/actions/runs/39216176410) |
 <!-- project-release-ledger:end -->
+
+</details>
 
 ## 화면
 
