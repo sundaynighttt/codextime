@@ -11,7 +11,7 @@ struct CodexTimeWidget: Widget {
                 .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("CodexTime")
-        .description("Codex·Grok·Claude를 한눈에 보고, 연결된 Codex 잔여량과 리셋 시간을 확인합니다.")
+        .description("Codex 잔여량과 Grok·Claude의 마지막 수동 확인 값을 한눈에 봅니다.")
         .supportedFamilies([.systemSmall])
     }
 }
@@ -19,10 +19,12 @@ struct CodexTimeWidget: Widget {
 struct UsageEntry: TimelineEntry {
     let date: Date
     let snapshot: UsageSnapshot?
+    var webReadings: [WebUsageProvider: WebUsageReading] = [:]
 }
 
 struct UsageTimelineProvider: TimelineProvider {
     private let usageStore = SharedUsageStore()
+    private let webUsageStore = WebUsageStore()
 
     func placeholder(in context: Context) -> UsageEntry {
         UsageEntry(date: Date(), snapshot: .demo())
@@ -30,7 +32,9 @@ struct UsageTimelineProvider: TimelineProvider {
 
     func getSnapshot(in context: Context, completion: @escaping (UsageEntry) -> Void) {
         let snapshot = context.isPreview ? UsageSnapshot.demo() : usageStore.load()
-        completion(UsageEntry(date: Date(), snapshot: snapshot))
+        let now = Date()
+        completion(UsageEntry(date: now, snapshot: snapshot,
+                              webReadings: snapshot?.isDemo == true ? [:] : webUsageStore.loadAll(now: now)))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<UsageEntry>) -> Void) {
@@ -43,7 +47,8 @@ struct UsageTimelineProvider: TimelineProvider {
             }
 
             let now = Date()
-            let entry = UsageEntry(date: now, snapshot: snapshot)
+            let entry = UsageEntry(date: now, snapshot: snapshot,
+                                   webReadings: snapshot?.isDemo == true ? [:] : webUsageStore.loadAll(now: now))
             completion(
                 Timeline(
                     entries: [entry],
@@ -79,7 +84,8 @@ struct CodexTimeWidgetView: View {
 
             Spacer(minLength: 4)
 
-            ProviderUsageColumns(snapshot: entry.snapshot, now: entry.date, compact: true)
+            ProviderUsageColumns(snapshot: entry.snapshot, now: entry.date, compact: true,
+                                 webReadings: entry.webReadings)
                 .invalidatableContent()
 
             Spacer(minLength: 6)

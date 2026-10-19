@@ -3,13 +3,14 @@ import UIKit
 
 struct ContentView: View {
     let model: AppModel
+    @StateObject private var webUsage = WebUsageCoordinator()
     @Environment(\.openURL) private var openURL
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var copiedUserCode: String?
     @State private var presentedSheet: SheetDestination?
 
     private enum SheetDestination: String, Identifiable {
-        case guide
+        case guide, grok, claude
         var id: String { rawValue }
     }
 
@@ -26,10 +27,8 @@ struct ContentView: View {
 
                 usageCard
 
-                Text("Grok·Claude는 iPhone 연결을 아직 지원하지 않습니다.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
+                webProviderControls
+                    .frame(maxWidth: 380)
 
                 content
                     .frame(maxWidth: 380)
@@ -45,7 +44,13 @@ struct ContentView: View {
             .padding(24)
             }
         }
-        .sheet(item: $presentedSheet) { _ in UsageGuideView() }
+        .sheet(item: $presentedSheet) { destination in
+            switch destination {
+            case .guide: UsageGuideView()
+            case .grok: ProviderWebUsageView(model: webUsage.model(for: .grok))
+            case .claude: ProviderWebUsageView(model: webUsage.model(for: .claude))
+            }
+        }
         .task {
             await model.load()
         }
@@ -75,7 +80,7 @@ struct ContentView: View {
                     .buttonStyle(.bordered)
                     .accessibilityIdentifier("start-demo")
 
-                Text("실제 사용량은 ChatGPT 연결 후 조회합니다.\nOpenAI가 제공하는 공식 앱이 아닙니다.")
+                Text("Codex 사용량은 ChatGPT 연결 후 조회합니다.\n각 서비스가 제공하는 공식 앱이 아닙니다.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -197,10 +202,13 @@ struct ContentView: View {
                 }
             }
             Spacer(minLength: 0)
-            ProviderUsageColumns(snapshot: currentSnapshot, now: .now)
+            TimelineView(.periodic(from: .now, by: 60)) { context in
+                ProviderUsageColumns(snapshot: currentSnapshot, now: context.date,
+                                     webReadings: webUsage.readings)
+            }
                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
             Spacer(minLength: 0)
-            Text(currentSnapshot.map { "업데이트 " + UsageFormatter.updateTime($0.updatedAt) } ?? "계정을 연결해 주세요")
+            Text(currentSnapshot.map { "Codex 업데이트 " + UsageFormatter.updateTime($0.updatedAt) } ?? "서비스별로 계정을 연결하세요")
                 .font(.caption)
                 .foregroundStyle(.secondary)
               }
@@ -208,6 +216,50 @@ struct ContentView: View {
             }
         .frame(maxWidth: 280)
         .accessibilityIdentifier("provider-usage-card")
+    }
+
+    private var webProviderControls: some View {
+        VStack(spacing: 12) {
+            HStack(spacing: 12) {
+                ForEach(WebUsageProvider.allCases) { provider in
+                    Button {
+                        presentedSheet = provider == .grok ? .grok : .claude
+                    } label: {
+                        Text(provider.name + (webUsage.readings[provider] == nil ? " 연결·확인" : " 다시 확인"))
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(currentSnapshot?.isDemo == true)
+                    .accessibilityIdentifier("connect-" + provider.rawValue)
+                }
+            }
+            Text(currentSnapshot?.isDemo == true
+                 ? "예시를 끝내면 Grok·Claude 계정을 연결할 수 있습니다. 예시 모드에서는 웹 로그인이나 실제 사용량 확인을 시작하지 않습니다."
+                 : "Grok·Claude는 웹에서 직접 로그인한 뒤 사용량 숫자를 수동으로 확인합니다. 카드에는 선택한 구간의 잔여율과 마지막 확인 시각이 표시됩니다.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+            if currentSnapshot?.isDemo != true && !webUsage.readings.isEmpty {
+                DisclosureGroup("웹 사용량 관리") {
+                    ForEach(WebUsageProvider.allCases) { provider in
+                        if let reading = webUsage.readings[provider] {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("\(provider.name) · \(reading.metric.name) · 사용 \(WebUsageReading.percentText(reading.usedPercent)) / 잔여 \(WebUsageReading.percentText(reading.remainingPercent))")
+                                    .font(.footnote)
+                                Button(provider.name + " 연결 해제·기록 삭제", role: .destructive) {
+                                    webUsage.disconnect(provider)
+                                }
+                                .font(.footnote)
+                                .accessibilityIdentifier("disconnect-" + provider.rawValue)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.top, 8)
+                        }
+                    }
+                }
+                .font(.footnote)
+            }
+        }
     }
 
     private func connectedView(_ snapshot: UsageSnapshot) -> some View {

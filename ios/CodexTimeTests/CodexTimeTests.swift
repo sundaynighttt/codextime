@@ -184,15 +184,15 @@ final class CodexTimeTests: XCTestCase {
         XCTAssertEqual(ProviderUsageDisplay(provider: .codex, snapshot: zero).percentText, "0%")
     }
 
-    func testUnsupportedProvidersNeverReuseCodexValues() {
+    func testWebProvidersNeverReuseCodexValues() {
         let real = UsageSnapshot(remainingPercent: 42, resetAt: .distantFuture,
                                  updatedAt: .distantPast, lifetimeTokens: nil)
         for snapshot in [real, .demo()] {
             for provider in [PhoneUsageProvider.grok, .claude] {
                 let display = ProviderUsageDisplay(provider: provider, snapshot: snapshot)
                 XCTAssertEqual(display.percentText, "—")
-                XCTAssertEqual(display.statusText, "미지원")
-                XCTAssertTrue(display.accessibilityText.contains("iPhone 연결 미지원"))
+                XCTAssertEqual(display.statusText, snapshot.isDemo == true ? "예시 없음" : "웹 연결")
+                XCTAssertTrue(display.accessibilityText.contains("잔여량 없음"))
             }
         }
     }
