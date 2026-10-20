@@ -74,15 +74,15 @@ Codex의 직접 인증·조회와 Grok의 사용함/남음·주간 선택·위�
 
 빌드15의 Google/새창 제한 안내·부모 페이지 보존·뒤로/새로고침/공식 사용량 복귀는 유지한다. 이 확장은 Google OAuth 지원이나 외부 브라우저 세션 이전을 추가하지 않는다. 세션은 앱 실행 중 메모리에만 유지하고 앱 종료·연결 해제 뒤 재로그인이 필요하다. 빌드16의 검증·배포 상태와 실제 계정 확인 범위는 [릴리스 원장](releases/release-ledger.json)을 따른다. 이 동작 계약 자체를 파서·캐시·위젯 실계정 검증 완료로 해석하지 않는다.
 
-### 1.0(17) 로컬 후보: 아이폰 단독 직접 연결과 자동 조회
+### 1.0(17) 내부 TestFlight: 아이폰 단독 직접 연결과 자동 조회
 
-이 절은 기존 웹 수동 확인을 대체할 수 있는 **로컬 구현 후보**의 계약이다. Apple 처리 확인 최신은 1.0(16)이며 빌드17의 실제 계정 로그인·권한·토큰 갱신·위젯 대조·TestFlight 처리는 미확인이다. 이 구현은 Mac·PC·Cursor·iCloud·개발자 서버를 경유하지 않는다. 이전 빌드13/16의 수동 웹 확인은 별도 대체 경로로 유지하며 과거 계약과 배포 이력은 보존한다.
+이 절은 기존 웹 수동 확인을 대체할 수 있는 **1.0(17) 내부 TestFlight 기술 후보**의 계약이다. 2026-10-20 13:21:13 KST 업로드와 13:25 KST 기준 App Store Connect의 처리 완료·CodexTime Internal 그룹·초대1명·설치 집계 `–`를 확인했다. Apple 처리 확인 최신은1.0(17)이며 실제 계정 로그인·권한·토큰 갱신·위젯 대조·사용자 설치는 미확인이다. [검증·배포 근거](releases/2026-10-20-ios-direct-refresh.md)와 [제출 현황](app-store/submission.md)을 구분한다. 이 구현은 Mac·PC·Cursor·iCloud·개발자 서버를 경유하지 않는다. 이전 빌드13/16의 수동 웹 확인은 별도 대체 경로로 유지하며 과거 계약과 배포 이력은 보존한다.
 
 **Grok:** `GrokAccountClient`는 `POST https://auth.x.ai/oauth2/device/code`에서 기기 코드를 요청하고 사용자가 xAI 페이지에서 승인한 뒤 `POST https://auth.x.ai/oauth2/token`으로 토큰을 발급·갱신한다. [OpenClaw 문서](https://docs.openclaw.ai/providers/xai)에 소개된 공유 공개 클라이언트를 사용하므로 승인 화면에 Grok Build가 표시될 수 있다. CodexTime의 독립 앱 등록·공식 승인을 주장하지 않는다. 후보 요청 범위는 `openid offline_access grok-cli:access`다. 익명 기기 코드 요청이 이 범위로 수락됨은 확인했지만 실제 계정 billing 권한과 공식 웹의 같은 구독 한도·리셋 일치는 아직 확인하지 않았다.
 
 사용량은 고정 `GET https://cli-chat-proxy.grok.com/v1/billing?format=credits`에서 읽는다. 수치가 없거나 범위·기간 형식이 유효하지 않으면 값을 만들지 않는다. 주간·월간·미상 기간을 구분하고 `currentPeriod`가 존재하면 잘못된 현재 기간을 과거 billing 날짜로 대체하지 않는다. 실제 관측한 사용률·기간·선택적 리셋·시각만 `GrokUsageSnapshot`에 보관한다. 금액·모델별 비중·API 결제 잔액을 구독 잔여율로 변환하지 않는다.
 
-**Claude:** `ClaudeNativeAccountClient`는 **비공식 호환 기술 후보**다. 공개 네이티브 구현의 Claude Code 공개 클라이언트 ID를 참고한 독립 PKCE 구현이며, Anthropic이 CodexTime에 별도 타사 로그인을 허용했다고 확인한 경로가 아니다. [공식 지침](https://code.claude.com/docs/en/legal-and-compliance#authentication-and-credential-use)은 자체 앱의 Claude.ai 로그인과 구독 인증정보의 수집·보관·중개를 제한하고, [공식 안내](https://support.claude.com/en/articles/13189465-log-in-to-your-claude-account)는 타사 개발자에게 API 키를 안내한다. 특정 타사 도구의 허용 재량 조항은 있으나 사용량 전용·개인 오픈소스·내부 TestFlight에 대한 명시 예외나 이 후보의 허용은 확인하지 못했다. 실제 계정 인증이나 활성 배포의 근거로 공개 구현 사례·합성 검증을 사용하지 않는다.
+**Claude:** `ClaudeNativeAccountClient`는 **비공식 호환 기술 후보**다. 공개 네이티브 구현의 Claude Code 공개 클라이언트 ID를 참고한 독립 PKCE 구현이며, Anthropic이 CodexTime에 별도 타사 로그인을 허용했다고 확인한 경로가 아니다. [공식 지침](https://code.claude.com/docs/en/legal-and-compliance#authentication-and-credential-use)은 자체 앱의 Claude.ai 로그인과 구독 인증정보의 수집·보관·중개를 제한하고, [공식 안내](https://support.claude.com/en/articles/13189465-log-in-to-your-claude-account)는 타사 개발자에게 API 키를 안내한다. 특정 타사 도구의 허용 재량 조항은 있으나 사용량 전용·개인 오픈소스·내부 TestFlight에 대한 명시 예외나 이 후보의 허용은 확인하지 못했다. 실제 계정 인증·공급자 허용의 근거로 공개 구현 사례·합성 검증·Apple 처리·내부 그룹 배정을 사용하지 않는다.
 
 후보는 `https://claude.ai/oauth/authorize`에 PKCE S256·무작위 state·`user:profile`을 요청한다. 정확한 HTTPS `https://platform.claude.com/oauth/code/callback` 또는 사용자가 입력한 일회성 `code#state`만 같은 진행 중 세션과 대조한다. 검증자·state는 actor 메모리에만 보관하며 만료·중복·다른 세션 결과를 거부한다. 고정 `POST https://platform.claude.com/v1/oauth/token`과 `GET https://api.anthropic.com/api/oauth/usage`만 사용할 수 있다. `user:profile`의 실제 계정 승인·usage 접근 가능은 미검증이다. 공통 `five_hour`·`seven_day`의 두 사용률·리셋과 실제 조회 시각을 함께 검증해 원자적으로 교체하며 부분 응답으로 한쪽을 새 값처럼 저장하지 않는다. 모델별 한도·계정·프로필·결제 정보는 보관하지 않는다.
 
