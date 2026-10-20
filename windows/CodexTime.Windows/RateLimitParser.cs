@@ -11,10 +11,7 @@ public static class RateLimitParser
 
         if (root.TryGetProperty("error", out var error) && error.ValueKind != JsonValueKind.Null)
         {
-            var message = error.TryGetProperty("message", out var errorMessage)
-                ? errorMessage.GetString()
-                : error.GetRawText();
-            throw new InvalidOperationException($"Codex 응답 오류: {message}");
+            throw new ProviderQueryException(ProviderFailure.QueryFailed);
         }
 
         if (!root.TryGetProperty("result", out var result) || result.ValueKind != JsonValueKind.Object)
@@ -85,15 +82,17 @@ public static class RateLimitParser
 
     private static LimitWindow ParseWindow(JsonElement window)
     {
-        var usedPercent = window.TryGetProperty("usedPercent", out var used) && used.TryGetDouble(out var value)
-            ? value
-            : 0d;
-        var remaining = (int)Math.Round(Math.Clamp(100d - usedPercent, 0d, 100d));
+        if (!window.TryGetProperty("usedPercent", out var used) || used.ValueKind != JsonValueKind.Number
+            || !used.TryGetDouble(out var usedPercent) || !double.IsFinite(usedPercent)
+            || usedPercent is < 0 or > 100)
+            throw new ProviderQueryException(ProviderFailure.InvalidResponse);
+        var remaining = (int)Math.Floor(100d - usedPercent);
 
         DateTimeOffset? resetsAt = null;
         if (window.TryGetProperty("resetsAt", out var reset) && reset.TryGetInt64(out var unixSeconds))
         {
-            resetsAt = DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToLocalTime();
+            try { resetsAt = DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToLocalTime(); }
+            catch (ArgumentOutOfRangeException) { throw new ProviderQueryException(ProviderFailure.InvalidResponse); }
         }
 
         return new LimitWindow(remaining, resetsAt);
@@ -127,5 +126,17 @@ public static class RateLimitParserSelfTest
         {
             throw new InvalidOperationException("Parser accepted a notification without a result.");
         }
+
+        foreach (var invalid in new[] { "{}", "{\"usedPercent\":true}", "{\"usedPercent\":\"2\"}",
+            "{\"usedPercent\":-1}", "{\"usedPercent\":101}" })
+        {
+            var rejected = false;
+            try { RateLimitParser.ParseResponseLine("{\"id\":2,\"result\":{\"rateLimits\":{\"primary\":" + invalid + "}}}"); }
+            catch (ProviderQueryException error) when (error.Failure == ProviderFailure.InvalidResponse) { rejected = true; }
+            if (!rejected) throw new InvalidOperationException("Parser accepted an invalid percentage.");
+        }
+        var fractional = RateLimitParser.ParseResponseLine("{\"id\":2,\"result\":{\"rateLimits\":{\"primary\":{\"usedPercent\":6.2}}}}")!;
+        if (fractional.Main.Primary.RemainingPercent != 93)
+            throw new InvalidOperationException("Parser overstated a fractional remaining quota.");
     }
 }

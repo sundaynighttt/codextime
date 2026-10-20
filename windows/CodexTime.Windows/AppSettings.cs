@@ -10,6 +10,24 @@ public sealed class AppSettings
     public DisplayMode DisplayMode { get; set; } = DisplayMode.TaskbarLabel;
     public int? FloatingLeftPx { get; set; }
     public int? FloatingTopPx { get; set; }
+    public bool ShowResetTime { get; set; }
+    public bool HasCompletedSetup { get; set; }
+    public Dictionary<UsageProviderID, ProviderPreferences> Providers { get; set; } = new();
+
+    public ProviderPreferences Preferences(UsageProviderID id)
+    {
+        Providers ??= new();
+        if (!Providers.TryGetValue(id, out var preferences) || preferences is null)
+            Providers[id] = preferences = new ProviderPreferences();
+        return preferences;
+    }
+}
+
+public sealed class ProviderPreferences
+{
+    public bool Enabled { get; set; } = true;
+    public bool UsageConsent { get; set; }
+    public bool GrokWebVerified { get; set; }
 }
 
 public static class SettingsStore
@@ -79,7 +97,8 @@ public static class AppLog
 {
     private static readonly object Gate = new();
 
-    public static void Write(Exception exception) => Write(exception.ToString());
+    // Exception text can contain CLI output, account information or request data.
+    public static void Write(Exception exception) => Write("operation_failed");
 
     public static void Write(string message)
     {

@@ -12,17 +12,40 @@ public partial class App : System.Windows.Application
     {
         base.OnStartup(e);
 
+        if (e.Args.Length == 2 && e.Args[0] == "--provider-wal-fixture")
+        {
+            try { await ProviderClientSelfTests.RunWalFixtureAsync(e.Args[1]); Shutdown(0); }
+            catch { Shutdown(1); }
+            return;
+        }
+
         if (e.Args.Contains("--self-test", StringComparer.OrdinalIgnoreCase))
         {
             try
             {
                 RateLimitParserSelfTest.Run();
+                Console.WriteLine("Codex parser checks passed.");
+                await ProviderClientSelfTests.RunAsync();
+                Console.WriteLine("Provider HTTP and native Windows storage checks passed.");
+                await ProviderMonitorSelfTests.RunAsync();
+                Console.WriteLine("Provider lifecycle checks passed (7 scenarios).");
+                ProviderUiSelfTests.Run();
+                Console.WriteLine("Provider UI checks passed.");
                 Shutdown(0);
             }
-            catch
+            catch (Exception error)
             {
+                Console.Error.WriteLine("Synthetic self-test failure: " + error.GetType().Name);
+                Console.Error.WriteLine(error.StackTrace);
                 Shutdown(1);
             }
+            return;
+        }
+
+        if (e.Args.Length == 2 && e.Args[0] == "--render-preview")
+        {
+            try { WindowsPreview.Render(e.Args[1]); Shutdown(0); }
+            catch { Shutdown(1); }
             return;
         }
 
@@ -42,7 +65,7 @@ public partial class App : System.Windows.Application
         {
             AppLog.Write(exception);
             System.Windows.MessageBox.Show(
-                exception.Message,
+                "앱을 시작하지 못했습니다. 다시 실행해 주세요.",
                 "CodexTime",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);

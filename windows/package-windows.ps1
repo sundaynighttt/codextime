@@ -1,5 +1,5 @@
 param(
-    [string] $Version = '0.2.0',
+    [string] $Version = '0.4.0',
     [string] $Runtime = 'win-x64'
 )
 
@@ -38,6 +38,7 @@ foreach ($file in $files) {
 }
 Copy-Item -Path (Join-Path $publishRoot 'CodexTime.exe') -Destination $stageRoot
 Copy-Item -Path (Join-Path $repoRoot 'LICENSE') -Destination (Join-Path $stageRoot 'LICENSE.txt')
+Copy-Item -Path (Join-Path $PSScriptRoot 'THIRD_PARTY_NOTICES.txt') -Destination (Join-Path $stageRoot 'ThirdPartyNotices.txt')
 
 Compress-Archive -Path $stageRoot -DestinationPath $zipPath -CompressionLevel Optimal
 Remove-Item -Path $publishRoot -Recurse -Force

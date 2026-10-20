@@ -15,13 +15,18 @@
     },
     {
       "key": "latest_desktop_release",
-      "label": "데스크톱 공개 최신",
+      "label": "macOS 공개 최신",
       "releaseId": "macos-031-b2026101907"
     },
     {
       "key": "last_installed_smoke",
       "label": "macOS 로컬 설치·실행 확인",
       "releaseId": "macos-031-b2026101907"
+    },
+    {
+      "key": "latest_windows_release",
+      "label": "Windows 공개 미리보기 최신",
+      "releaseId": "windows-040"
     }
   ],
   "releases": [
@@ -483,6 +488,23 @@
         "git:9cd429d",
         "git:0effad7",
         "https://testflight.apple.com/v1/app/6805935440"
+      ]
+    },
+    {
+      "id": "windows-040",
+      "sequence": 32,
+      "version": "windows-v0.4.0",
+      "date": "2026-10-20",
+      "stage": "released",
+      "status": "active",
+      "summary": "Windows 0.4.0 세 서비스 공개 미리보기; 네이티브·전송·저장소·상태관리7시나리오·UI·패키지 재실행·WPF PNG4종·전체 CI·비로그인 다운로드/SHA256 통과, 실물 계정 대조 미검증",
+      "evidence": [
+        "windows/CodexTime.Windows/CodexTime.Windows.csproj",
+        "docs/releases/2026-10-20-windows-v0.4.0.md",
+        "docs/windows-setup.md",
+        "git:5e026a0",
+        "https://github.com/sundaynighttt/codextime/actions/runs/39344190966",
+        "https://github.com/sundaynighttt/codextime/releases/tag/windows-v0.4.0"
       ]
     }
   ]

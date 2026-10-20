@@ -41,6 +41,7 @@ jobs:
   windows:
     name: Windows WPF
     runs-on: windows-latest
+    timeout-minutes: 20
     defaults:
       run:
         shell: powershell
@@ -55,3 +56,27 @@ jobs:
 
       - name: Build and run parser tests
         run: .\windows\test-parser.ps1
+
+      - name: Package and verify standalone app
+        run: |
+          .\windows\package-windows.ps1 -Version 0.4.0
+          Expand-Archive -Path dist\CodexTime-Windows-0.4.0.zip -DestinationPath "$env:RUNNER_TEMP\codextime-package"
+          $executable = "$env:RUNNER_TEMP\codextime-package\CodexTime-Windows-0.4.0\CodexTime.exe"
+          $test = Start-Process -FilePath $executable -ArgumentList '--self-test' -Wait -PassThru
+          if ($test.ExitCode -ne 0) { throw 'Published application self-test failed.' }
+          $previewPath = Join-Path $env:RUNNER_TEMP 'codextime-windows-previews'
+          $preview = Start-Process -FilePath $executable -ArgumentList @('--render-preview', $previewPath) -Wait -PassThru
+          if ($preview.ExitCode -ne 0) { throw 'Published application preview failed.' }
+          $zip = Get-Item dist\CodexTime-Windows-0.4.0.zip
+          $hash = (Get-FileHash -Algorithm SHA256 $zip.FullName).Hash.ToLowerInvariant()
+          "$hash  $($zip.Name)" | Out-File -FilePath dist\SHA256SUMS-Windows.txt -Encoding ascii
+
+      - name: Retain Windows package and synthetic previews
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-0.4.0-validation
+          path: |
+            dist/CodexTime-Windows-0.4.0.zip
+            dist/SHA256SUMS-Windows.txt
+            ${{ runner.temp }}/codextime-windows-previews/*.png
+          if-no-files-found: error

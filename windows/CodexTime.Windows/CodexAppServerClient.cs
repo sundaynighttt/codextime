@@ -16,17 +16,17 @@ public sealed class CodexAppServerClient
             throw new InvalidOperationException("Codex app-server를 시작하지 못했습니다.");
         }
 
-        var stderrTask = process.StandardError.ReadToEndAsync(cancellationToken);
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeout.CancelAfter(RequestTimeout);
+        var stderrTask = DiscardErrorsAsync(process.StandardError, timeout.Token);
         try
         {
             await process.StandardInput.WriteLineAsync(
-                "{\"id\":1,\"method\":\"initialize\",\"params\":{\"clientInfo\":{\"name\":\"codextime-windows\",\"version\":\"0.2.0\"}}}");
-            await process.StandardInput.WriteLineAsync("{\"method\":\"initialized\"}");
-            await process.StandardInput.WriteLineAsync("{\"id\":2,\"method\":\"account/rateLimits/read\"}");
-            await process.StandardInput.FlushAsync();
+                "{\"id\":1,\"method\":\"initialize\",\"params\":{\"clientInfo\":{\"name\":\"codextime-windows\",\"version\":\"0.4.0\"}}}".AsMemory(), timeout.Token);
+            await process.StandardInput.WriteLineAsync("{\"method\":\"initialized\"}".AsMemory(), timeout.Token);
+            await process.StandardInput.WriteLineAsync("{\"id\":2,\"method\":\"account/rateLimits/read\"}".AsMemory(), timeout.Token);
+            await process.StandardInput.FlushAsync(timeout.Token);
 
-            using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            timeout.CancelAfter(RequestTimeout);
             while (true)
             {
                 string? line;
@@ -41,12 +41,10 @@ public sealed class CodexAppServerClient
 
                 if (line is null)
                 {
-                    var error = await stderrTask;
-                    throw new InvalidOperationException(
-                        string.IsNullOrWhiteSpace(error)
-                            ? "Codex app-server가 응답 없이 종료됐습니다."
-                            : error.Trim());
+                    throw new ProviderQueryException(ProviderFailure.QueryFailed);
                 }
+
+                if (line.Length > 262_144) throw new ProviderQueryException(ProviderFailure.InvalidResponse);
 
                 var report = RateLimitParser.ParseResponseLine(line);
                 if (report is not null)
@@ -57,19 +55,28 @@ public sealed class CodexAppServerClient
         }
         finally
         {
+            timeout.Cancel();
             if (!process.HasExited)
             {
                 try
                 {
                     process.Kill(entireProcessTree: true);
-                    await process.WaitForExitAsync(CancellationToken.None);
+                    using var cleanup = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+                    await process.WaitForExitAsync(cleanup.Token);
                 }
                 catch
                 {
                     // The short-lived app-server may exit between the checks above.
                 }
             }
+            try { await stderrTask; } catch { /* Never publish raw stderr. */ }
         }
+    }
+
+    private static async Task DiscardErrorsAsync(StreamReader reader, CancellationToken cancellationToken)
+    {
+        var buffer = new char[1024];
+        while (await reader.ReadAsync(buffer.AsMemory(), cancellationToken) > 0) { }
     }
 
     private static ProcessStartInfo CreateStartInfo(string path)
@@ -113,7 +120,7 @@ public sealed class CodexAppServerClient
         return startInfo;
     }
 
-    private static string ResolveCodexPath()
+    internal static string ResolveCodexPath()
     {
         var explicitPath = Environment.GetEnvironmentVariable("CODEX_CLI_PATH");
         if (!string.IsNullOrWhiteSpace(explicitPath) && File.Exists(explicitPath))

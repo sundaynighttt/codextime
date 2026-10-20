@@ -15,6 +15,6 @@ $dotnet = if (Get-Command dotnet -ErrorAction SilentlyContinue) {
 if ($LASTEXITCODE -ne 0) { throw 'Windows build failed.' }
 
 & $dotnet run --project $project -c Release --no-build -- --self-test
-if ($LASTEXITCODE -ne 0) { throw 'Windows parser self-test failed.' }
+if ($LASTEXITCODE -ne 0) { throw 'Windows provider, lifecycle, or UI self-test failed.' }
 
-Write-Output 'Windows build and parser tests passed'
+Write-Output 'Windows build and provider, lifecycle, and UI tests passed'

@@ -48,7 +48,7 @@ $shell = New-Object -ComObject WScript.Shell
 $shortcut = $shell.CreateShortcut($shortcutPath)
 $shortcut.TargetPath = Join-Path $installRoot 'CodexTime.exe'
 $shortcut.WorkingDirectory = $installRoot
-$shortcut.Description = 'Codex usage monitor'
+$shortcut.Description = 'Codex, Grok and Claude usage monitor'
 $shortcut.Save()
 Remove-Item -Path $legacyShortcutPath -Force -ErrorAction SilentlyContinue
 
