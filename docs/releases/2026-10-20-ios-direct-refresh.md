@@ -1,6 +1,6 @@
 # iPhone 1.0(17) — 아이폰 단독 직접 조회 후보
 
-2026-10-20 기준 로컬 검증 후보다. Apple 처리 확인 최신은 1.0(16)이며 새 업로드·처리·실기기 계정 검증을 구분한다. Mac·PC·Cursor·iCloud·개발자 중계 서버를 사용하지 않는다.
+2026-10-20 기준 아이폰 단독 직접 조회 기술 후보다. 빌드17은 13:21:13 KST 업로드 성공 후 App Store Connect의 처리 완료를 확인했다. Apple 처리 완료와 CodexTime Internal 그룹 배정을 확인했다. 실기기 설치·실계정 검증은 별도로 구분한다. Mac·PC·Cursor·iCloud·개발자 중계 서버를 사용하지 않는다.
 
 ## 동작
 
@@ -24,13 +24,20 @@
 - XCTest **170개 통과, 실패0, 건너뜀0**. Grok core22·model13·표시9, Claude core21·model17·표시8과 기존80개를 포함한다.
 - PKCE/state·정확한 callback·만료·재로그인·늦은 응답·공유 회전·모호한 회전·25초 취소·원자적 한도·데모·공급자 분리·새 수동 기록 우선 회귀 포함.
 - 시뮬레이터의 로그인 전3열 카드·Grok 직접 연결 화면·Claude 제한 안내와 호환 연결 화면을 확인했다. 실제 계정 로그인·계정HTTP·타 앱 Keychain·쿠키·토큰·세션 원문은 검사하지 않았다.
-- Release archive의 앱·위젯이 모두1.0(17)이며 코드 서명 검증을 통과했다. 배포용 내보내기·최종 배포 서명은 별도 확인한다.
+- Release archive와 App Store 내보내기의 앱·위젯이 모두1.0(17)이며 Apple Distribution 코드 서명 검증을 통과했다. Team7FCZ5TAX3B, 기존 App Group·Keychain 그룹, 디버깅 비활성, iCloud 권한 없음, iPhone/iOS17 이상과 비면제 암호화 없음 선언을 확인했다. 시스템 신뢰 검사는 필요한 보안 서비스 접근에서 검증했으며 인증서·권한 설정은 변경하지 않았다.
+- [최종 GitHub CI](https://github.com/sundaynighttt/codextime/actions/runs/39368369324): iPhone widget5분58초·macOS Swift2분4초·Windows WPF1분39초 모두 통과. [PR20](https://github.com/sundaynighttt/codextime/pull/20)은 검사 후 main에 병합했다(`bc0c82966fdeb3abc2ab2ccf1cfa65dafc42ee75`).
 - 고정 소스의 실제 소형 위젯 뷰로 합성 문서 이미지17을 생성했다. 인증 클라이언트·저장소·네트워크 없는 별도 미리보기 호스트만 사용하고 제거했다.
 - 독립 최종 기술 리뷰에 확정 P1/P2 없음.
 - 실제 계정의 승인·usage 권한·공식 웹의 값/리셋 대조·앱/위젯 동시 표시·자연스러운 토큰 갱신은 사용자의 TestFlight 확인 대상이다. 모델 호출·메시지 생성은 하지 않는다.
 
 ## 배포 상태
 
-현재 소스 후보 1.0(17), 로컬 검증 완료. Release archive·서명·GitHub CI·TestFlight 업로드 및 Apple 처리 결과는 확인 후 이 절과 원장을 갱신한다. 공개 App Store 출시는 수행하지 않았다.
+1.0(17)은 Release·배포 서명·세 플랫폼 최종 CI 통과 후 **2026-10-20 13:21:13 KST 업로드 성공**했다. App Store Connect에서 빌드17의 **제출 준비 완료·CodexTime Internal 그룹·초대1명·설치 표시없음**을 13:25 KST 기준으로 확인했다. Apple 처리·내부 그룹 배정과 iPhone 설치·실계정 사용량 성공을 구분하며 후자는 아직 미검증이다. 공개 App Store 출시는 수행하지 않았다.
+
+- 실행 소스: `40d2f2e11367051617ce1127fd6968c35835e932`와 동일한 앱 파일. 문서·이미지를 포함한 최종 검사 소스 `9f5dcb6f05ffd93dd9eacc0fcf3ff5acc8b41aa2`.
+- 로컬 배포 IPA: 2,299,784 bytes, SHA256 `e6015797c212b340014496460a2e562c0542c7985d879456770102b3121e93aa`. 업로드는 동일 archive에서 Apple 자동 배포 경로로 수행하며 업로드용 임시 패키지의 보존을 주장하지 않는다.
+- 업로드 처리 식별자: `4ac35106-3be9-4b90-9fd2-8f1df6625f59`. 인증정보나 계정별 사용량은 이 기록에 포함하지 않는다.
 
 새 개인정보 정책 고정 커밋: `5f8851900aa27ae1586fbb6ee0f5f96f35ece8e0`. 앱은 이 공개 커밋의 정책 URL을 사용한다.
+
+앱에 고정된 정책 커밋의 후보·배포 상태 문구는 작성 당시 기준이다. 처리 계약은 동일하며 업로드 이후의 현재 상태는 이 기록과 원장을 따른다. 최신 정책의 도입부는 반복되는 배포 상태를 원장 참조로 정리했다.

@@ -1,13 +1,15 @@
 # CodexTime App Store 제출 현황
 
-## 1.0(17) 로컬 후보 — 아이폰 단독 직접 연결
+## 1.0(17) Apple 처리·내부 그룹 배정 확인 — 아이폰 단독 직접 연결
 
-- **local_verified/passed:** 앱·위젯 빌드와 합성 XCTest170개 및 시뮬레이터 연결 화면 검증을 통과했다. 이 항목은 로컬 소스 후보의 범위다. Apple 처리 확인 최신은 아래 **1.0(16)**이며 빌드17의 업로드·Apple 처리·내부 테스터 배정·실제 기기 설치·사용량 대조는 아직 완료로 기록하지 않는다. 합성 시험과 실제 계정 성공을 구분한다.
+- **external_processed/passed:** Apple 처리 확인 최신은 **1.0(17)**이다. **2026-10-20 13:21:13 KST** Xcode 업로드 성공을 확인했고, **13:25 KST 기준** App Store Connect의 빌드17 **제출 준비 완료·CodexTime Internal 그룹·초대1명·설치 집계 `–`**를 확인했다. [빌드 상세](https://appstoreconnect.apple.com/teams/8874948e-3fee-4bea-a414-67a4c0f0e7d8/apps/6805935440/testflight/ios/4ac35106-3be9-4b90-9fd2-8f1df6625f59) · [배포 근거](../releases/2026-10-20-ios-direct-refresh.md). 이 관측은 내부 그룹 배정까지의 근거이며 사용자 기기의 설치·업데이트·실계정 성공을 추정하지 않는다. 정식 App Store 공개는 수행하지 않았다.
+- 앱·위젯 빌드, 합성 XCTest170개, 시뮬레이터 연결 화면, Release archive·Apple Distribution 서명과 [세 플랫폼 최종 CI](https://github.com/sundaynighttt/codextime/actions/runs/39368369324)를 통과했다. 앱·위젯 모두1.0(17), Team7FCZ5TAX3B·기존 App Group/Keychain 그룹·디버깅 비활성·iCloud 권한 없음을 확인했다. [PR20](https://github.com/sundaynighttt/codextime/pull/20)은 검사 후 main에 병합했다(`bc0c82966fdeb3abc2ab2ccf1cfa65dafc42ee75`). 실제 인증·usage 권한·공식 웹 수치/리셋 대조·토큰 갱신·앱/위젯 실계정 검증은 미확인이다.
+- 업로드 실행 소스는 `40d2f2e11367051617ce1127fd6968c35835e932`와 동일한 앱 파일이며, 문서·이미지를 포함한 최종 검사 소스는 `9f5dcb6f05ffd93dd9eacc0fcf3ff5acc8b41aa2`다. Apple 처리 식별자는 `4ac35106-3be9-4b90-9fd2-8f1df6625f59`다.
 - Grok은 xAI 기기 인증과 이 앱 전용 Keychain·billing 직접 조회 후보다. 공유 공개 OAuth 클라이언트이므로 승인 화면에 Grok Build가 표시될 수 있다. `openid offline_access grok-cli:access` 범위로 기기 코드가 발급됨은 확인했지만 실제 계정 billing 권한·공식 웹 숫자와 reset 대조·토큰 갱신은 미검증이다. CodexTime의 독립 등록·공식 승인을 뜻하지 않는다.
-- Claude는 공개 Claude Code 클라이언트 선례를 참고한 독립 PKCE **비공식 호환 기술 후보**다. [공식 인증 지침](https://code.claude.com/docs/en/legal-and-compliance#authentication-and-credential-use)은 자체 앱의 Claude.ai 로그인과 구독 인증정보 수집·보관·중개를 제한한다. [공식 로그인 안내](https://support.claude.com/en/articles/13189465-log-in-to-your-claude-account)는 타사 개발자에게 API 키 경로를 안내하고 특정 타사 도구 허용은 Anthropic의 재량이라고 설명한다. 사용량 전용·개인 오픈소스·내부 TestFlight 명시 예외나 CodexTime의 허용은 확인하지 못했다. 실제 로그인·`user:profile` usage 권한·활성 배포 여부는 별도 판단하며 공개 구현 사례를 허가 근거로 사용하지 않는다.
+- Claude는 공개 Claude Code 클라이언트 선례를 참고한 독립 PKCE **비공식 호환 기술 후보**다. [공식 인증 지침](https://code.claude.com/docs/en/legal-and-compliance#authentication-and-credential-use)은 자체 앱의 Claude.ai 로그인과 구독 인증정보 수집·보관·중개를 제한한다. [공식 로그인 안내](https://support.claude.com/en/articles/13189465-log-in-to-your-claude-account)는 타사 개발자에게 API 키 경로를 안내하고 특정 타사 도구 허용은 Anthropic의 재량이라고 설명한다. 사용량 전용·개인 오픈소스·내부 TestFlight 명시 예외나 CodexTime의 허용은 확인하지 못했다. 실제 로그인·`user:profile` usage 권한·공식 허용은 미확인이다. 이번 Apple 처리·내부 그룹 배정과 공개 구현 사례를 공급자 허가 근거로 사용하지 않는다.
 - 연결된 직접 공급자는 앱 활성화·복귀·수동 새로고침·활성 중 10분 갱신, 위젯 타임라인에서 독립 조회하는 후보다. iOS가 실제 위젯 실행 시점을 결정하므로 정해진 백그라운드 간격을 보장하지 않는다. 수치 부재·만료·지난 조회·재연결 필요를 구분하고 실제 조회 시각만 표시한다.
 - 인증은 이 앱이 새로 발급받은 토큰만 기기 전용 Keychain에 보관한다. App Group에는 최소 숫자·기간·리셋·실제 조회 시각과 연결 세대만 저장한다. 다른 앱·CLI·브라우저의 인증정보, Mac·PC·iCloud·개발자 중계 서버를 사용하지 않는다. 모델·대화·과거 세션 조회도 없다. 기존 nonPersistent WebKit 수동 확인을 별도 대체 경로로 유지한다.
-- 새 개인정보 처리 범위는 [현재 정책](../privacy-policy.md)과 [프로토콜](../protocol.md)에 반영한다. 이 정책을 공개한 커밋에 앱 내 링크를 고정한 뒤 실제 archive의 URL·서명·권한을 확인해야 한다. ASC 개인정보 레이블·심사 메모를 저장했다는 뜻은 아니다.
+- 개인정보 처리 범위는 [고정 공개 정책](https://github.com/sundaynighttt/codextime/blob/5f8851900aa27ae1586fbb6ee0f5f96f35ece8e0/docs/privacy-policy.md)과 [프로토콜](../protocol.md)을 따른다. 앱의 정책 링크는 `5f8851900aa27ae1586fbb6ee0f5f96f35ece8e0`에 고정했고 실제 archive의 URL·서명·권한을 확인했다. 정책의 당시 로컬 후보 상태와 이후 업로드·Apple 처리 상태는 이 문서에서 구분한다. ASC 개인정보 레이블·심사 메모를 새로 저장했다는 뜻은 아니다.
 
 ## TestFlight 처리 완료 1.0(16) — Claude 세션·주간 한 번 읽기
 
@@ -76,16 +78,16 @@
 ## 스토어 표현과 심사 경계
 
 - 비공식 읽기 전용 사용량 대시보드이며 OpenAI·xAI·Anthropic·Apple의 제작·보증을 주장하지 않는다.
-- 빌드16 배포본은 Codex 직접 인증·Grok/Claude 공식 웹 수동 확인을 설명한다. 빌드17 직접 연결은 위의 로컬 후보 범위로 구분하며 실제 계정 자동 조회·영구 로그인·모든 계정 성공·공급자 승인으로 소개하지 않는다. 수동 웹의 Claude Google/새창 제한도 유지한다. Mac·Codex CLI·Cursor·iCloud·별도 API 키가 필요하지 않으며 실제 계정별 성공과 배포 허용은 각각 별도로 확인한다.
+- 빌드16 배포본은 Codex 직접 인증·Grok/Claude 공식 웹 수동 확인을 설명한다. 빌드17 직접 연결은 위의 내부 TestFlight 검증 범위로 구분하며 실제 계정 자동 조회·영구 로그인·모든 계정 성공·공급자 승인으로 소개하지 않는다. 수동 웹의 Claude Google/새창 제한도 유지한다. Mac·Codex CLI·Cursor·iCloud·별도 API 키가 필요하지 않으며 실제 계정별 성공과 배포 허용은 각각 별도로 확인한다.
 - 기본 한도 구간만 표시한다. 모든 구간, 결제 크레딧, 리셋 실행 기능은 없다.
 - 위젯은 30분 뒤 갱신을 요청하지만 실제 일정은 iOS가 결정한다.
 - 공개 예시 모드는 로그인 없이 작동한다. 심사에만 보이는 숨겨진 경로나 실제 값처럼 꾸민 예시가 아니다.
-- 심사 메모는 해당 제출 빌드의 실제 동작에 맞춰야 한다. 빌드16의 수동 웹 확인·앱 수명 세션과, 활성 배포가 결정될 경우 빌드17의 직접 인증·기기 전용 토큰·최소 캐시·삭제·OS 갱신 제한을 구분한다. 후보 기능이나 제한을 심사에서 숨기지 않으며 새 메모를 ASC에 저장했다는 뜻이 아니다.
+- 심사 메모는 해당 제출 빌드의 실제 동작에 맞춰야 한다. 빌드16의 수동 웹 확인·앱 수명 세션과 빌드17 내부 테스트의 직접 인증·기기 전용 토큰·최소 캐시·삭제·OS 갱신 제한을 구분한다. 후보 기능이나 제한을 심사에서 숨기지 않으며 새 메모를 ASC에 저장했다는 뜻이 아니다.
 - 심사 연락처는 사용자 제공 기존 연락처를 App Store Connect에만 입력한다. 저장소에는 복제하지 않는다.
 
 ## 개인정보
 
-현재 소스 후보의 계약은 [저장소 개인정보 방침](../privacy-policy.md)이다. 빌드17 직접 연결의 이 앱 전용 기기 Keychain·공급자 직접 요청·최소 숫자 캐시·인증 갱신·연결 해제 범위와, 유지되는 수동 WebKit 경로의 앱 수명 세션·수동 숫자·자동 웹 갱신 없음을 구분한다. Codex의 기존 직접 인증·조회는 유지한다. Claude 후보의 공식 허용과 활성 배포는 별도로 확인한다.
+현재 빌드17의 개인정보 계약은 위의 고정 공개 정책이며 [저장소 개인정보 방침](../privacy-policy.md)에서도 확인할 수 있다. 빌드17 직접 연결의 이 앱 전용 기기 Keychain·공급자 직접 요청·최소 숫자 캐시·인증 갱신·연결 해제 범위와, 유지되는 수동 WebKit 경로의 앱 수명 세션·수동 숫자·자동 웹 갱신 없음을 구분한다. Codex의 기존 직접 인증·조회는 유지한다. Claude 호환 경로의 공식 허용과 실계정 검증은 여전히 미확인이다. Apple 처리·내부 그룹 배정은 정식 App Store 공개나 공급자 허가의 증거가 아니다.
 
 빌드 11까지 앱 방침 링크는 고정 커밋 `0405d909da7db6fd58a337e417d336b89e88fee3`을 사용했다. 중단된 iCloud 후보의 방침 커밋 `1fa6718bc59942b7bd1b6fd5f410bef6ea2dc4c6`은 별도 과거 계약이다. 두 고정 링크가 새 웹 정책으로 자동 갱신되지는 않는다. 빌드 13은 새 정책 커밋 [`694397676e700a164cb9d931b449a230267fe865`](https://github.com/sundaynighttt/codextime/blob/694397676e700a164cb9d931b449a230267fe865/docs/privacy-policy.md)을 앱 내 링크에 고정하고 후보 브랜치에 공개했다. ASC 개인정보 레이블·심사 메모의 현재 동작 일치 여부는 별도 확인 항목이며 저장 완료를 주장하지 않는다.
 

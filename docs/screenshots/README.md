@@ -7,7 +7,7 @@ README 이미지는 현재 제품의 화면 코드에 **오프라인 예시 데�
 | [macos-menubar-v0.3.1.png](macos-menubar-v0.3.1.png) | macOS 0.3.1 (2026101907) | 실제 `MenuBarPresentation`의 세 로고와 남은 사용량. 리셋 시간 표시를 끈 기본 상태 |
 | [macos-setup-v0.3.1.png](macos-setup-v0.3.1.png) | macOS 0.3.1 (2026101907) | 실제 `ConnectionSettingsWindow`의 로그인 전 화면 |
 | [macos-connected-v0.3.1.png](macos-connected-v0.3.1.png) | macOS 0.3.1 (2026101907) | 같은 설정 창의 세 서비스 연결 완료 예시 |
-| [ios-widget-v1.0-b17.png](ios-widget-v1.0-b17.png) | iPhone 1.0 (17), 로컬 후보 | 고정 후보 소스의 실제 `UsageEntry`·`CodexTimeWidgetView`와 합성 상태: Codex73%, Grok월간82%, Claude주간75%/세션90%. 이미지 안에 합성 UI·실계정 검증 아님 표시 |
+| [ios-widget-v1.0-b17.png](ios-widget-v1.0-b17.png) | iPhone 1.0 (17), TestFlight UI·합성 | 고정 후보 소스의 실제 `UsageEntry`·`CodexTimeWidgetView`와 합성 상태: Codex73%, Grok월간82%, Claude주간75%/세션90%. 이미지 안에 합성 UI·실계정 검증 아님 표시 |
 | [ios-widget-v1.0-b16.png](ios-widget-v1.0-b16.png) | iPhone 1.0 (16), TestFlight | 실제 `CodexTimeWidgetView`와 `UsageSnapshot.demo`: 세 로고·Codex 예시 73%·Grok 예시 없음·Claude 주간/세션 예시 없음·리셋·갱신 시각 |
 | [ios-widget-v1.0-b9.png](ios-widget-v1.0-b9.png) | iPhone 1.0 (9), 이전 이미지 | 기존 Codex 전용 위젯 예시 보존 |
 | [windows-taskbar-v0.4.0.png](windows-taskbar-v0.4.0.png) | Windows 0.4.0 공개 미리보기 | 실제 WPF 세 로고·독립 잔여율, 합성 예시 |
