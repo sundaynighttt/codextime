@@ -18,6 +18,10 @@ extension GrokAccountClient: GrokAccountServicing {}
 @MainActor
 @Observable
 final class GrokAppModel {
+    enum ConnectionFailureStage: Equatable {
+        case approvalResult, firstUsage
+    }
+
     private(set) var snapshot: GrokUsageSnapshot?
     private(set) var authorization: GrokDeviceAuthorization?
     private(set) var isConnected = false
@@ -26,6 +30,7 @@ final class GrokAppModel {
     private(set) var isDisconnecting = false
     private(set) var requiresSignIn = false
     private(set) var error: GrokClientError?
+    private(set) var connectionFailureStage: ConnectionFailureStage?
 
     @ObservationIgnored private let client: any GrokAccountServicing
     @ObservationIgnored private let cachedSnapshot: @Sendable () -> GrokUsageSnapshot?
@@ -52,7 +57,14 @@ final class GrokAppModel {
         self.reloadWidgets = reloadWidgets
     }
 
-    var message: String? { error?.errorDescription }
+    var message: String? {
+        guard let detail = error?.errorDescription else { return nil }
+        switch connectionFailureStage {
+        case .approvalResult: return "Grok 연결 승인을 마무리하지 못했습니다.\n" + detail
+        case .firstUsage: return "Grok 인증은 완료됐지만 사용량을 조회하지 못했습니다.\n" + detail
+        case nil: return detail
+        }
+    }
     var canRefresh: Bool { isConnected && !isAuthenticating && !isRefreshing && !isDisconnecting }
     var canBeginSignIn: Bool { !isDemoEnabled() && !isAuthenticating && !isRefreshing && !isDisconnecting }
 
@@ -68,6 +80,13 @@ final class GrokAppModel {
         guard isCurrent(requestGeneration) else { return }
         isConnected = connected
         requiresSignIn = !connected && snapshot != nil
+        if connected, let snapshot, !snapshot.isStale(at: now(), maxAge: 600),
+           connectionFailureStage == .firstUsage {
+            // A widget may have completed the first usage request while this sheet was away.
+            error = nil
+            connectionFailureStage = nil
+            nextAutomaticAttemptAt = nil
+        }
         if connected { await refreshIfNeeded() }
     }
 
@@ -82,6 +101,7 @@ final class GrokAppModel {
     func refresh(force: Bool = true) async {
         guard !isDemoEnabled(), isConnected, !isAuthenticating, !isRefreshing, !isDisconnecting else { return }
         let requestGeneration = generation
+        connectionFailureStage = nil
         isRefreshing = true
         defer {
             if generation == requestGeneration { isRefreshing = false }
@@ -92,6 +112,7 @@ final class GrokAppModel {
             guard fresh.isValid(at: now()) else { throw GrokClientError.invalidResponse }
             snapshot = fresh
             error = nil
+            connectionFailureStage = nil
             requiresSignIn = false
             nextAutomaticAttemptAt = nil
             reloadWidgets()
@@ -110,6 +131,7 @@ final class GrokAppModel {
         isConnected = false
         authorization = nil
         error = nil
+        connectionFailureStage = nil
         requiresSignIn = snapshot != nil
         nextAutomaticAttemptAt = nil
         signInTask = Task { [weak self] in
@@ -135,6 +157,7 @@ final class GrokAppModel {
                 self.isConnected = true
                 self.requiresSignIn = false
                 self.error = nil
+                self.connectionFailureStage = nil
                 self.reloadWidgets()
             } catch {
                 if let issuedAuthorization, Task.isCancelled || !self.isCurrent(requestGeneration) {
@@ -152,6 +175,10 @@ final class GrokAppModel {
                     self.snapshot = nil
                 }
                 self.record(error)
+                if self.error != nil {
+                    self.connectionFailureStage = issuedAuthorization != nil && self.isConnected
+                        ? .firstUsage : .approvalResult
+                }
             }
             guard self.generation == requestGeneration else { return }
             self.authorization = nil
@@ -169,6 +196,7 @@ final class GrokAppModel {
         authorization = nil
         isAuthenticating = false
         error = nil
+        connectionFailureStage = nil
         if let issued { try? await client.cancelDeviceAuthorization(issued) }
     }
 
@@ -185,6 +213,7 @@ final class GrokAppModel {
         isAuthenticating = false
         isRefreshing = false
         error = nil
+        connectionFailureStage = nil
         nextAutomaticAttemptAt = nil
         // Hide the old account immediately. A failed deletion stays visible as an error.
         snapshot = nil
@@ -218,6 +247,7 @@ final class GrokAppModel {
         isConnected = false
         requiresSignIn = false
         error = nil
+        connectionFailureStage = nil
         snapshot = nil
         nextAutomaticAttemptAt = nil
         if let issued { try? await client.cancelDeviceAuthorization(issued) }

@@ -163,6 +163,301 @@ final class GrokAccountClientTests: XCTestCase {
         XCTAssertNil(stores.auth)
     }
 
+    func testTransientURLFailuresAreTypedOnlyForExactURLLoadingDomain() {
+        for failure in GrokTransientNetworkFailure.allCases {
+            XCTAssertEqual(GrokTransientNetworkFailure.classify(
+                NSError(domain: NSURLErrorDomain, code: failure.rawValue)), failure)
+            XCTAssertNil(GrokTransientNetworkFailure.classify(
+                NSError(domain: "fixture-unrelated-domain", code: failure.rawValue)))
+        }
+        XCTAssertEqual(GrokTransientNetworkFailure.classify(URLError(.cancelled)), .cancelled)
+        XCTAssertNil(GrokTransientNetworkFailure.classify(CancellationError()))
+        XCTAssertNil(GrokTransientNetworkFailure.classify(URLError(.serverCertificateUntrusted)))
+    }
+
+    func testDevicePollingResumesAfterBrowserInterruptionWithBoundedBackoff() async throws {
+        let stores = GrokTestStores()
+        let clock = GrokTestClock(instant)
+        let transport = GrokScriptTransport([
+            .response(200, deviceData()), .transient(.cancelled), .transient(.timedOut),
+            .response(400, json(["error": "authorization_pending"])),
+            .response(200, tokenData()), .response(200, billingData(percent: 42))
+        ])
+        let client = makeClient(stores: stores, transport: transport, clock: clock)
+        let authorization = try await client.requestDeviceAuthorization()
+        let snapshot = try await client.completeDeviceAuthorization(authorization)
+        XCTAssertEqual(snapshot.usedPercent, 42)
+        XCTAssertEqual(clock.delays, [2, 2, 4, 2])
+        let requests = await transport.recordedRequests()
+        XCTAssertEqual(requests.filter { $0.url == GrokConfiguration.tokenURL }.count, 4)
+        XCTAssertEqual(stores.auth?.connectionID, authorization.connectionID)
+    }
+
+    func testInterruptedDevicePollingStopsAtOriginalDeadline() async throws {
+        let stores = GrokTestStores()
+        let clock = GrokTestClock(instant)
+        let transport = GrokScriptTransport([
+            .response(200, deviceData(expiresIn: 5)), .transient(.cancelled), .transient(.timedOut)
+        ])
+        let client = makeClient(stores: stores, transport: transport, clock: clock)
+        let authorization = try await client.requestDeviceAuthorization()
+        do {
+            _ = try await client.completeDeviceAuthorization(authorization)
+            XCTFail("Temporary interruption must not extend the device code deadline")
+        } catch { XCTAssertEqual(error as? GrokClientError, .loginExpired) }
+        XCTAssertEqual(clock.delays, [2, 2, 1])
+        let requests = await transport.recordedRequests()
+        XCTAssertEqual(requests.count, 3)
+        XCTAssertNil(stores.auth)
+    }
+
+    func testDevicePollingBackoffNeverExceedsSixtySeconds() async throws {
+        let stores = GrokTestStores()
+        let clock = GrokTestClock(instant)
+        let failures = Array(repeating: GrokScriptTransport.Step.transient(.notConnectedToInternet), count: 9)
+        let transport = GrokScriptTransport([.response(200, deviceData(expiresIn: 300))] + failures)
+        let client = makeClient(stores: stores, transport: transport, clock: clock)
+        let authorization = try await client.requestDeviceAuthorization()
+        do {
+            _ = try await client.completeDeviceAuthorization(authorization)
+            XCTFail("Offline device approval must eventually expire")
+        } catch { XCTAssertEqual(error as? GrokClientError, .loginExpired) }
+        XCTAssertEqual(clock.delays, [2, 2, 4, 8, 16, 32, 60, 60, 60, 56])
+        XCTAssertTrue(clock.delays.allSatisfy { $0 <= 60 })
+        XCTAssertNil(stores.auth)
+    }
+
+    func testLateSuccessfulApprovalAfterDeadlineCannotSaveTokens() async throws {
+        let stores = GrokTestStores()
+        let clock = GrokTestClock(instant)
+        let gate = GrokResponseGate()
+        let transport = GrokScriptTransport([.response(200, deviceData(expiresIn: 3)), .gated(gate)])
+        let client = makeClient(stores: stores, transport: transport, clock: clock)
+        let authorization = try await client.requestDeviceAuthorization()
+        let completion = Task { try await client.completeDeviceAuthorization(authorization) }
+        await gate.waitUntilRequested()
+        clock.advance(2)
+        await gate.resolve(.init(statusCode: 200, data: tokenData()))
+        do {
+            _ = try await completion.value
+            XCTFail("A late successful response must not extend expired approval")
+        } catch { XCTAssertEqual(error as? GrokClientError, .loginExpired) }
+        let requests = await transport.recordedRequests()
+        XCTAssertEqual(requests.count, 2)
+        XCTAssertNil(stores.auth)
+    }
+
+    func testUserTaskCancellationIsNeverRetriedAsURLSessionCancellation() async throws {
+        let stores = GrokTestStores()
+        let clock = GrokTestClock(instant)
+        let gate = GrokResponseGate()
+        let transport = GrokScriptTransport([
+            .response(200, deviceData()), .gatedTransient(gate, .cancelled)
+        ])
+        let client = makeClient(stores: stores, transport: transport, clock: clock)
+        let authorization = try await client.requestDeviceAuthorization()
+        let completion = Task { try await client.completeDeviceAuthorization(authorization) }
+        await gate.waitUntilRequested()
+        completion.cancel()
+        await gate.resolve(.init(statusCode: 200, data: Data()))
+        do {
+            _ = try await completion.value
+            XCTFail("Cancelling the owned task must stop approval")
+        } catch { XCTAssertTrue(error is CancellationError) }
+        XCTAssertEqual(clock.delays, [2])
+        let requests = await transport.recordedRequests()
+        XCTAssertEqual(requests.count, 2)
+        XCTAssertNil(stores.auth)
+    }
+
+    func testDirectCancellationErrorIsNeverRetried() async throws {
+        let stores = GrokTestStores()
+        let transport = GrokScriptTransport([.response(200, deviceData()), .cancellation])
+        let client = makeClient(stores: stores, transport: transport)
+        let authorization = try await client.requestDeviceAuthorization()
+        do {
+            _ = try await client.completeDeviceAuthorization(authorization)
+            XCTFail("An explicit cancellation must remain terminal")
+        } catch { XCTAssertTrue(error is CancellationError) }
+        let requests = await transport.recordedRequests()
+        XCTAssertEqual(requests.count, 2)
+        XCTAssertNil(stores.auth)
+    }
+
+    func testRetiredAuthorizationDoesNotRetryAnInterruptedPoll() async throws {
+        let stores = GrokTestStores()
+        let gate = GrokResponseGate()
+        let transport = GrokScriptTransport([
+            .response(200, deviceData()), .gatedTransient(gate, .cancelled)
+        ])
+        let client = makeClient(stores: stores, transport: transport)
+        let authorization = try await client.requestDeviceAuthorization()
+        let completion = Task { try await client.completeDeviceAuthorization(authorization) }
+        await gate.waitUntilRequested()
+        try await client.cancelDeviceAuthorization(authorization)
+        await gate.resolve(.init(statusCode: 200, data: Data()))
+        do {
+            _ = try await completion.value
+            XCTFail("A retired connection must not resume approval")
+        } catch { XCTAssertEqual(error as? GrokClientError, .connectionChanged) }
+        let requests = await transport.recordedRequests()
+        XCTAssertEqual(requests.count, 2)
+        XCTAssertNil(stores.auth)
+    }
+
+    func testDemoEntryDoesNotRetryAnInterruptedPoll() async throws {
+        let stores = GrokTestStores()
+        let demo = GrokTestFlag()
+        let gate = GrokResponseGate()
+        let transport = GrokScriptTransport([
+            .response(200, deviceData()), .gatedTransient(gate, .networkConnectionLost)
+        ])
+        let client = makeClient(stores: stores, transport: transport, isDemo: { demo.value })
+        let authorization = try await client.requestDeviceAuthorization()
+        let completion = Task { try await client.completeDeviceAuthorization(authorization) }
+        await gate.waitUntilRequested()
+        demo.value = true
+        await gate.resolve(.init(statusCode: 200, data: Data()))
+        do {
+            _ = try await completion.value
+            XCTFail("Demo entry must stop approval without another request")
+        } catch { XCTAssertEqual(error as? GrokClientError, .demoMode) }
+        let requests = await transport.recordedRequests()
+        XCTAssertEqual(requests.count, 2)
+        XCTAssertNil(stores.auth)
+    }
+
+    func testOfficialTokenFixtureMayOmitTokenType() async throws {
+        let stores = GrokTestStores()
+        let transport = GrokScriptTransport([
+            .response(200, deviceData()),
+            .response(200, json(["access_token": "fixture-access", "refresh_token": "fixture-refresh",
+                                 "expires_in": 3_600, "scope": "openid offline_access grok-cli:access"])),
+            .response(200, billingData(percent: 12))
+        ])
+        let client = makeClient(stores: stores, transport: transport)
+        let authorization = try await client.requestDeviceAuthorization()
+        let snapshot = try await client.completeDeviceAuthorization(authorization)
+        XCTAssertEqual(snapshot.usedPercent, 12)
+        XCTAssertNotNil(stores.auth)
+    }
+
+    func testMissingExpiryUsesOnlyBoundedAccessTokenJWTExpiration() async throws {
+        let stores = GrokTestStores()
+        let expiry = instant.addingTimeInterval(3_600)
+        let access = jwt(["exp": expiry.timeIntervalSince1970])
+        let transport = GrokScriptTransport([
+            .response(200, deviceData()),
+            .response(200, json(["access_token": access, "refresh_token": "fixture-refresh",
+                                 "id_token": jwt(["exp": instant.addingTimeInterval(90_000).timeIntervalSince1970])])),
+            .response(200, billingData(percent: 15))
+        ])
+        let client = makeClient(stores: stores, transport: transport)
+        let authorization = try await client.requestDeviceAuthorization()
+        _ = try await client.completeDeviceAuthorization(authorization)
+        XCTAssertEqual(stores.auth?.expiresAt, expiry)
+        XCTAssertEqual(stores.auth?.accessToken, access)
+    }
+
+    func testSuppliedExpiryTakesPrecedenceOverJWTAndRejectsWrongTypes() async throws {
+        let access = jwt(["exp": instant.addingTimeInterval(3_600).timeIntervalSince1970])
+        for invalid: Any in [true, "3600", NSNull(), 0, -1, 366 * 86_400 + 1] {
+            try await assertAuthorizationRejects(json([
+                "access_token": access, "refresh_token": "fixture-refresh", "expires_in": invalid
+            ]))
+        }
+        let stores = GrokTestStores()
+        let transport = GrokScriptTransport([
+            .response(200, deviceData()),
+            .response(200, json(["access_token": "fixture-opaque-access", "refresh_token": "fixture-refresh",
+                                 "expires_in": 1_800, "token_type": "bEaReR"])),
+            .response(200, billingData(percent: 15))
+        ])
+        let client = makeClient(stores: stores, transport: transport)
+        let authorization = try await client.requestDeviceAuthorization()
+        _ = try await client.completeDeviceAuthorization(authorization)
+        XCTAssertEqual(stores.auth?.expiresAt, instant.addingTimeInterval(1_802))
+    }
+
+    func testInvalidOrOversizedAccessJWTNeverFallsBackToIDTokenExpiration() async throws {
+        let idToken = jwt(["exp": instant.addingTimeInterval(3_600).timeIntervalSince1970])
+        let invalidTokens = [
+            "fixture-opaque-access", "header.%%%.signature", "header.e30.signature",
+            jwt(["exp": true]), jwt(["exp": "2000003600"]), jwt(["exp": NSNull()]),
+            jwt(["exp": instant.timeIntervalSince1970]),
+            jwt(["exp": instant.addingTimeInterval(367 * 86_400).timeIntervalSince1970]),
+            jwt(["exp": instant.addingTimeInterval(3_600).timeIntervalSince1970,
+                 "padding": String(repeating: "x", count: 13_000)])
+        ]
+        for access in invalidTokens {
+            try await assertAuthorizationRejects(json([
+                "access_token": access, "refresh_token": "fixture-refresh", "id_token": idToken
+            ]))
+        }
+    }
+
+    func testSuppliedNonBearerTokenTypeAndMissingInitialRefreshTokenFailClosed() async throws {
+        for invalid: Any in ["MAC", "", 1, true, NSNull()] {
+            try await assertAuthorizationRejects(json([
+                "access_token": "fixture-access", "refresh_token": "fixture-refresh",
+                "expires_in": 3_600, "token_type": invalid
+            ]))
+        }
+        try await assertAuthorizationRejects(json(["access_token": "fixture-access", "expires_in": 3_600]))
+    }
+
+    func testTransientRefreshFailureRemainsUncertainAndIsNeverRetried() async throws {
+        for failure in [GrokTransientNetworkFailure.cancelled, .timedOut, .networkConnectionLost] {
+            let stores = authenticatedStores(expiresIn: -1)
+            let transport = GrokScriptTransport([.transient(failure)])
+            let client = makeClient(stores: stores, transport: transport)
+            for _ in 0..<2 {
+                do {
+                    _ = try await client.fetchUsage(force: true)
+                    XCTFail("A rotating refresh token must not be sent again after an ambiguous result")
+                } catch { XCTAssertEqual(error as? GrokClientError, .refreshUncertain) }
+            }
+            XCTAssertTrue(stores.auth?.refreshUncertain ?? false)
+            let requests = await transport.recordedRequests()
+            XCTAssertEqual(requests.count, 1)
+        }
+    }
+
+    func testRefreshMayKeepExistingRefreshTokenWhenProviderOmitsReplacement() async throws {
+        let stores = authenticatedStores(expiresIn: -1)
+        let transport = GrokScriptTransport([
+            .response(200, json(["access_token": "fixture-access-new", "expires_in": 3_600])),
+            .response(200, billingData(percent: 16))
+        ])
+        let client = makeClient(stores: stores, transport: transport)
+        let snapshot = try await client.fetchUsage(force: true)
+        XCTAssertEqual(snapshot.usedPercent, 16)
+        XCTAssertEqual(stores.auth?.refreshToken, "fixture-refresh-old")
+        XCTAssertFalse(stores.auth?.refreshUncertain ?? true)
+    }
+
+    func testServerFailureIsDistinctFromNetworkAndNeverRetriedDuringApproval() async throws {
+        for body in [json(["error": "fixture-private-details"]),
+                     Data("<html>fixture-private-details</html>".utf8), Data()] {
+            let stores = GrokTestStores()
+            let transport = GrokScriptTransport([
+                .response(200, deviceData()), .response(503, body)
+            ])
+            let client = makeClient(stores: stores, transport: transport)
+            let authorization = try await client.requestDeviceAuthorization()
+            do {
+                _ = try await client.completeDeviceAuthorization(authorization)
+                XCTFail("Server failure must be visible without leaking its body or retrying denial")
+            } catch {
+                XCTAssertEqual(error as? GrokClientError, .server(status: 503))
+                XCTAssertFalse(error.localizedDescription.contains("fixture-private-details"))
+            }
+            let requests = await transport.recordedRequests()
+            XCTAssertEqual(requests.count, 2)
+            XCTAssertNil(stores.auth)
+        }
+    }
+
     func testCachedFreshUsageAvoidsNetworkAndExpiredCacheDoesNot() async throws {
         let cached = GrokUsageSnapshot(usedPercent: 0, period: .weekly,
                                       resetAt: instant.addingTimeInterval(3_600),
@@ -440,6 +735,28 @@ final class GrokAccountClientTests: XCTestCase {
         XCTAssertThrowsError(try store.readState())
     }
 
+    private func assertAuthorizationRejects(_ body: Data, file: StaticString = #filePath,
+                                            line: UInt = #line) async throws {
+        let stores = GrokTestStores()
+        let transport = GrokScriptTransport([.response(200, deviceData()), .response(200, body)])
+        let client = makeClient(stores: stores, transport: transport)
+        let authorization = try await client.requestDeviceAuthorization()
+        do {
+            _ = try await client.completeDeviceAuthorization(authorization)
+            XCTFail("Invalid token responses must fail closed", file: file, line: line)
+        } catch { XCTAssertEqual(error as? GrokClientError, .invalidResponse, file: file, line: line) }
+        XCTAssertNil(stores.auth, file: file, line: line)
+        let requests = await transport.recordedRequests()
+        XCTAssertEqual(requests.count, 2, file: file, line: line)
+    }
+
+    private func jwt(_ claims: [String: Any]) -> String {
+        let payload = json(claims).base64EncodedString()
+            .replacingOccurrences(of: "+", with: "-").replacingOccurrences(of: "/", with: "_")
+            .replacingOccurrences(of: "=", with: "")
+        return "fixture-header." + payload + ".fixture-signature"
+    }
+
     private func makeClient(stores: GrokTestStores, transport: GrokScriptTransport,
                             mutex: GrokTestMutex = GrokTestMutex(),
                             clock: GrokTestClock? = nil,
@@ -590,6 +907,9 @@ private actor GrokScriptTransport: GrokHTTPTransport {
     enum Step: Sendable {
         case response(Int, Data)
         case failure(GrokClientError)
+        case transient(GrokTransientNetworkFailure)
+        case cancellation
+        case gatedTransient(GrokResponseGate, GrokTransientNetworkFailure)
         case gated(GrokResponseGate)
         case cancellableDelay(TimeInterval)
     }
@@ -604,6 +924,11 @@ private actor GrokScriptTransport: GrokHTTPTransport {
         switch step {
         case let .response(status, data): return .init(statusCode: status, data: data)
         case let .failure(error): throw error
+        case let .transient(error): throw error
+        case .cancellation: throw CancellationError()
+        case let .gatedTransient(gate, error):
+            _ = await gate.response()
+            throw error
         case let .gated(gate): return await gate.response()
         case let .cancellableDelay(seconds):
             try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))

@@ -6,7 +6,7 @@
     {
       "key": "latest_candidate",
       "label": "iPhone 최신 후보",
-      "releaseId": "ios-10-b17"
+      "releaseId": "ios-10-b18"
     },
     {
       "key": "last_external",
@@ -515,7 +515,7 @@
       "date": "2026-10-20",
       "stage": "external_processed",
       "status": "passed",
-      "summary": "아이폰 단독 Grok 직접 조회·Claude 비공식 PKCE 호환 연결;170 XCTest·Release/배포서명·최종3플랫폼CI통과,13:21:13 KST업로드·Apple처리/내부그룹배정확인,실계정/Claude허용미확인",
+      "summary": "아이폰 단독 직접 조회 TestFlight;170 XCTest·Release/배포서명·3플랫폼CI·Apple처리/내부그룹배정통과,사용자Claude연결성공·Grok승인후앱통신실패보고,공식수치대조/장기갱신미확인",
       "evidence": [
         "ios/project.yml",
         "docs/releases/2026-10-20-ios-direct-refresh.md",
@@ -526,6 +526,21 @@
         "https://github.com/sundaynighttt/codextime/pull/20",
         "https://appstoreconnect.apple.com/apps/6805935440/testflight/ios/4ac35106-3be9-4b90-9fd2-8f1df6625f59",
         "https://testflight.apple.com/v1/app/6805935440"
+      ]
+    },
+    {
+      "id": "ios-10-b18",
+      "sequence": 34,
+      "version": "1.0",
+      "build": "18",
+      "date": "2026-10-20",
+      "stage": "local_verified",
+      "status": "passed",
+      "summary": "Grok 승인 대기 통신 복구·공식 토큰 응답 호환·실패 단계 구분; 194 XCTest·시뮬레이터·Release/배포 서명 통과, GitHub CI·TestFlight·실기기 재확인 대기",
+      "evidence": [
+        "ios/project.yml",
+        "docs/releases/2026-10-20-ios-direct-refresh.md",
+        "docs/app-store/submission.md"
       ]
     }
   ]
