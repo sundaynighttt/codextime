@@ -4,14 +4,14 @@
 
 **Apple 처리 확인 최신은 1.0(18)**입니다. **2026-10-20 14:15:50.926 KST 업로드 성공**, **14:18 KST 기준** App Store Connect에서 **제출 준비 완료·CodexTime Internal 그룹·초대1명·설치 집계 `–`**를 확인했습니다. [기존 앱의 TestFlight 페이지](https://testflight.apple.com/v1/app/6805935440)는 유지합니다. 그룹 배정과 사용자 기기의 설치·업데이트·실계정 자동 갱신 완료는 구분합니다. [릴리스 원장](../docs/releases/release-ledger.json) · [제출 현황](../docs/app-store/submission.md).
 
-빌드18은 시뮬레이터 빌드·실행, 통합 XCTest194개, Release archive·로컬 App Store export·앱/위젯 배포 서명 검증을 통과했습니다. [세 플랫폼 최종 CI](https://github.com/sundaynighttt/codextime/actions/runs/39373349236)와 [PR22 main 병합](https://github.com/sundaynighttt/codextime/pull/22)을 확인했습니다. **사용자 기기의18 설치·실기기 수정 효과는 미확인**입니다. [빌드18 후속 기록](../docs/releases/2026-10-20-ios-direct-refresh.md).
+빌드18은 시뮬레이터 빌드·실행, 통합 XCTest194개, Release archive·로컬 App Store export·앱/위젯 배포 서명 검증을 통과했습니다. [세 플랫폼 최종 CI](https://github.com/sundaynighttt/codextime/actions/runs/39373349236)와 [PR22 main 병합](https://github.com/sundaynighttt/codextime/pull/22)을 확인했습니다. 이후 사용자가 **TestFlight18의 Grok 연결·사용량 표시 성공**을 보고했습니다. 공식 숫자·리셋 대조, 위젯과 장기간 인증 갱신은 아직 미확인입니다. [빌드18 후속 기록](../docs/releases/2026-10-20-ios-direct-refresh.md).
 
 사용자는 TestFlight17에서 **Claude 로그인·표시 성공**, **Grok 공식 승인 성공 후 앱 연결 실패**를 보고했습니다. Grok 오류 화면에 연결 버튼만 있었다는 추가 보고로 사용할 인증의 저장·확인 전으로 범위를 좁혔지만 실제 실패 원인은 미확인입니다. 빌드18은 일시적인 승인 대기 전송 실패를 만료 시간 안에서 복구하고, 인증 완료와 첫 사용량 조회 실패를 나누어 안내합니다. Claude의 공식 수치 대조·위젯·장기 인증 갱신도 미확인입니다.
 
 ## 직접 연결과 새 계정 설정 — 1.0(18)
 
 - **Codex:** 기존 OpenAI 기기 로그인과 직접 사용량 조회를 유지합니다. 본인 ChatGPT 계정으로 연결하며 리셋·누적 토큰도 표시합니다.
-- **Grok:** 앱에서 기기 인증을 시작하고 xAI 페이지에서 직접 승인하는 내부 테스트 경로입니다. 공유 공개 OAuth 클라이언트 때문에 승인 화면에 **Grok Build**가 표시될 수 있습니다. 이 앱이 발급받은 토큰만 기기 전용 Keychain에 저장하고 직접 billing 사용률·기간·리셋을 조회합니다. 서버의 주간·월간·미상 기간을 구분합니다. 최소 요청 범위로 기기 코드를 받을 수 있음은 확인했지만 실제 계정의 usage 권한과 웹 숫자·리셋 대조는 아직 미검증입니다.
+- **Grok:** 앱에서 기기 인증을 시작하고 xAI 페이지에서 직접 승인하는 내부 테스트 경로입니다. 공유 공개 OAuth 클라이언트 때문에 승인 화면에 **Grok Build**가 표시될 수 있습니다. 이 앱이 발급받은 토큰만 기기 전용 Keychain에 저장하고 직접 billing 사용률·기간·리셋을 조회합니다. 서버의 주간·월간·미상 기간을 구분합니다. 최소 요청 범위로 기기 코드를 받을 수 있음을 확인했고 사용자는 TestFlight18의 연결·사용량 표시 성공을 보고했습니다. 공식 웹 숫자·리셋 대조와 위젯·장기 갱신은 아직 미검증입니다.
 - **Claude:** 공개 네이티브 선례를 참고한 PKCE **비공식 호환 후보**입니다. 공식 페이지에서 승인한 뒤 같은 아이폰에서 일회성 인증 결과를 앱에 전달하는 방식을 제공합니다. 사용자가 TestFlight17에서 로그인·표시 성공을 보고했습니다. 공식 웹 숫자·리셋 대조, 위젯과 장기 토큰 갱신은 미검증입니다. **Anthropic이 CodexTime의 자체 앱 로그인을 허용했다고 확인한 경로가 아닙니다.** 내부 테스트 배정도 공급자 허용이나 공식 지원의 증거가 아닙니다.
 
 Claude의 [공식 인증 지침](https://code.claude.com/docs/en/legal-and-compliance#authentication-and-credential-use)은 자체 앱의 Claude.ai 로그인 제공과 구독 자격증명·세션 토큰의 수집·보관·중개를 제한합니다. [공식 로그인 안내](https://support.claude.com/en/articles/13189465-log-in-to-your-claude-account)는 오픈소스를 포함한 타사 개발자에게 API 키 경로를 안내하며 특정 도구 허용은 Anthropic의 재량이라고 설명합니다. 사용량 전용·개인 오픈소스·내부 TestFlight 예외나 이 후보의 허용은 확인하지 못했습니다. 공개 사례나 합성 시험을 공급자 허가로 소개하지 않습니다.
@@ -45,7 +45,7 @@ Claude Google OAuth는 이 내부 웹뷰에서 지원하지 않아 [공식 이�
 
 ## 배포와 검증 이력
 
-이전 빌드17은 **Apple 처리·내부 그룹 배정 확인** 이력입니다. 170개 XCTest와 [세 플랫폼 최종 CI](https://github.com/sundaynighttt/codextime/actions/runs/39368369324), 앱·위젯의 Apple Distribution 서명을 통과했습니다. 앱·위젯 모두1.0(17), Team7FCZ5TAX3B·기존 App Group/Keychain 그룹·디버깅 비활성·iCloud 권한 없음을 확인했습니다. 이후 사용자는 TestFlight17의 Claude 로그인·표시 성공을 보고했습니다. **공식 사용량 숫자·리셋·앱/위젯 대조·자연스러운 인증 갱신의 독립 검증은 미확인**이며, Grok은 공식 승인 후 앱 복귀 실패를 보고받아 빌드18의 복귀 복구로 대응하며 실기기 재확인을 기다립니다. [빌드17 근거](../docs/releases/2026-10-20-ios-direct-refresh.md). 정식 App Store 공개는 수행하지 않았습니다.
+이전 빌드17은 **Apple 처리·내부 그룹 배정 확인** 이력입니다. 170개 XCTest와 [세 플랫폼 최종 CI](https://github.com/sundaynighttt/codextime/actions/runs/39368369324), 앱·위젯의 Apple Distribution 서명을 통과했습니다. 앱·위젯 모두1.0(17), Team7FCZ5TAX3B·기존 App Group/Keychain 그룹·디버깅 비활성·iCloud 권한 없음을 확인했습니다. 이후 사용자는 TestFlight17의 Claude 로그인·표시 성공을 보고했습니다. **공식 사용량 숫자·리셋·앱/위젯 대조·자연스러운 인증 갱신의 독립 검증은 미확인**이며, Grok의17 승인 후 앱 복귀 실패에 대응한 뒤 사용자는18에서 연결·사용량 표시 성공을 보고했습니다. [빌드17 근거](../docs/releases/2026-10-20-ios-direct-refresh.md). 정식 App Store 공개는 수행하지 않았습니다.
 
 **1.0(16)**은 80 XCTest·최종 Release·archive 서명을 통과했고 **2026-10-19 23:40:44 KST 업로드·23:43:46 KST Apple 테스트 가능 알림**을 확인했습니다. 정확한 ASC 그룹 UI·인원과 사용자 기기 설치·새 읽기의 숫자·위젯 대조는 미확인입니다. 사용자는 Claude 로그인 성공·사용량 패널 도달, 빌드14 Grok 로그인 성공을 보고했지만 이를 새 자동 연결의 E2E 성공으로 확대하지 않습니다. [빌드16 기록](../docs/releases/2026-10-19-claude-usage-reader.md) · [빌드15](../docs/releases/2026-10-19-claude-login-recovery.md) · [빌드14](../docs/releases/2026-10-19-ios-web-height.md).
 

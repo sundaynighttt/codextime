@@ -2,11 +2,12 @@
 
 ## 1.0(18) Apple 처리·내부 그룹 배정 확인 — Grok 승인 후 앱 복귀
 
-- **external_processed/passed:** 후속 Grok 연결 수리의 시뮬레이터 빌드·실행, 통합 XCTest194개(실패0·건너뜀0·8.5초), Release archive·로컬 App Store export·배포 서명 검증을 통과했다. 세 플랫폼 최종 GitHub CI와 PR22 main 병합을 확인했다. **2026-10-20 14:15:50.926 KST** xcodebuild exit0·`Uploaded CodexTime`으로 TestFlight 업로드 성공을 확인했다. **2026-10-20 14:18 KST 기준** App Store Connect에서 **제출 준비 완료·CodexTime Internal 그룹·초대1명·설치 집계 `–`**를 확인했다. Apple 처리 확인 최신은 **1.0(18)**이다. 사용자 기기 설치·실기기 수정 효과는 아직 미확인이다.
+- **external_processed/passed:** 후속 Grok 연결 수리의 시뮬레이터 빌드·실행, 통합 XCTest194개(실패0·건너뜀0·8.5초), Release archive·로컬 App Store export·배포 서명 검증을 통과했다. 세 플랫폼 최종 GitHub CI와 PR22 main 병합을 확인했다. **2026-10-20 14:15:50.926 KST** xcodebuild exit0·`Uploaded CodexTime`으로 TestFlight 업로드 성공을 확인했다. **2026-10-20 14:18 KST 기준** App Store Connect에서 **제출 준비 완료·CodexTime Internal 그룹·초대1명·설치 집계 `–`**를 확인했다. Apple 처리 확인 최신은 **1.0(18)**이다. 이후 사용자는 TestFlight18에서 Grok 연결·사용량 표시 성공을 보고했다. 공식 숫자·리셋 대조·위젯·장기간 인증 갱신은 미확인이다.
 - [빌드18 상세](https://appstoreconnect.apple.com/teams/8874948e-3fee-4bea-a414-67a4c0f0e7d8/apps/6805935440/testflight/ios/cf070875-afcc-4d16-a4bf-137144f2e93e)의 Apple 처리 식별자는 `cf070875-afcc-4d16-a4bf-137144f2e93e`다. 14:18 KST는 처리 상태를 확인한 시각이며 정확한 완료 시각으로 단정하지 않는다. 내부 그룹 배정과 사용자 기기의 설치·업데이트·실계정 성공은 구분한다.
 - [빌드18 CI](https://github.com/sundaynighttt/codextime/actions/runs/39373349236)는 실행 소스 `77ab46e32894d367f4c3afcb47aaf9d46be39125`에서 macOS2분7초·Windows1분48초·iPhone4분26초로 모두 통과했고 GitHub iPhone 로그의194 tests·실패0을 확인했다. [PR22](https://github.com/sundaynighttt/codextime/pull/22)는 검사 후 main에 병합했다(`6b7094fef1cfec9b01c89d77838b1d023a628b23`).
 - 앱·위젯 모두1.0(18), Team7FCZ5TAX3B의 Apple Distribution strict/deep 서명, 기존 App Group/auth Keychain 그룹·디버깅 비활성·iCloud 없음·iPhone 전용·최소iOS17.0·고정 정책 URL을 확인했다. 로컬 IPA는2,322,180 bytes이며 SHA256 `8449f07733a8c6ddf9cfe846bbfcb0b29a5e1cb6c318feec4aaf9c43b31400e5`다. 로컬 내보내기·서명 검증과 Apple 업로드·처리는 구분한다.
 - 사용자는 TestFlight17에서 **Claude 로그인·표시 성공**을 보고했다. 공식 웹 숫자·리셋 대조·위젯·장기간 인증 갱신·Anthropic의 공식 타사 허용은 미확인으로 유지한다. Grok은 공식 승인 화면에서 성공했으나 앱 복귀 뒤 연결 실패를 보고했고 고정 네트워크 오류 안내가 확인됐다. 같은 화면에 Grok 연결만 있고 연결됨·새로고침은 없다는 추가 보고로 사용할 인증이 저장·확인되기 전으로 범위를 좁혔다. 승인 대기·토큰 교환·검증·저장 중 실제 원인은 아직 확정하지 않는다.
+- **TestFlight18 재시험 사용자 보고:** Grok이 연결되고 사용량이 표시됨을 보고했다. Claude17 로그인·표시 성공과 Grok18 연결·표시 성공을 구분한다. 공식 수치/리셋 대조·위젯·장기간 refresh와17 실패의 원인 로그는 미확인으로 유지한다. 실제 사용량·인증정보는 기록하지 않는다.
 - 같은 승인 만료 시간 안의 일시적인 기기 인증 poll 전송 실패 복구, 토큰 응답의 선택적 `token_type`·엄격한 만료 검증, 인증 완료와 첫 usage 조회 실패의 UI 구분을 구현했다. 실제 취소·거부·세대 변경·예시 전환은 재시도하지 않는다. 기존 scope·고정 요청 경로·기기 전용 인증·개인정보 정책 커밋 `5f8851900aa27ae1586fbb6ee0f5f96f35ece8e0`은 유지한다.
 - [빌드18 후속 기록](../releases/2026-10-20-ios-direct-refresh.md)에17 이력과 신규 수정·검증을 구분한다. 공개 App Store 출시는 수행하지 않았다.
 

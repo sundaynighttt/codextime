@@ -536,7 +536,7 @@
       "date": "2026-10-20",
       "stage": "external_processed",
       "status": "passed",
-      "summary": "Grok 승인 대기 통신 복구·토큰 호환·실패 단계 구분; 194 XCTest·Release/배포 서명·3플랫폼 CI 통과, 14:15:50 KST 업로드·14:18 Apple 처리/내부그룹 배정 확인, 실기기 재확인 대기",
+      "summary": "Grok 승인 대기 통신 복구·토큰 호환·실패 단계 구분; 194 XCTest·Release/배포 서명·3플랫폼 CI·Apple 처리/내부그룹 통과, 사용자 Grok18 연결·사용량 표시 성공 보고, 공식 수치·장기 갱신 미확인",
       "evidence": [
         "ios/project.yml",
         "docs/releases/2026-10-20-ios-direct-refresh.md",
