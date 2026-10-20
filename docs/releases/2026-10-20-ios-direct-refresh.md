@@ -29,3 +29,5 @@
 ## 배포 상태
 
 현재 소스 후보 1.0(17), 로컬 검증 완료. Release archive·서명·GitHub CI·TestFlight 업로드 및 Apple 처리 결과는 확인 후 이 절과 원장을 갱신한다. 공개 App Store 출시는 수행하지 않았다.
+
+새 개인정보 정책 고정 커밋: `5f8851900aa27ae1586fbb6ee0f5f96f35ece8e0`. 앱은 이 공개 커밋의 정책 URL을 사용한다.

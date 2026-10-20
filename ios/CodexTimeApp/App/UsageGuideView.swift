@@ -44,7 +44,7 @@ struct UsageGuideView: View {
                 }
                 Section("지원과 한계") {
                     Text("CodexTime은 각 서비스의 공식 제품이 아닙니다. 외부 인증·사용량 응답과 웹 화면 변경에 따라 연결이나 조회가 중단될 수 있습니다. Codex는 Codex 사용 권한이 있는 ChatGPT 계정, Grok 직접 조회는 지원되는 Grok 구독과 사용량 응답이 필요합니다. Claude 호환 연결은 계정별 허용 여부 확인이 필요하며 자동 지원이 보장되지 않습니다. 수동 웹 확인은 본인의 공식 사용량 화면을 열 수 있어야 합니다.")
-                    Link("개인정보 처리방침", destination: URL(string: "https://github.com/sundaynighttt/codextime/blob/9cd429d37b04dabc3ebb303072d1c9c04d371a56/docs/privacy-policy.md")!)
+                    Link("개인정보 처리방침", destination: URL(string: "https://github.com/sundaynighttt/codextime/blob/5f8851900aa27ae1586fbb6ee0f5f96f35ece8e0/docs/privacy-policy.md")!)
                     Link("문제 신고 및 지원", destination: URL(string: "https://github.com/sundaynighttt/codextime/issues")!)
                     Text("지원 요청에 로그인 코드, 토큰 또는 실제 계정 응답을 첨부하지 마세요.")
                         .font(.footnote)
