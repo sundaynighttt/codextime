@@ -134,9 +134,9 @@ SELECT value FROM ItemTable WHERE key = 'cursorAuth/accessToken' LIMIT 1
 프로토콜 비교 참고: [CodexBar Grok](https://github.com/steipete/CodexBar/blob/main/docs/grok.md), [QuotaBar](https://github.com/hibik1725/ai-usage-monitor). 로고 라이선스는 [third-party-notices.md](third-party-notices.md)에 보존한다.
 
 
-## Windows 0.4.0 후보: 세 공급자와 계정 연결
+## Windows 0.4.0 미리보기: 세 공급자와 계정 연결
 
-이 절은 소스 후보의 동작 계약이다. 이전 공개 Windows v0.3.1은 Codex 전용이며, 새 ZIP 공개·실물 Windows 실계정 검증은 [후보 기록](releases/2026-10-20-windows-v0.4.0.md)에서 별도로 확인한다. macOS 0.3.1과 iPhone TestFlight 1.0(16)의 런타임은 변경하지 않는다.
+이 절은 Windows 0.4.0 공개 미리보기의 동작 계약이다. 공개 ZIP의 고정 소스는 `5e026a0027e5fa6c52b602f6986d294245564625`이며 이전 Windows v0.3.1은 Codex 전용이다. [배포 기록](releases/2026-10-20-windows-v0.4.0.md)은 CI·합성 저장소/HTTP·UI·배포 실행 파일 검사와 아직 미확인인 실물 Windows 실계정·절전 복귀·Explorer 재시작을 구분한다. macOS 0.3.1과 iPhone TestFlight 1.0(16)의 런타임은 변경하지 않는다.
 
 기본 순서는 `Codex / Grok / Claude`이고 세 로고·잔여율을 모두 표시한다. 대표 값은 공통 한도 중 가장 적게 남은 비율을 내림한 값이다. Claude 모델별 한도는 상세에만 두며 공통 한도와 합산하지 않는다. 수치가 없으면 `—`, 실제 영이면 `0%`다. 리셋 시간의 기본 표시는 꺼짐이며 사용자가 선택해 켠다.
 

@@ -1,21 +1,21 @@
 # Windows 설치와 세 서비스 연결
 
-현재 **Windows 0.4.0 소스 후보**의 안내입니다. 기존 공개 **v0.3.1 ZIP은 Codex 전용**이며 새 버전의 공개 다운로드와 검증 결과는 [후보 기록](releases/2026-10-20-windows-v0.4.0.md)을 따릅니다. 실물 Windows의 본인 계정 로그인·사용량·재시작 검증은 아직 확인되지 않았습니다. Mac v0.3.1과 iPhone TestFlight 1.0(16)은 별도 배포본입니다.
+**Windows 0.4.0 공개 미리보기**는 Codex·Grok·Claude 세 서비스 표시와 연결을 제공합니다. [다운로드·검증 기록](releases/2026-10-20-windows-v0.4.0.md)에 공개 ZIP과 고정 소스를 기록했습니다. 기존 Windows v0.3.1 ZIP은 Codex 전용입니다. 실물 Windows의 본인 계정 로그인·숫자·절전 복귀·Explorer 재시작 검증은 별도 미확인입니다. Mac v0.3.1과 iPhone TestFlight 1.0(16)은 별도 배포본입니다.
 
 ## 설치와 업데이트
 
-Windows 10/11 64비트에서 사용합니다. 새 후보 ZIP을 직접 빌드하거나 검증된 새 배포본을 받은 뒤 압축을 풀고 같은 폴더의 PowerShell에서 실행합니다.
+Windows 10/11 64비트에서 [CodexTime-Windows-0.4.0.zip](https://github.com/sundaynighttt/codextime/releases/download/windows-v0.4.0/CodexTime-Windows-0.4.0.zip)을 내려받아 압축을 풀고 같은 폴더의 PowerShell에서 실행합니다.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\install.ps1 -EnableStartup
 ```
 
-설치 위치는 `%LOCALAPPDATA%\CodexUsageMonitor`입니다. 업데이트는 실행 중 앱을 종료한 뒤 새 ZIP의 설치 스크립트를 실행합니다. 표시·연결 동의 같은 기존 비민감 설정은 유지합니다. Windows 실행 파일과 스크립트는 코드 서명되지 않았습니다. 공개 배포본에서는 함께 제공하는 `SHA256SUMS.txt`를 확인하세요.
+설치 위치는 `%LOCALAPPDATA%\CodexUsageMonitor`입니다. 업데이트는 실행 중 앱을 종료한 뒤 새 ZIP의 설치 스크립트를 실행합니다. 표시·연결 동의 같은 기존 비민감 설정은 유지합니다. Windows 실행 파일과 스크립트는 코드 서명되지 않았습니다. 이 미리보기 릴리스의 [SHA256SUMS-Windows.txt](https://github.com/sundaynighttt/codextime/releases/download/windows-v0.4.0/SHA256SUMS-Windows.txt)로 ZIP을 확인하세요. 공개 ZIP은 고정 소스 `5e026a0027e5fa6c52b602f6986d294245564625`로 빌드했습니다.
 
 ## 첫 연결
 
 1. 첫 실행의 계정 설정에서 사용할 서비스를 고릅니다. 이후에도 표시의 오른쪽 클릭 메뉴에서 계정 설정을 다시 엽니다.
-2. **Codex:** 공식 Codex CLI를 설치하고 설정의 로그인 동작으로 본인 계정 로그인을 완료합니다. 기존 로그인으로 `codex app-server`가 사용량 메타데이터만 요청합니다.
+2. **Codex:** 공식 Codex CLI를 설치하고 설정의 로그인 동작으로 본인 계정 로그인을 완료합니다. 기존 로그인으로 `codex app-server`가 사용량 메타데이터만 요청합니다. 공식 `.exe`와 `.cmd`·`.bat` 래퍼의 고정 로그인 인수 전달을 Windows 합성 시험으로 확인했습니다.
 3. **Claude:** 공식 Claude Code의 구독 계정 로그인을 직접 완료하고 앱의 사용량 조회에 동의합니다. 기본 Windows Claude Code OAuth 저장소만 지원하며 Claude Desktop 로그인과는 다릅니다. 만료되면 공식 CLI에서 다시 로그인합니다.
 4. **Grok:** Cursor를 열어 본인의 같은 계정으로 로그인하고 앱의 사용량 조회에 동의합니다. 첫 조회의 사용률·리셋을 본인 [Grok 웹 사용량](https://grok.com/?_s=usage)과 비교한 뒤 일치할 때 자동 갱신을 시작합니다. 같은 계정·구독 기간인지 확인되지 않거나 값이 다르면 연결을 해제하세요.
 
@@ -56,4 +56,4 @@ Cursor DB는 고정 SQLite 3.53.4를 사용해 읽기 전용으로 엽니다. �
 powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\CodexUsageMonitor\uninstall.ps1"
 ```
 
-[개인정보 처리방침](privacy-policy.md) · [보안 정책](../SECURITY.md) · [통신·상태 계약](protocol.md#windows-040-후보-세-공급자와-계정-연결)
+[개인정보 처리방침](privacy-policy.md) · [보안 정책](../SECURITY.md) · [통신·상태 계약](protocol.md#windows-040-미리보기-세-공급자와-계정-연결)

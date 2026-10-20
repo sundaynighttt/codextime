@@ -1,8 +1,8 @@
-CodexTime Windows 0.4.0 후보 설치
+CodexTime Windows 0.4.0 설치
 ================================
 
-현재 소스 후보의 안내입니다. 기존 공개 v0.3.1 ZIP은 Codex 전용입니다.
-새 후보의 공개 배포와 실물 Windows 실계정 검증은 별도 확인합니다.
+세 서비스 공개 미리보기의 설치 안내입니다. 기존 v0.3.1 ZIP은 Codex 전용입니다.
+실물 Windows 실계정 로그인·숫자·절전 복귀·Explorer 재시작은 별도 미확인입니다.
 
 필요한 환경
 - Windows 10 또는 11 (64비트)
@@ -39,7 +39,7 @@ Claude는 기본 ~/.claude/.credentials.json, Grok은 기본 Cursor 저장소의
 이슈나 채팅에 첨부하지 마세요. 앱은 원본 인증정보를 수정하지 않습니다.
 
 Windows 실행 파일/설치 스크립트는 코드 서명되지 않았습니다.
-배포 ZIP의 SHA256SUMS.txt와 공개 소스를 함께 확인하세요.
+릴리스의 SHA256SUMS-Windows.txt와 공개 소스를 함께 확인하세요.
 계정별 인터페이스 지원과 실제 실행 결과는 환경에 따라 다를 수 있습니다.
 
 상세 설정: https://github.com/sundaynighttt/codextime/blob/main/docs/windows-setup.md

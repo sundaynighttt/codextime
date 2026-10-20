@@ -24,8 +24,8 @@
       "releaseId": "macos-031-b2026101907"
     },
     {
-      "key": "latest_windows_candidate",
-      "label": "Windows 확장 최신 후보",
+      "key": "latest_windows_release",
+      "label": "Windows 공개 미리보기 최신",
       "releaseId": "windows-040"
     }
   ],
@@ -495,13 +495,16 @@
       "sequence": 32,
       "version": "windows-v0.4.0",
       "date": "2026-10-20",
-      "stage": "candidate",
-      "status": "pending",
-      "summary": "Windows 세 서비스·간편 설정·조회 동의·웹 대조·숨김/조회중지 구현; .NET 8 win-x64 교차 빌드 경고0·오류0 및 합성 상태관리7시나리오 통과, 네이티브 Windows 패키지/화면 검증 대기",
+      "stage": "released",
+      "status": "active",
+      "summary": "Windows 0.4.0 세 서비스 공개 미리보기; 네이티브·전송·저장소·상태관리7시나리오·UI·패키지 재실행·WPF PNG4종·전체 CI·비로그인 다운로드/SHA256 통과, 실물 계정 대조 미검증",
       "evidence": [
         "windows/CodexTime.Windows/CodexTime.Windows.csproj",
         "docs/releases/2026-10-20-windows-v0.4.0.md",
-        "docs/windows-setup.md"
+        "docs/windows-setup.md",
+        "git:5e026a0",
+        "https://github.com/sundaynighttt/codextime/actions/runs/39344190966",
+        "https://github.com/sundaynighttt/codextime/releases/tag/windows-v0.4.0"
       ]
     }
   ]
