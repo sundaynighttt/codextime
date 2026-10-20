@@ -536,7 +536,7 @@
       "date": "2026-10-20",
       "stage": "external_processed",
       "status": "passed",
-      "summary": "Grok 승인 대기 통신 복구·토큰 호환·실패 단계 구분; 194 XCTest·Release/배포 서명·3플랫폼 CI·Apple 처리/내부그룹 통과, 사용자 Grok18 연결·사용량 표시 성공 보고, 공식 수치·장기 갱신 미확인",
+      "summary": "Grok 승인 복귀 수정; 194 XCTest·Release/배포 서명·3플랫폼 CI·TestFlight·사용자 Grok18 연결/표시 성공, 정식 App Store18 설명·이미지 준비, 최종 심사 제출 전",
       "evidence": [
         "ios/project.yml",
         "docs/releases/2026-10-20-ios-direct-refresh.md",
@@ -545,7 +545,9 @@
         "https://github.com/sundaynighttt/codextime/actions/runs/39373349236",
         "https://github.com/sundaynighttt/codextime/pull/22",
         "https://appstoreconnect.apple.com/apps/6805935440/testflight/ios/cf070875-afcc-4d16-a4bf-137144f2e93e",
-        "https://testflight.apple.com/v1/app/6805935440"
+        "https://testflight.apple.com/v1/app/6805935440",
+        "docs/app-store/metadata-ko.md",
+        "docs/app-store/screenshots-1.0-b18/01-onboarding.jpg"
       ]
     }
   ]
