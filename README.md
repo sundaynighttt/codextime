@@ -115,11 +115,11 @@ Windows **0.4.0 공개 미리보기** — 실제 WPF 화면에 합성 예시를 
 
 </details>
 
-iPhone **1.0 (16) · TestFlight** — 세 서비스와 Claude 주간·세션을 표시하는 소형 위젯 미리보기:
+iPhone **1.0 (17) · 직접 연결 후보** — 실제 소형 위젯 뷰에 합성 값을 넣은 미리보기:
 
-<img src="docs/screenshots/ios-widget-v1.0-b16.png" width="170" alt="iPhone 1.0 빌드 16 소형 위젯: Codex·Grok·Claude 세 로고, Codex 예시 73%, Grok 예시 없음, Claude 주간·세션 예시 없음, 리셋 3d 17h, 갱신 10:24">
+<img src="docs/screenshots/ios-widget-v1.0-b17.png" width="170" alt="iPhone 빌드17 소형 위젯 합성 UI: Codex73%, Grok월간82%, Claude주간75%·세션90%, 자동조회와 시각. 실제 계정 검증 아님">
 
-수치는 문서용 예시입니다. iPhone은 [빌드 16 소스](https://github.com/sundaynighttt/codextime/tree/0effad7c2f703638a0a97d6b066dc6ea93d89114)의 실제 위젯 뷰를 iOS Simulator에서 렌더링했습니다. 예시 모드에는 Grok·Claude 샘플 숫자가 없으므로 `—`로 표시합니다. macOS는 리셋 시간 표시를 끈 기본 설정입니다. [이미지 기준과 다시 생성하는 방법](docs/screenshots/README.md)
+실제 계정 수치가 아닌 문서용 합성 예시입니다. [빌드17 소스](https://github.com/sundaynighttt/codextime/tree/5f8851900aa27ae1586fbb6ee0f5f96f35ece8e0)의 실제 위젯 뷰를 iOS Simulator에서 렌더링했으며 Claude 연결 허용·실계정 호환성을 입증하지 않습니다. 기존 [빌드16 TestFlight 이미지](docs/screenshots/ios-widget-v1.0-b16.png)는 보존했습니다. 실제 앱의 오프라인 예시 모드는 Grok·Claude 샘플 숫자를 만들지 않습니다. [이미지 기준과 다시 생성하는 방법](docs/screenshots/README.md)
 
 ## 다운로드
 
