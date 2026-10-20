@@ -7,9 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		08A70C479FFFACA90A64261D /* ClaudeNativeConnectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BB8CD104C64DA1AB445878C /* ClaudeNativeConnectionView.swift */; };
 		0B0660F0506B34FA5EFAE5E8 /* ProviderUsageCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 088149125678413229107E2C /* ProviderUsageCard.swift */; };
 		0B4478E4855C8E6B92F614C3 /* WebProviderUsageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FF5BC78C3F8F2FF7C4E4928 /* WebProviderUsageTests.swift */; };
+		0B70D07C27908F17CF93B63E /* ClaudeNativeAccountClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F652E19C7086D98D238D951 /* ClaudeNativeAccountClient.swift */; };
 		0DA891154C65CA4C457B8977 /* GrokWebTrialModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A7825A64E612C0FA4FE498 /* GrokWebTrialModel.swift */; };
+		0E6E0D9B21AFD0576CACFB80 /* GrokUsageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660D08E10B9FACE754CE8146 /* GrokUsageStore.swift */; };
+		1461E1FEF6BC915791F0DF94 /* GrokAuthLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39E5B94B7FB88140B4DC3E2D /* GrokAuthLock.swift */; };
 		1799CD2D8738A06EB3FE03CD /* CodexTimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D964DE06E623122334DE0DEB /* CodexTimeTests.swift */; };
 		209F90734B6EA47CD166F6D6 /* CodexAccountClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4168AAEC9B883FD8837BAED5 /* CodexAccountClient.swift */; };
 		239DEDB34C5F2DE69B70BB03 /* RefreshUsageIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E417C0A837B96308880FBDC /* RefreshUsageIntent.swift */; };
@@ -19,19 +23,38 @@
 		32892F10105C73B3F9ACC408 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C73105F3DDB2F31A1B69E29B /* PrivacyInfo.xcprivacy */; };
 		32FC5D5FC1FFD624EFF16FB9 /* KeychainTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B923D0890D464850C53031E8 /* KeychainTokenStore.swift */; };
 		3925A6CFB07A68F4F70BB302 /* AuthModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40B1A7E35D926B525420C522 /* AuthModels.swift */; };
+		3C8D7ADB09030DBC77712D2F /* ClaudeNativeAuthLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4AA139DDA32221E58519F1B /* ClaudeNativeAuthLock.swift */; };
+		41EC0D51613B1836963A0DEF /* GrokAppModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 797D6DBDCA71064C7026D4E3 /* GrokAppModelTests.swift */; };
+		427825372D3AD82042E8FE81 /* GrokKeychainTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6225673130906EFDF47736F /* GrokKeychainTokenStore.swift */; };
+		43E085ECE06B53C0C4F6FACC /* ClaudeNativeAuthModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E816E54D5D1ADD8B9C921E55 /* ClaudeNativeAuthModels.swift */; };
+		4970500AF62F703FB739BB10 /* ClaudeNativeAccountClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F652E19C7086D98D238D951 /* ClaudeNativeAccountClient.swift */; };
 		4B9C9937B187E8B27A7931AE /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 457D81058899C9B8057C34A1 /* AppModel.swift */; };
 		53923D61905BF2CAA351812F /* AuthModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40B1A7E35D926B525420C522 /* AuthModels.swift */; };
+		564A4CE0240C1FF722B387ED /* ClaudeNativeUsageDisplayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF81290A9022BCFAAC63BA41 /* ClaudeNativeUsageDisplayTests.swift */; };
+		575C365520498BA81A473F8E /* GrokConnectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A99CE7ADF8EEEC81B3A51B46 /* GrokConnectionView.swift */; };
 		5769AEEA8A0073CC31E8C220 /* WebProviderUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2588D87DF0EFB24CB48011A7 /* WebProviderUsage.swift */; };
+		5BA5A68BF58DAD329BE4AE06 /* GrokAuthModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB01F1A23ED3F574F763EC78 /* GrokAuthModels.swift */; };
 		5E4B21E8B96F0EFBE8BE46C2 /* CodexTimeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A50F486C17482AB8795D65 /* CodexTimeApp.swift */; };
 		61CEEE006D87B3DC2F31E571 /* GrokWebTrialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C60564F63C52A1D0717BC4 /* GrokWebTrialView.swift */; };
 		61E07CBF037F29CA5B5EA46B /* UsageModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D8DE89F8301DF38FF6C519 /* UsageModels.swift */; };
+		6A183CFC9378E3A9371383F7 /* GrokAccountClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07A4ACA19621D0621B7017D6 /* GrokAccountClient.swift */; };
 		724ED8BECFFD10202BAB4ECE /* UsageGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA820FE63B0CD214C11D955 /* UsageGuideView.swift */; };
+		798288CA78DBBBD799D74731 /* ClaudeNativeAppModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B45249C42E29D16292924CCB /* ClaudeNativeAppModelTests.swift */; };
+		7ABA0A6D45C13B61E1493EBE /* ClaudeNativeAppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 295F027FA8CD52636C5D4126 /* ClaudeNativeAppModel.swift */; };
 		7AFA75BD1EF4009FCB0875C4 /* ThirdPartyNotices.txt in Resources */ = {isa = PBXBuildFile; fileRef = 97724876D098885FC75444F1 /* ThirdPartyNotices.txt */; };
+		7B6B000EE1FB175E6F40097F /* ClaudeNativeUsageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811BCF37827F49E560AB427C /* ClaudeNativeUsageStore.swift */; };
 		7BFE831D5E97103CDCA710FF /* WebUsageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6CC1A599E4CC56C15085B43 /* WebUsageStore.swift */; };
 		896E52D214C09A89BC396E1E /* CodexTimeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8469A2B105882F57CE07469C /* CodexTimeWidget.swift */; };
+		92FBA0F838D364464BE6727D /* GrokAuthModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB01F1A23ED3F574F763EC78 /* GrokAuthModels.swift */; };
+		9596F8F72E21A69203D191C0 /* GrokAuthLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39E5B94B7FB88140B4DC3E2D /* GrokAuthLock.swift */; };
 		97ADC604913462A1042DBA51 /* CodexAccountClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4168AAEC9B883FD8837BAED5 /* CodexAccountClient.swift */; };
+		98933CC22F82466FD1C058A5 /* GrokUsageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660D08E10B9FACE754CE8146 /* GrokUsageStore.swift */; };
+		9FC0F95C9605A891B4B85C46 /* ClaudeNativeTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39541099CB6A7E2DB8DBB873 /* ClaudeNativeTokenStore.swift */; };
 		A6210FCCD9A98AC8E822E4D5 /* CodexTimeWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5DFD0E37BF09910D8A4F3664 /* CodexTimeWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A958AADCB266AF664FEA2F90 /* GrokKeychainTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6225673130906EFDF47736F /* GrokKeychainTokenStore.swift */; };
+		AA7C3A94FB142AA203444BBE /* ClaudeNativeUsageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811BCF37827F49E560AB427C /* ClaudeNativeUsageStore.swift */; };
 		ABD03A553A4D84CD9CBB8FAE /* ProviderAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D1ECA4BF85965FFC8FEC1295 /* ProviderAssets.xcassets */; };
+		AC29DBBA19377E01CB0595AC /* GrokAppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F923E8830587B1CD270E4B0 /* GrokAppModel.swift */; };
 		B865ED55E90D72D7FDF38FCE /* WebProviderUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2588D87DF0EFB24CB48011A7 /* WebProviderUsage.swift */; };
 		BF297DAF46820CA4C1F19047 /* ProviderAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D1ECA4BF85965FFC8FEC1295 /* ProviderAssets.xcassets */; };
 		BF517A3096186600B29C67DA /* WebUsageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6CC1A599E4CC56C15085B43 /* WebUsageStore.swift */; };
@@ -41,11 +64,18 @@
 		C7DFC7DFC08962DFEB94ADAD /* ProviderUsageCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 088149125678413229107E2C /* ProviderUsageCard.swift */; };
 		C7E8264D40D345CEBA95DC0E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13499CB51DA85D68AA484DF1 /* Assets.xcassets */; };
 		CE693044E1C6B81334B08F6A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA1DCCA3F9D4FE716EA2799A /* ContentView.swift */; };
+		CF25546E86634F8C3DBC6671 /* GrokUsageDisplayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFB54E867703CDD7FB3C8B1 /* GrokUsageDisplayTests.swift */; };
 		CF5D8BBB5AF899949400CE16 /* UsageModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D8DE89F8301DF38FF6C519 /* UsageModels.swift */; };
 		D256B89816B0D0E547422224 /* CodexConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74A4F755B919C6E725E7DF8C /* CodexConfiguration.swift */; };
+		D7F2D00F6F614876852650B0 /* ClaudeNativeAuthModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E816E54D5D1ADD8B9C921E55 /* ClaudeNativeAuthModels.swift */; };
 		D9AB89488AC01734A6851213 /* GrokWebTrialTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C820727FCFB597D816A4B0 /* GrokWebTrialTests.swift */; };
+		DB3029165664F7889093046E /* ClaudeNativeTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39541099CB6A7E2DB8DBB873 /* ClaudeNativeTokenStore.swift */; };
 		E23755518489EE3D22AEFB5A /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C73105F3DDB2F31A1B69E29B /* PrivacyInfo.xcprivacy */; };
+		E36F2E846B5D3B4143594D8D /* GrokAccountClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07A4ACA19621D0621B7017D6 /* GrokAccountClient.swift */; };
 		E4F5CA12B1F86DF16EB027C1 /* WebUsageCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB1CF2C7DDDD2801315A0F1F /* WebUsageCoordinator.swift */; };
+		E983012F42E84A297D8339C4 /* GrokAccountClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAD49DCEFAC3958DFC0FD9A /* GrokAccountClientTests.swift */; };
+		EFAAB6B49C8ED39F59C37109 /* ClaudeNativeAuthLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4AA139DDA32221E58519F1B /* ClaudeNativeAuthLock.swift */; };
+		F06AA00D1E99D865757B619F /* ClaudeNativeAccountClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A72CF64E61F40D1014D5C1F3 /* ClaudeNativeAccountClientTests.swift */; };
 		FD525D0D52A04DA5F7BAE3D0 /* SharedUsageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362FBC4F7FF8C360488A9168 /* SharedUsageStore.swift */; };
 /* End PBXBuildFile section */
 
@@ -81,32 +111,52 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		07A4ACA19621D0621B7017D6 /* GrokAccountClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrokAccountClient.swift; sourceTree = "<group>"; };
 		088149125678413229107E2C /* ProviderUsageCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderUsageCard.swift; sourceTree = "<group>"; };
 		12D8DE89F8301DF38FF6C519 /* UsageModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageModels.swift; sourceTree = "<group>"; };
 		13499CB51DA85D68AA484DF1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2588D87DF0EFB24CB48011A7 /* WebProviderUsage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebProviderUsage.swift; sourceTree = "<group>"; };
+		295F027FA8CD52636C5D4126 /* ClaudeNativeAppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeNativeAppModel.swift; sourceTree = "<group>"; };
+		2F652E19C7086D98D238D951 /* ClaudeNativeAccountClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeNativeAccountClient.swift; sourceTree = "<group>"; };
 		34A7825A64E612C0FA4FE498 /* GrokWebTrialModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrokWebTrialModel.swift; sourceTree = "<group>"; };
 		362FBC4F7FF8C360488A9168 /* SharedUsageStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedUsageStore.swift; sourceTree = "<group>"; };
+		39541099CB6A7E2DB8DBB873 /* ClaudeNativeTokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeNativeTokenStore.swift; sourceTree = "<group>"; };
+		39E5B94B7FB88140B4DC3E2D /* GrokAuthLock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrokAuthLock.swift; sourceTree = "<group>"; };
 		40B1A7E35D926B525420C522 /* AuthModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthModels.swift; sourceTree = "<group>"; };
 		4168AAEC9B883FD8837BAED5 /* CodexAccountClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexAccountClient.swift; sourceTree = "<group>"; };
 		42C820727FCFB597D816A4B0 /* GrokWebTrialTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrokWebTrialTests.swift; sourceTree = "<group>"; };
 		457D81058899C9B8057C34A1 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		59055CF5479E67957B0F93C8 /* CodexTimeTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = CodexTimeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5DFD0E37BF09910D8A4F3664 /* CodexTimeWidgetExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = CodexTimeWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		660D08E10B9FACE754CE8146 /* GrokUsageStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrokUsageStore.swift; sourceTree = "<group>"; };
 		74A4F755B919C6E725E7DF8C /* CodexConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexConfiguration.swift; sourceTree = "<group>"; };
+		797D6DBDCA71064C7026D4E3 /* GrokAppModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrokAppModelTests.swift; sourceTree = "<group>"; };
 		7E417C0A837B96308880FBDC /* RefreshUsageIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshUsageIntent.swift; sourceTree = "<group>"; };
+		811BCF37827F49E560AB427C /* ClaudeNativeUsageStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeNativeUsageStore.swift; sourceTree = "<group>"; };
 		8469A2B105882F57CE07469C /* CodexTimeWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexTimeWidget.swift; sourceTree = "<group>"; };
+		8BB8CD104C64DA1AB445878C /* ClaudeNativeConnectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeNativeConnectionView.swift; sourceTree = "<group>"; };
 		8FF5BC78C3F8F2FF7C4E4928 /* WebProviderUsageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebProviderUsageTests.swift; sourceTree = "<group>"; };
 		97724876D098885FC75444F1 /* ThirdPartyNotices.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ThirdPartyNotices.txt; sourceTree = "<group>"; };
+		9F923E8830587B1CD270E4B0 /* GrokAppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrokAppModel.swift; sourceTree = "<group>"; };
+		9FFB54E867703CDD7FB3C8B1 /* GrokUsageDisplayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrokUsageDisplayTests.swift; sourceTree = "<group>"; };
 		A1A50F486C17482AB8795D65 /* CodexTimeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexTimeApp.swift; sourceTree = "<group>"; };
+		A72CF64E61F40D1014D5C1F3 /* ClaudeNativeAccountClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeNativeAccountClientTests.swift; sourceTree = "<group>"; };
+		A99CE7ADF8EEEC81B3A51B46 /* GrokConnectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrokConnectionView.swift; sourceTree = "<group>"; };
 		B0833964EC2977FEBCE5B62C /* CodexTime.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CodexTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B45249C42E29D16292924CCB /* ClaudeNativeAppModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeNativeAppModelTests.swift; sourceTree = "<group>"; };
+		B4AA139DDA32221E58519F1B /* ClaudeNativeAuthLock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeNativeAuthLock.swift; sourceTree = "<group>"; };
+		B6225673130906EFDF47736F /* GrokKeychainTokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrokKeychainTokenStore.swift; sourceTree = "<group>"; };
 		B923D0890D464850C53031E8 /* KeychainTokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainTokenStore.swift; sourceTree = "<group>"; };
 		BA1DCCA3F9D4FE716EA2799A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		BCAD49DCEFAC3958DFC0FD9A /* GrokAccountClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrokAccountClientTests.swift; sourceTree = "<group>"; };
 		C73105F3DDB2F31A1B69E29B /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		CF81290A9022BCFAAC63BA41 /* ClaudeNativeUsageDisplayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeNativeUsageDisplayTests.swift; sourceTree = "<group>"; };
 		D0C60564F63C52A1D0717BC4 /* GrokWebTrialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrokWebTrialView.swift; sourceTree = "<group>"; };
 		D1ECA4BF85965FFC8FEC1295 /* ProviderAssets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = ProviderAssets.xcassets; sourceTree = "<group>"; };
 		D876EA78BA7D719C2513F7F0 /* ClaudeUsagePanelReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeUsagePanelReader.swift; sourceTree = "<group>"; };
 		D964DE06E623122334DE0DEB /* CodexTimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexTimeTests.swift; sourceTree = "<group>"; };
+		DB01F1A23ED3F574F763EC78 /* GrokAuthModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrokAuthModels.swift; sourceTree = "<group>"; };
+		E816E54D5D1ADD8B9C921E55 /* ClaudeNativeAuthModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeNativeAuthModels.swift; sourceTree = "<group>"; };
 		EFA820FE63B0CD214C11D955 /* UsageGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageGuideView.swift; sourceTree = "<group>"; };
 		F6CC1A599E4CC56C15085B43 /* WebUsageStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebUsageStore.swift; sourceTree = "<group>"; };
 		FB1CF2C7DDDD2801315A0F1F /* WebUsageCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebUsageCoordinator.swift; sourceTree = "<group>"; };
@@ -136,8 +186,18 @@
 			isa = PBXGroup;
 			children = (
 				40B1A7E35D926B525420C522 /* AuthModels.swift */,
+				2F652E19C7086D98D238D951 /* ClaudeNativeAccountClient.swift */,
+				B4AA139DDA32221E58519F1B /* ClaudeNativeAuthLock.swift */,
+				E816E54D5D1ADD8B9C921E55 /* ClaudeNativeAuthModels.swift */,
+				39541099CB6A7E2DB8DBB873 /* ClaudeNativeTokenStore.swift */,
+				811BCF37827F49E560AB427C /* ClaudeNativeUsageStore.swift */,
 				4168AAEC9B883FD8837BAED5 /* CodexAccountClient.swift */,
 				74A4F755B919C6E725E7DF8C /* CodexConfiguration.swift */,
+				07A4ACA19621D0621B7017D6 /* GrokAccountClient.swift */,
+				39E5B94B7FB88140B4DC3E2D /* GrokAuthLock.swift */,
+				DB01F1A23ED3F574F763EC78 /* GrokAuthModels.swift */,
+				B6225673130906EFDF47736F /* GrokKeychainTokenStore.swift */,
+				660D08E10B9FACE754CE8146 /* GrokUsageStore.swift */,
 				B923D0890D464850C53031E8 /* KeychainTokenStore.swift */,
 				C73105F3DDB2F31A1B69E29B /* PrivacyInfo.xcprivacy */,
 				D1ECA4BF85965FFC8FEC1295 /* ProviderAssets.xcassets */,
@@ -155,7 +215,13 @@
 		924C0A2F2C77BCB3C6DDE553 /* CodexTimeTests */ = {
 			isa = PBXGroup;
 			children = (
+				A72CF64E61F40D1014D5C1F3 /* ClaudeNativeAccountClientTests.swift */,
+				B45249C42E29D16292924CCB /* ClaudeNativeAppModelTests.swift */,
+				CF81290A9022BCFAAC63BA41 /* ClaudeNativeUsageDisplayTests.swift */,
 				D964DE06E623122334DE0DEB /* CodexTimeTests.swift */,
+				BCAD49DCEFAC3958DFC0FD9A /* GrokAccountClientTests.swift */,
+				797D6DBDCA71064C7026D4E3 /* GrokAppModelTests.swift */,
+				9FFB54E867703CDD7FB3C8B1 /* GrokUsageDisplayTests.swift */,
 				42C820727FCFB597D816A4B0 /* GrokWebTrialTests.swift */,
 				8FF5BC78C3F8F2FF7C4E4928 /* WebProviderUsageTests.swift */,
 			);
@@ -185,9 +251,13 @@
 			isa = PBXGroup;
 			children = (
 				457D81058899C9B8057C34A1 /* AppModel.swift */,
+				295F027FA8CD52636C5D4126 /* ClaudeNativeAppModel.swift */,
+				8BB8CD104C64DA1AB445878C /* ClaudeNativeConnectionView.swift */,
 				D876EA78BA7D719C2513F7F0 /* ClaudeUsagePanelReader.swift */,
 				A1A50F486C17482AB8795D65 /* CodexTimeApp.swift */,
 				BA1DCCA3F9D4FE716EA2799A /* ContentView.swift */,
+				9F923E8830587B1CD270E4B0 /* GrokAppModel.swift */,
+				A99CE7ADF8EEEC81B3A51B46 /* GrokConnectionView.swift */,
 				34A7825A64E612C0FA4FE498 /* GrokWebTrialModel.swift */,
 				D0C60564F63C52A1D0717BC4 /* GrokWebTrialView.swift */,
 				EFA820FE63B0CD214C11D955 /* UsageGuideView.swift */,
@@ -326,9 +396,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				53923D61905BF2CAA351812F /* AuthModels.swift in Sources */,
+				0B70D07C27908F17CF93B63E /* ClaudeNativeAccountClient.swift in Sources */,
+				EFAAB6B49C8ED39F59C37109 /* ClaudeNativeAuthLock.swift in Sources */,
+				43E085ECE06B53C0C4F6FACC /* ClaudeNativeAuthModels.swift in Sources */,
+				DB3029165664F7889093046E /* ClaudeNativeTokenStore.swift in Sources */,
+				7B6B000EE1FB175E6F40097F /* ClaudeNativeUsageStore.swift in Sources */,
 				209F90734B6EA47CD166F6D6 /* CodexAccountClient.swift in Sources */,
 				D256B89816B0D0E547422224 /* CodexConfiguration.swift in Sources */,
 				896E52D214C09A89BC396E1E /* CodexTimeWidget.swift in Sources */,
+				6A183CFC9378E3A9371383F7 /* GrokAccountClient.swift in Sources */,
+				9596F8F72E21A69203D191C0 /* GrokAuthLock.swift in Sources */,
+				5BA5A68BF58DAD329BE4AE06 /* GrokAuthModels.swift in Sources */,
+				A958AADCB266AF664FEA2F90 /* GrokKeychainTokenStore.swift in Sources */,
+				98933CC22F82466FD1C058A5 /* GrokUsageStore.swift in Sources */,
 				32FC5D5FC1FFD624EFF16FB9 /* KeychainTokenStore.swift in Sources */,
 				0B0660F0506B34FA5EFAE5E8 /* ProviderUsageCard.swift in Sources */,
 				C2FF746346A3E5DDDBE79677 /* RefreshUsageIntent.swift in Sources */,
@@ -343,7 +423,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F06AA00D1E99D865757B619F /* ClaudeNativeAccountClientTests.swift in Sources */,
+				798288CA78DBBBD799D74731 /* ClaudeNativeAppModelTests.swift in Sources */,
+				564A4CE0240C1FF722B387ED /* ClaudeNativeUsageDisplayTests.swift in Sources */,
 				1799CD2D8738A06EB3FE03CD /* CodexTimeTests.swift in Sources */,
+				E983012F42E84A297D8339C4 /* GrokAccountClientTests.swift in Sources */,
+				41EC0D51613B1836963A0DEF /* GrokAppModelTests.swift in Sources */,
+				CF25546E86634F8C3DBC6671 /* GrokUsageDisplayTests.swift in Sources */,
 				D9AB89488AC01734A6851213 /* GrokWebTrialTests.swift in Sources */,
 				0B4478E4855C8E6B92F614C3 /* WebProviderUsageTests.swift in Sources */,
 			);
@@ -355,11 +441,25 @@
 			files = (
 				4B9C9937B187E8B27A7931AE /* AppModel.swift in Sources */,
 				3925A6CFB07A68F4F70BB302 /* AuthModels.swift in Sources */,
+				4970500AF62F703FB739BB10 /* ClaudeNativeAccountClient.swift in Sources */,
+				7ABA0A6D45C13B61E1493EBE /* ClaudeNativeAppModel.swift in Sources */,
+				3C8D7ADB09030DBC77712D2F /* ClaudeNativeAuthLock.swift in Sources */,
+				D7F2D00F6F614876852650B0 /* ClaudeNativeAuthModels.swift in Sources */,
+				08A70C479FFFACA90A64261D /* ClaudeNativeConnectionView.swift in Sources */,
+				9FC0F95C9605A891B4B85C46 /* ClaudeNativeTokenStore.swift in Sources */,
+				AA7C3A94FB142AA203444BBE /* ClaudeNativeUsageStore.swift in Sources */,
 				2ED55AE2E2CD5996FB757870 /* ClaudeUsagePanelReader.swift in Sources */,
 				97ADC604913462A1042DBA51 /* CodexAccountClient.swift in Sources */,
 				3207E1012EE13C7B623F3FC6 /* CodexConfiguration.swift in Sources */,
 				5E4B21E8B96F0EFBE8BE46C2 /* CodexTimeApp.swift in Sources */,
 				CE693044E1C6B81334B08F6A /* ContentView.swift in Sources */,
+				E36F2E846B5D3B4143594D8D /* GrokAccountClient.swift in Sources */,
+				AC29DBBA19377E01CB0595AC /* GrokAppModel.swift in Sources */,
+				1461E1FEF6BC915791F0DF94 /* GrokAuthLock.swift in Sources */,
+				92FBA0F838D364464BE6727D /* GrokAuthModels.swift in Sources */,
+				575C365520498BA81A473F8E /* GrokConnectionView.swift in Sources */,
+				427825372D3AD82042E8FE81 /* GrokKeychainTokenStore.swift in Sources */,
+				0E6E0D9B21AFD0576CACFB80 /* GrokUsageStore.swift in Sources */,
 				0DA891154C65CA4C457B8977 /* GrokWebTrialModel.swift in Sources */,
 				61CEEE006D87B3DC2F31E571 /* GrokWebTrialView.swift in Sources */,
 				C6B51D0DF8D2F42545F5AF9A /* KeychainTokenStore.swift in Sources */,
@@ -444,7 +544,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 16;
+				CURRENT_PROJECT_VERSION = 17;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -595,7 +695,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 16;
+				CURRENT_PROJECT_VERSION = 17;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;

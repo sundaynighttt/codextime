@@ -191,7 +191,7 @@ final class CodexTimeTests: XCTestCase {
             for provider in [PhoneUsageProvider.grok, .claude] {
                 let display = ProviderUsageDisplay(provider: provider, snapshot: snapshot)
                 XCTAssertEqual(display.percentText, "—")
-                XCTAssertEqual(display.statusText, snapshot.isDemo == true ? "예시 없음" : "웹 연결")
+                XCTAssertEqual(display.statusText, snapshot.isDemo == true ? "예시 없음" : "계정 연결")
                 XCTAssertTrue(display.accessibilityText.contains("잔여량 없음"))
             }
         }

@@ -6,7 +6,7 @@
     {
       "key": "latest_candidate",
       "label": "iPhone 최신 후보",
-      "releaseId": "ios-10-b16"
+      "releaseId": "ios-10-b17"
     },
     {
       "key": "last_external",
@@ -505,6 +505,21 @@
         "git:5e026a0",
         "https://github.com/sundaynighttt/codextime/actions/runs/39344190966",
         "https://github.com/sundaynighttt/codextime/releases/tag/windows-v0.4.0"
+      ]
+    },
+    {
+      "id": "ios-10-b17",
+      "sequence": 33,
+      "version": "1.0",
+      "build": "17",
+      "date": "2026-10-20",
+      "stage": "local_verified",
+      "status": "passed",
+      "summary": "아이폰 단독 Grok 직접 조회·Claude 비공식 PKCE 호환 후보·앱/위젯 자동 갱신; 170 XCTest·시뮬레이터 빌드/연결 화면 통과, 실계정 권한·공급자 허용·새 TestFlight 미확인",
+      "evidence": [
+        "ios/project.yml",
+        "docs/releases/2026-10-20-ios-direct-refresh.md",
+        "docs/app-store/submission.md"
       ]
     }
   ]
