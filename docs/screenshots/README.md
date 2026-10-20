@@ -1,13 +1,17 @@
 # 문서 화면 이미지
 
-README 이미지는 현재 제품의 화면 코드에 **오프라인 예시 데이터**를 넣어 생성합니다. 실제 계정·로그인·Keychain·네트워크 조회를 사용하지 않습니다.
+README 이미지는 실제 제품의 미연결·공개 예시 화면 캡처와 문서용 합성 UI 이미지를 구분합니다. 실제 계정의 사용량·인증정보를 이미지에 담지 않습니다.
 
 | 이미지 | 기준 | 내용 |
 | --- | --- | --- |
 | [macos-menubar-v0.3.1.png](macos-menubar-v0.3.1.png) | macOS 0.3.1 (2026101907) | 실제 `MenuBarPresentation`의 세 로고와 남은 사용량. 리셋 시간 표시를 끈 기본 상태 |
 | [macos-setup-v0.3.1.png](macos-setup-v0.3.1.png) | macOS 0.3.1 (2026101907) | 실제 `ConnectionSettingsWindow`의 로그인 전 화면 |
 | [macos-connected-v0.3.1.png](macos-connected-v0.3.1.png) | macOS 0.3.1 (2026101907) | 같은 설정 창의 세 서비스 연결 완료 예시 |
-| [ios-widget-v1.0-b17.png](ios-widget-v1.0-b17.png) | iPhone 1.0 (17), TestFlight UI·합성 | 고정 후보 소스의 실제 `UsageEntry`·`CodexTimeWidgetView`와 합성 상태: Codex73%, Grok월간82%, Claude주간75%/세션90%. 이미지 안에 합성 UI·실계정 검증 아님 표시 |
+| [01-onboarding.jpg](../app-store/screenshots-1.0-b18/01-onboarding.jpg) | iPhone 1.0(18) Release 실제 앱 | Codex·Grok·Claude 계정 연결 전 첫 실행 화면 |
+| [02-grok.jpg](../app-store/screenshots-1.0-b18/02-grok.jpg) | iPhone 1.0(18) Release 실제 앱 | Grok 연결 시작·기기 승인 방식·자동 갱신 안내 |
+| [03-claude.jpg](../app-store/screenshots-1.0-b18/03-claude.jpg) | iPhone 1.0(18) Release 실제 앱 | Claude 호환 연결·공급자 제한·자동 갱신 안내 |
+| [04-demo.jpg](../app-store/screenshots-1.0-b18/04-demo.jpg) | iPhone 1.0(18) Release 공개 예시 모드 | 앱이 제공하는 Codex 예시73%·Grok/Claude 예시 없음 |
+| [ios-widget-v1.0-b17.png](ios-widget-v1.0-b17.png) | iPhone 1.0 (17) 소스, 18과 같은 위젯 UI·합성 | 고정 후보 소스의 실제 `UsageEntry`·`CodexTimeWidgetView`와 합성 상태: Codex73%, Grok월간82%, Claude주간75%/세션90%. 이미지 안에 합성 UI·실계정 검증 아님 표시 |
 | [ios-widget-v1.0-b16.png](ios-widget-v1.0-b16.png) | iPhone 1.0 (16), TestFlight | 실제 `CodexTimeWidgetView`와 `UsageSnapshot.demo`: 세 로고·Codex 예시 73%·Grok 예시 없음·Claude 주간/세션 예시 없음·리셋·갱신 시각 |
 | [ios-widget-v1.0-b9.png](ios-widget-v1.0-b9.png) | iPhone 1.0 (9), 이전 이미지 | 기존 Codex 전용 위젯 예시 보존 |
 | [windows-taskbar-v0.4.0.png](windows-taskbar-v0.4.0.png) | Windows 0.4.0 공개 미리보기 | 실제 WPF 세 로고·독립 잔여율, 합성 예시 |
@@ -15,11 +19,21 @@ README 이미지는 현재 제품의 화면 코드에 **오프라인 예시 데�
 | [windows-details-v0.4.0.png](windows-details-v0.4.0.png) | Windows 0.4.0 공개 미리보기 | 세 서비스 카드·Claude 세션/주간, 합성 예시 |
 | [windows-setup-v0.4.0.png](windows-setup-v0.4.0.png) | Windows 0.4.0 공개 미리보기 | 로그인 전 설정·서비스 선택·연결 버튼 |
 
-macOS는 AppKit 화면 내용을 PNG로 내보냅니다. iPhone은 별도의 오프라인 iOS Simulator 호스트에서 원본 위젯 뷰를 `ImageRenderer`로 렌더링합니다. 위젯 영역만 보여 주는 UI 미리보기이며 iPhone 홈 화면 전체를 촬영한 스크린샷은 아닙니다. 문서용 호스트는 사용자 앱의 인증정보·캐시를 사용하지 않습니다.
+macOS는 AppKit 화면 내용을 PNG로 내보냅니다. iPhone 위젯 PNG는 별도의 오프라인 iOS Simulator 호스트에서 원본 위젯 뷰를 `ImageRenderer`로 렌더링합니다. 위젯 영역만 보여 주는 UI 미리보기이며 iPhone 홈 화면 전체를 촬영한 스크린샷은 아닙니다. 문서용 호스트는 사용자 앱의 인증정보·캐시를 사용하지 않습니다.
+
+## iPhone 1.0(18) 실제 앱 화면
+
+[App Store 제출용 캡처 4장](../app-store/screenshots-1.0-b18/)은 2026-10-20에 **빌드18 Release 앱**을 **iPhone17 Pro Max / iOS26.5 Simulator**에서 실행해 캡처했습니다. 앱 실행 소스는 [커밋 `77ab46e32894d367f4c3afcb47aaf9d46be39125`](https://github.com/sundaynighttt/codextime/tree/77ab46e32894d367f4c3afcb47aaf9d46be39125)이며 현재 문서 브랜치의 앱 코드는 같습니다. 원본1320×2868 PNG를 같은 크기의 RGB JPEG(품질100)로 형식만 변환했습니다. 앱이 그린 화면을 그대로 사용하며, 아래 위젯 PNG의 문서용 합성 호스트와는 생성 경로가 다릅니다.
+
+`01-onboarding`·`02-grok`·`03-claude`는 계정 미연결 상태의 실제 화면입니다. `04-demo`는 제품이 제공하는 **예시 데이터로 둘러보기**로 진입한 공개 예시 모드이며 Codex73%만 예시로 표시하고 Grok·Claude는 예시 없음으로 표시합니다. 실제 계정·로그인·사용량 조회 성공을 캡처한 자료가 아니며 인증정보·실제 사용량·외부 합성 수치를 담지 않습니다. 심사 제출용으로 준비된 자료이며 App Store 접수·승인·공개 여부는 [제출 현황](../app-store/submission.md)에서 구분합니다.
+
+## 기존 문서용 합성 이미지
 
 macOS 이미지는 2026-10-19에 M2 MacBook Air에서 생성했으며 소스 기준은 [v0.3.1](https://github.com/sundaynighttt/codextime/tree/v0.3.1)입니다.
 
 iPhone 빌드17 이미지는 2026-10-20에 iPhone17e / iOS26.5 Simulator에서 [공개 후보 커밋 `5f8851900aa27ae1586fbb6ee0f5f96f35ece8e0`](https://github.com/sundaynighttt/codextime/tree/5f8851900aa27ae1586fbb6ee0f5f96f35ece8e0)을 고정해 생성했습니다. 원본 `UsageEntry`·`CodexTimeWidgetView`·공유 표시 뷰는 그대로 사용하며, 문서 전용 호스트가 직접 조회 상태를 나타내는 **합성 non-demo 수치**만 주입합니다. 공급자별 숫자·월간/주간/세션 구분·자동 조회 시각을 보여 주기 위한 UI 예시이며 실제 계정 로그인·usage 권한·토큰 갱신·TestFlight 배포·실기기 위젯 검증의 근거가 아닙니다. 위젯 영역 아래의 합성 안내는 문서 호스트가 덧붙인 캡션입니다.
+
+현재 TestFlight는 **1.0(18)**입니다. 빌드17의 고정 이미지 소스와 빌드18의 `CodexTimeWidget.swift`·`ProviderUsageCard.swift`는 동일하므로 같은 위젯 UI 예시로 사용합니다. 빌드18의 변경은 Grok 승인 대기·토큰 응답 처리·연결 화면 오류 안내에 있습니다. 파일명·렌더 소스·합성 캡션은 빌드17의 실제 생성 출처를 유지하며, 이미지 생성 시점이나 실기기 인증 성공을 빌드18로 소급하지 않습니다. Claude17·Grok18의 사용자 연결·표시 성공은 [빌드별 검증 기록](../releases/2026-10-20-ios-direct-refresh.md)에서 확인할 수 있습니다.
 
 문서 호스트에는 표현·모델 소스와 로고만 넣고 계정 client·Keychain 저장소·사용량 캐시·인증 잠금·네트워크 타임라인·공유 그룹 권한을 포함하지 않습니다. 사용자 앱의 상태를 읽거나 서비스를 호출하지 않습니다. 실제 제품의 예시 모드는 변경하지 않으며 Grok·Claude 샘플 숫자도 여전히 만들지 않습니다.
 
@@ -37,7 +51,7 @@ Windows 이미지는 [검증 CI](https://github.com/sundaynighttt/codextime/acti
 python3 docs/screenshots/render-macos.py
 ```
 
-iPhone 이미지는 Xcode·사용 가능한 iPhone Simulator·XcodeGen이 있는 Mac에서 다음 명령으로 만듭니다. 임시 문서용 앱을 설치하고 이미지 출력 후 제거하며, 스크립트가 부팅한 시뮬레이터는 종료합니다. 먼저 공개 저장소에서 고정 소스 커밋을 가져옵니다. 렌더 실행 중 서비스 로그인·사용량 네트워크 조회는 없습니다.
+iPhone 위젯 PNG는 Xcode·사용 가능한 iPhone Simulator·XcodeGen이 있는 Mac에서 다음 명령으로 만듭니다. 임시 문서용 앱을 설치하고 이미지 출력 후 제거하며, 스크립트가 부팅한 시뮬레이터는 종료합니다. 먼저 공개 저장소에서 고정 소스 커밋을 가져옵니다. 렌더 실행 중 서비스 로그인·사용량 네트워크 조회는 없습니다.
 
 ```sh
 git fetch origin 5f8851900aa27ae1586fbb6ee0f5f96f35ece8e0
