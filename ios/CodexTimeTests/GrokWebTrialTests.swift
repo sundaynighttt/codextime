@@ -963,7 +963,9 @@ final class ClaudeUsagePanelTests: XCTestCase {
             var callbacks = 0
             model.onReading = { _ in callbacks += 1 }
             let pending = Task { await model.readClaudeUsage() }
-            await fulfillment(of: [began], timeout: 1)
+            // Cold CI WebKit startup can delay this injected MainActor task.
+            // Bound fixture readiness separately from the cancellation assertions below.
+            await fulfillment(of: [began], timeout: 30)
             XCTAssertTrue(model.isReading, action)
             switch action {
             case "cancel": model.cancelPointRead(clearMessage: false)
