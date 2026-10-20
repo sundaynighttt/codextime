@@ -1,4 +1,6 @@
-# iPhone 1.0(17) — 아이폰 단독 직접 조회 후보
+# iPhone 1.0(17)·(18) — 아이폰 단독 직접 조회와 Grok 복귀 수리
+
+현재 Apple 처리 확인 최신은 **1.0(18)**이다. 2026-10-20 14:15:50.926 KST 업로드 성공과 14:18 KST 기준 Apple 처리·CodexTime Internal 그룹 배정을 확인했다. 사용자 기기의18 설치·Grok 연결 복귀·수치 대조는 아직 미확인이다. 아래17 검증·배포 이력과18 후속 결과를 구분한다.
 
 2026-10-20 기준 아이폰 단독 직접 조회 기술 후보다. 빌드17은 13:21:13 KST 업로드 성공 후 App Store Connect의 처리 완료를 확인했다. Apple 처리 완료와 CodexTime Internal 그룹 배정을 확인했다. 실기기 설치·실계정 검증은 별도로 구분한다. 이후 TestFlight17 사용자 보고와 후속 빌드18 후보는 문서 하단에 이어 기록한다. Mac·PC·Cursor·iCloud·개발자 중계 서버를 사용하지 않는다.
 
@@ -43,9 +45,9 @@
 앱에 고정된 정책 커밋의 후보·배포 상태 문구는 작성 당시 기준이다. 처리 계약은 동일하며 업로드 이후의 현재 상태는 이 기록과 원장을 따른다. 최신 정책의 도입부는 반복되는 배포 상태를 원장 참조로 정리했다.
 
 
-## 1.0(18) 후속 후보 — Grok 승인 후 앱 복귀
+## 1.0(18) Apple 처리·내부 그룹 배정 확인 — Grok 승인 후 앱 복귀
 
-**local_verified/passed:** 빌드18은 Grok 연결 복귀 문제를 다루는 후속 로컬 검증본이다. 시뮬레이터 빌드·실행, 전체 XCTest194개, Release archive·App Store용 로컬 export·앱/위젯 배포 서명 검증을 통과했다. 최종 GitHub CI·TestFlight 업로드·Apple 처리·실기기 수정 확인은 아직 완료로 기록하지 않는다. Apple 처리 확인 최신은 **1.0(17)**이며 위의17 검증·배포 이력은 그대로 보존한다.
+**external_processed/passed:** 빌드18은 Grok 연결 복귀 문제를 다루는 후속 빌드다. 시뮬레이터 빌드·실행, 전체 XCTest194개, Release archive·App Store용 로컬 export·앱/위젯 배포 서명 검증을 통과했다. 세 플랫폼 최종 GitHub CI도 통과했고 PR22를 main에 병합했다. **2026-10-20 14:15:50.926 KST TestFlight 업로드 성공**을 확인했다. **14:18 KST 기준 Apple 처리·CodexTime Internal 그룹 배정**을 확인했다. Apple 처리 확인 최신은 **1.0(18)**이며 실기기 수정 효과는 미확인이다. 위의17 검증·배포 이력은 그대로 보존한다.
 
 ### TestFlight17 사용자 보고
 
@@ -65,5 +67,8 @@
 - iOS 통합 XCTest **194개 통과, 실패0, 건너뜀0, 실행8.5초**. 합성·회귀 검증이며 실제 계정의 승인·usage 요청이나 실기기 복귀 성공을 뜻하지 않는다.
 - Release archive와 App Store용 로컬 export를 통과했다. 앱·위젯 모두1.0(18), Team7FCZ5TAX3B의 Apple Distribution strict/deep 서명, 기존 App Group·auth Keychain 그룹, 디버깅 비활성·iCloud 권한 없음·iPhone 전용·최소iOS17.0·고정 개인정보 정책 URL `5f8851900aa27ae1586fbb6ee0f5f96f35ece8e0`을 확인했다.
 - 로컬 배포 IPA는 **2,322,180 bytes**, SHA256 `8449f07733a8c6ddf9cfe846bbfcb0b29a5e1cb6c318feec4aaf9c43b31400e5`다. 로컬 내보내기는 업로드·Apple 처리의 근거가 아니다.
+- [빌드18 최종 GitHub CI](https://github.com/sundaynighttt/codextime/actions/runs/39373349236)는 실행 소스 `77ab46e32894d367f4c3afcb47aaf9d46be39125`에서 세 플랫폼 모두 통과했다(macOS2분7초·Windows1분48초·iPhone4분26초). GitHub iPhone 로그에서도194 tests·실패0을 확인했다. [PR22](https://github.com/sundaynighttt/codextime/pull/22)는 검사 후 main에 병합했다(`6b7094fef1cfec9b01c89d77838b1d023a628b23`).
 - 읽기 전용 최종 동료 검토에서 차단 결함이 확인되지 않았다.
-- 빌드18 최종 GitHub CI·TestFlight 업로드·Apple 처리·실기기 연결 복귀·usage 숫자/리셋 대조는 미확인이다. 실제17 실패 원인과18의 실기기 수정 효과를 확정하지 않으며 합성 검증과 구분한다.
+- 빌드18은 **2026-10-20 14:15:50.926 KST** xcodebuild exit0·`Uploaded CodexTime`으로 TestFlight 업로드 성공을 확인했다.
+- **2026-10-20 14:18 KST 기준** App Store Connect의 **제출 준비 완료·CodexTime Internal 그룹·초대1명·설치 집계 `–`**를 확인했다. [빌드18 상세](https://appstoreconnect.apple.com/teams/8874948e-3fee-4bea-a414-67a4c0f0e7d8/apps/6805935440/testflight/ios/cf070875-afcc-4d16-a4bf-137144f2e93e)의 식별자는 `cf070875-afcc-4d16-a4bf-137144f2e93e`다. 이는 처리 상태의 관측 시각이며 정확한 처리 완료 시각이나 사용자 기기 설치를 추정하지 않는다.
+- 사용자 기기의18 설치·Grok 연결 복귀·usage 숫자/리셋 대조는 미확인이다. 실제17 실패 원인과18의 실기기 수정 효과를 확정하지 않으며 합성 검증과 구분한다. 공개 App Store 출시는 수행하지 않았다.
