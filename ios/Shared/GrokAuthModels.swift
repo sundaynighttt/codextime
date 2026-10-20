@@ -69,6 +69,7 @@ enum GrokClientError: LocalizedError, Equatable, Sendable {
     case notAuthenticated, loginExpired, authorizationDenied, invalidResponse, usageUnavailable
     case permissionRequired, retryLater, connectionChanged, secureStorageUnavailable
     case refreshUncertain, network, demoMode, busy
+    case server(status: Int)
 
     var requiresSignIn: Bool {
         switch self {
@@ -90,9 +91,28 @@ enum GrokClientError: LocalizedError, Equatable, Sendable {
         case .secureStorageUnavailable: return "Grok 보안 저장소에 접근할 수 없습니다."
         case .refreshUncertain: return "Grok 인증 갱신 결과를 확인하지 못했습니다. 안전하게 다시 연결해 주세요."
         case .network: return "Grok에 연결하지 못했습니다. 마지막 확인 값은 유지합니다."
+        case let .server(status): return "Grok 서버 응답을 확인하지 못했습니다(HTTP \(status)). 잠시 뒤 다시 확인해 주세요."
         case .demoMode: return "예시를 끝낸 뒤 Grok을 연결해 주세요."
         case .busy: return "다른 Grok 연결 작업이 진행 중입니다. 잠시 뒤 다시 확인해 주세요."
         }
+    }
+}
+
+/// Only identity-free URL loading failures which may clear after returning from
+/// the approval browser. This type is retried by device polling, never by rotation.
+enum GrokTransientNetworkFailure: Int, Error, Equatable, Sendable, CaseIterable {
+    case cancelled = -999
+    case timedOut = -1001
+    case cannotFindHost = -1003
+    case cannotConnectToHost = -1004
+    case networkConnectionLost = -1005
+    case dnsLookupFailed = -1006
+    case notConnectedToInternet = -1009
+
+    static func classify(_ error: Error) -> GrokTransientNetworkFailure? {
+        let underlying = error as NSError
+        guard underlying.domain == NSURLErrorDomain else { return nil }
+        return Self(rawValue: underlying.code)
     }
 }
 

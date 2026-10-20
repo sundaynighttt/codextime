@@ -81,6 +81,12 @@ struct GrokConnectionView: View {
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .accessibilityIdentifier("grok-native-message")
+                if model.connectionFailureStage == .firstUsage, model.isConnected, model.snapshot == nil {
+                    Text("다시 로그인하지 않고 ‘지금 새로고침’으로 사용량을 다시 확인할 수 있습니다.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .accessibilityIdentifier("grok-native-first-usage-retry-guidance")
+                }
             }
             Button(model.isConnected || model.requiresSignIn ? "Grok 다시 로그인" : "Grok 연결") {
                 guard model.canBeginSignIn else { return }

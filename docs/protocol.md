@@ -76,7 +76,7 @@ Codex의 직접 인증·조회와 Grok의 사용함/남음·주간 선택·위�
 
 ### 1.0(17) 내부 TestFlight: 아이폰 단독 직접 연결과 자동 조회
 
-이 절은 기존 웹 수동 확인을 대체할 수 있는 **1.0(17) 내부 TestFlight 기술 후보**의 계약이다. 2026-10-20 13:21:13 KST 업로드와 13:25 KST 기준 App Store Connect의 처리 완료·CodexTime Internal 그룹·초대1명·설치 집계 `–`를 확인했다. Apple 처리 확인 최신은1.0(17)이며 실제 계정 로그인·권한·토큰 갱신·위젯 대조·사용자 설치는 미확인이다. [검증·배포 근거](releases/2026-10-20-ios-direct-refresh.md)와 [제출 현황](app-store/submission.md)을 구분한다. 이 구현은 Mac·PC·Cursor·iCloud·개발자 서버를 경유하지 않는다. 이전 빌드13/16의 수동 웹 확인은 별도 대체 경로로 유지하며 과거 계약과 배포 이력은 보존한다.
+이 절은 기존 웹 수동 확인을 대체할 수 있는 **1.0(17) 내부 TestFlight 기술 후보**의 계약이다. 2026-10-20 13:21:13 KST 업로드와 13:25 KST 기준 App Store Connect의 처리 완료·CodexTime Internal 그룹·초대1명·설치 집계 `–`를 확인했다. Apple 처리 확인 최신은1.0(17)이다. 이후 Claude 로그인·표시 성공 및 Grok 승인 후 앱 복귀 실패의 사용자 보고는 아래18 후속 절에서 구분하며 토큰 갱신·공식 웹 값·위젯의 독립 대조는 미확인이다. [검증·배포 근거](releases/2026-10-20-ios-direct-refresh.md)와 [제출 현황](app-store/submission.md)을 구분한다. 이 구현은 Mac·PC·Cursor·iCloud·개발자 서버를 경유하지 않는다. 이전 빌드13/16의 수동 웹 확인은 별도 대체 경로로 유지하며 과거 계약과 배포 이력은 보존한다.
 
 **Grok:** `GrokAccountClient`는 `POST https://auth.x.ai/oauth2/device/code`에서 기기 코드를 요청하고 사용자가 xAI 페이지에서 승인한 뒤 `POST https://auth.x.ai/oauth2/token`으로 토큰을 발급·갱신한다. [OpenClaw 문서](https://docs.openclaw.ai/providers/xai)에 소개된 공유 공개 클라이언트를 사용하므로 승인 화면에 Grok Build가 표시될 수 있다. CodexTime의 독립 앱 등록·공식 승인을 주장하지 않는다. 후보 요청 범위는 `openid offline_access grok-cli:access`다. 익명 기기 코드 요청이 이 범위로 수락됨은 확인했지만 실제 계정 billing 권한과 공식 웹의 같은 구독 한도·리셋 일치는 아직 확인하지 않았다.
 
@@ -84,13 +84,21 @@ Codex의 직접 인증·조회와 Grok의 사용함/남음·주간 선택·위�
 
 **Claude:** `ClaudeNativeAccountClient`는 **비공식 호환 기술 후보**다. 공개 네이티브 구현의 Claude Code 공개 클라이언트 ID를 참고한 독립 PKCE 구현이며, Anthropic이 CodexTime에 별도 타사 로그인을 허용했다고 확인한 경로가 아니다. [공식 지침](https://code.claude.com/docs/en/legal-and-compliance#authentication-and-credential-use)은 자체 앱의 Claude.ai 로그인과 구독 인증정보의 수집·보관·중개를 제한하고, [공식 안내](https://support.claude.com/en/articles/13189465-log-in-to-your-claude-account)는 타사 개발자에게 API 키를 안내한다. 특정 타사 도구의 허용 재량 조항은 있으나 사용량 전용·개인 오픈소스·내부 TestFlight에 대한 명시 예외나 이 후보의 허용은 확인하지 못했다. 실제 계정 인증·공급자 허용의 근거로 공개 구현 사례·합성 검증·Apple 처리·내부 그룹 배정을 사용하지 않는다.
 
-후보는 `https://claude.ai/oauth/authorize`에 PKCE S256·무작위 state·`user:profile`을 요청한다. 정확한 HTTPS `https://platform.claude.com/oauth/code/callback` 또는 사용자가 입력한 일회성 `code#state`만 같은 진행 중 세션과 대조한다. 검증자·state는 actor 메모리에만 보관하며 만료·중복·다른 세션 결과를 거부한다. 고정 `POST https://platform.claude.com/v1/oauth/token`과 `GET https://api.anthropic.com/api/oauth/usage`만 사용할 수 있다. `user:profile`의 실제 계정 승인·usage 접근 가능은 미검증이다. 공통 `five_hour`·`seven_day`의 두 사용률·리셋과 실제 조회 시각을 함께 검증해 원자적으로 교체하며 부분 응답으로 한쪽을 새 값처럼 저장하지 않는다. 모델별 한도·계정·프로필·결제 정보는 보관하지 않는다.
+후보는 `https://claude.ai/oauth/authorize`에 PKCE S256·무작위 state·`user:profile`을 요청한다. 정확한 HTTPS `https://platform.claude.com/oauth/code/callback` 또는 사용자가 입력한 일회성 `code#state`만 같은 진행 중 세션과 대조한다. 검증자·state는 actor 메모리에만 보관하며 만료·중복·다른 세션 결과를 거부한다. 고정 `POST https://platform.claude.com/v1/oauth/token`과 `GET https://api.anthropic.com/api/oauth/usage`만 사용할 수 있다. 사용자는 TestFlight17의 Claude 로그인·표시 성공을 보고했으며 이 보고를 공식 수치 대조·범용 계정 지원·장기 인증 갱신 검증으로 확대하지 않는다. 공통 `five_hour`·`seven_day`의 두 사용률·리셋과 실제 조회 시각을 함께 검증해 원자적으로 교체하며 부분 응답으로 한쪽을 새 값처럼 저장하지 않는다. 모델별 한도·계정·프로필·결제 정보는 보관하지 않는다.
 
 **인증·저장·취소 경계:** 각 후보는 이 앱이 새로 발급받은 토큰만 별도의 `ThisDeviceOnly`·동기화 꺼짐 Keychain 항목에 보관하도록 설계한다. 같은 서명 그룹의 앱·위젯만 공유하며 다른 앱·CLI·브라우저 저장소를 읽지 않는다. App Group의 작은 원자적 JSON에는 사용량·기간·리셋·실제 조회 시각과 불투명한 연결 세대만 둔다. 프로세스 간 잠금과 연결 세대 검증으로 앱·위젯의 토큰 회전과 삭제를 직렬화한다. 갱신 요청 전에 불확실 상태를 영속화하고 성공을 확정하지 못하면 이전 refresh token을 자동 재사용하지 않는다. 연결 해제는 새 세대와 빈 캐시를 기록하고 앱 전용 토큰을 지워 이전 작업이 값을 복원하지 못하게 한다. 응답 완료가 확인된 회전 토큰은 같은 연결에 한해 보관하되 취소·예시 전환 후 사용량을 게시하지 않는다.
 
 **갱신·표시:** 앱은 연결된 공급자를 독립적으로 조회하고 앱 활성화·복귀·공통 새로고침과 활성 중 600초 갱신을 사용한다. 하나의 공급자 미연결·실패가 다른 공급자의 갱신을 막지 않는다. 위젯 타임라인도 직접 조회를 시도하고 30분 후 다시 실행을 요청하되 실제 실행 시점은 iOS가 결정한다. 위젯 버튼의 App Intent 반환 후 WidgetKit이 타임라인을 다시 요청하며 같은 버튼에서 중복 네트워크 조회를 시작하지 않는다. 서버 조회는 소유 작업의 취소·정리를 포함한 전체 25초 제한을 적용한다. 같은 연결의 실패는 마지막 성공 값과 실제 시각을 보존하고, 20분 경과·리셋 경과·재연결 필요를 구분한다. 새로운 계정 인증에서 이전 계정 값을 최신 자동 값으로 재사용하지 않는다. 수동 웹 값은 직접 조회 값과 출처·시각을 구분하며 실패한 직접 경로가 수동 확인 시각을 갱신하지 않는다. 예시 중에는 실제 인증·조회·수치 혼합을 차단한다.
 
 두 직접 transport는 고정 URL·method, 임시 URLSession, 쿠키·자격증명·디스크 캐시 없음, redirect 차단과 응답 크기 제한을 적용한다. 모델 호출·대화 조회·과거 세션 원문·원시 오류·원시 계정 응답 로그는 없다. 인증·구독 인터페이스 변경은 고정 연결 오류로 끝내며 쿠키·다른 저장소·더 넓은 scope를 자동 탐색하지 않는다. 이 계약은 실제 공급자 허용이나 실계정 E2E 성공의 증거가 아니다.
+
+### 1.0(18) 로컬 검증: Grok 승인 복귀 복구와 단계 구분
+
+빌드18은 **local_verified/passed**이며 시뮬레이터 빌드·실행, 합성·회귀 XCTest194개(실패0·건너뜀0), Release archive·로컬 App Store export·앱/위젯 Apple Distribution 서명 검증을 통과했다. 최종 GitHub CI·TestFlight 업로드·Apple 처리·실기기 수정 효과는 아직 미확인이다. 사용자는17에서 Claude 로그인·표시 성공과 Grok 공식 승인 성공 후 앱 연결 실패를 보고했다. Grok 오류 화면에 연결 버튼만 있고 연결됨·새로고침이 없다는 추가 보고로 사용할 인증이 저장·확인되기 전으로 범위를 좁혔지만 승인 대기·토큰 교환·검증·저장 중 실제 실패 원인은 미확정이다. Claude의 보고도 공식 값/리셋·위젯·장기 갱신·공식 타사 허용의 근거로 확대하지 않는다. [후속 기록](releases/2026-10-20-ios-direct-refresh.md)을 따른다.
+
+현재 구현은 기기 코드 poll의 일시적인 URLSession 취소·시간 초과·연결 단절을 같은 승인 만료 시간과 연결 세대 안에서 재시도한다. 실제 Task 취소·승인 거부·만료·연결 세대 변경·예시 전환은 즉시 종료한다. 불확실한 refresh token 재사용은 허용하지 않는다. 토큰 응답의 `token_type`은 누락만 허용하고 제공된 잘못된 값은 거부한다. 만료는 유효한 `expires_in` 또는 access token의 `exp`에서 확인하며 누락·비정상 값을 임의 만료 시각으로 대체하지 않는다. UI는 인증 완료와 첫 사용량 실패를 나누어 안내하며 숫자 부재를 성공·0%로 바꾸지 않는다.
+
+기존 scope·고정 호스트/경로·기기 전용 Keychain·App Group 잠금/연결 세대·최소 사용량 캐시·삭제·모델 미호출 계약은 유지한다. PC·iCloud 중계나 다른 앱 인증 접근을 추가하지 않으며 개인정보 처리 범주와 앱의 고정 정책 커밋 `5f8851900aa27ae1586fbb6ee0f5f96f35ece8e0`은 바뀌지 않는다.
 
 ## Compatibility boundary
 

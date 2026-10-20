@@ -60,9 +60,14 @@ final class GrokURLSessionTransport: GrokHTTPTransport, @unchecked Sendable {
                 data.append(byte)
             }
             return GrokHTTPResponse(statusCode: http.statusCode, data: data)
-        } catch is CancellationError { throw CancellationError() }
-        catch let error as GrokClientError { throw error }
-        catch { throw GrokClientError.network }
+        } catch {
+            // A user/task cancellation is terminal even if URLSession reports -999.
+            try Task.checkCancellation()
+            if error is CancellationError { throw CancellationError() }
+            if let failure = error as? GrokClientError { throw failure }
+            if let transient = GrokTransientNetworkFailure.classify(error) { throw transient }
+            throw GrokClientError.network
+        }
     }
 }
 
@@ -152,6 +157,7 @@ actor GrokAccountClient {
 
     func completeDeviceAuthorization(_ authorization: GrokDeviceAuthorization) async throws -> GrokUsageSnapshot {
         var interval = authorization.interval
+        var transientBackoff: TimeInterval = 0
         guard (1...60).contains(interval), GrokStoredAuth.validToken(authorization.deviceCode),
               authorization.expiresAt.timeIntervalSince(now()) <= 1_800 else {
             throw GrokClientError.invalidResponse
@@ -159,22 +165,39 @@ actor GrokAccountClient {
         while now() < authorization.expiresAt {
             try checkActive()
             try await checkConnection(authorization.connectionID)
-            try await sleep(min(interval, max(0, authorization.expiresAt.timeIntervalSince(now()))))
+            try await sleep(min(max(interval, transientBackoff),
+                                max(0, authorization.expiresAt.timeIntervalSince(now()))))
             try checkActive()
             guard now() < authorization.expiresAt else { break }
             try await checkConnection(authorization.connectionID)
-            let response = try await transport.send(formRequest(url: GrokConfiguration.tokenURL, fields: [
-                "client_id": GrokConfiguration.clientID,
-                "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
-                "device_code": authorization.deviceCode
-            ]), maximumBytes: 131_072)
+            let response: GrokHTTPResponse
+            do {
+                response = try await transport.send(formRequest(url: GrokConfiguration.tokenURL, fields: [
+                    "client_id": GrokConfiguration.clientID,
+                    "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
+                    "device_code": authorization.deviceCode
+                ]), maximumBytes: 131_072)
+            } catch {
+                // Safari/app switching can cancel URL loading without cancelling
+                // this authorization. Keep its deadline and generation; refresh
+                // tokens do not use this retry path because rotation is ambiguous.
+                try checkActive()
+                try await checkConnection(authorization.connectionID)
+                guard error is GrokTransientNetworkFailure else { throw error }
+                guard now() < authorization.expiresAt else { break }
+                transientBackoff = min(60, max(interval, max(1, transientBackoff) * 2))
+                continue
+            }
             try checkActive()
+            guard now() < authorization.expiresAt else { break }
+            transientBackoff = 0
             if response.statusCode == 200 {
                 let auth = try Self.parseTokens(response.data, connectionID: authorization.connectionID,
                                                 previous: nil, now: now())
                 let lease = try await authLock.acquire()
                 do {
                     try checkActive()
+                    guard now() < authorization.expiresAt else { throw GrokClientError.loginExpired }
                     guard try usageStore.readState()?.connectionID == authorization.connectionID else {
                         throw GrokClientError.connectionChanged
                     }
@@ -185,6 +208,9 @@ actor GrokAccountClient {
                     throw error
                 }
                 return try await fetchUsage(force: true)
+            }
+            guard (400...499).contains(response.statusCode) else {
+                throw Self.httpFailure(response.statusCode)
             }
             let fields = try Self.object(response.data, maximumBytes: 131_072)
             switch fields["error"] as? String {
@@ -392,14 +418,54 @@ actor GrokAccountClient {
         let fields = try object(data, maximumBytes: 131_072)
         guard let access = fields["access_token"] as? String,
               let refresh = fields["refresh_token"] as? String ?? previous?.refreshToken,
-              let duration = number(fields["expires_in"]), duration > 0, duration <= 366 * 86_400,
-              (fields["token_type"] as? String)?.lowercased() == "bearer" else {
+              GrokStoredAuth.validToken(access), GrokStoredAuth.validToken(refresh) else {
             throw GrokClientError.invalidResponse
         }
+        // xAI's public device-flow success shape omits token_type. An explicitly
+        // supplied incompatible type still must not become a Bearer credential.
+        if let rawType = fields["token_type"] {
+            guard let type = rawType as? String, type.lowercased() == "bearer" else {
+                throw GrokClientError.invalidResponse
+            }
+        }
+        let expiration: Date
+        if let rawDuration = fields["expires_in"] {
+            guard let duration = number(rawDuration), duration > 0, duration <= 366 * 86_400 else {
+                throw GrokClientError.invalidResponse
+            }
+            expiration = now.addingTimeInterval(duration)
+        } else {
+            expiration = try accessTokenExpiration(access)
+        }
+        let lifetime = expiration.timeIntervalSince(now)
+        guard now.timeIntervalSince1970.isFinite, now.timeIntervalSince1970 >= 0,
+              expiration.timeIntervalSince1970.isFinite, lifetime > 0,
+              lifetime <= 366 * 86_400 else { throw GrokClientError.invalidResponse }
         let auth = GrokStoredAuth(connectionID: connectionID, accessToken: access, refreshToken: refresh,
-                                  expiresAt: now.addingTimeInterval(duration), refreshUncertain: false)
+                                  expiresAt: expiration, refreshUncertain: false)
         guard auth.hasValidFields else { throw GrokClientError.invalidResponse }
         return auth
+    }
+
+    /// This is an expiry hint from the access token returned by our fixed TLS
+    /// endpoint, not signature validation or identity extraction. The API remains
+    /// authoritative for the bearer. An ID-token expiry must never extend access.
+    private static func accessTokenExpiration(_ access: String) throws -> Date {
+        let parts = access.split(separator: ".", omittingEmptySubsequences: false)
+        guard parts.count == 3, !parts[0].isEmpty, !parts[2].isEmpty,
+              !parts[1].isEmpty, parts[1].utf8.count <= 16_384,
+              parts[1].utf8.allSatisfy({ byte in
+                  (65...90).contains(byte) || (97...122).contains(byte)
+                    || (48...57).contains(byte) || byte == 45 || byte == 95
+              }) else { throw GrokClientError.invalidResponse }
+        var encoded = parts[1].replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+        encoded += String(repeating: "=", count: (4 - encoded.utf8.count % 4) % 4)
+        guard let data = Data(base64Encoded: encoded), data.count <= 12_288,
+              let expiry = number(try object(data, maximumBytes: 12_288)["exp"]) else {
+            throw GrokClientError.invalidResponse
+        }
+        return Date(timeIntervalSince1970: expiry)
     }
 
     private static func object(_ data: Data, maximumBytes: Int) throws -> [String: Any] {
@@ -436,7 +502,7 @@ actor GrokAccountClient {
         case 400, 401: return .loginExpired
         case 403: return .permissionRequired
         case 429: return .retryLater
-        default: return .network
+        default: return .server(status: status)
         }
     }
 }

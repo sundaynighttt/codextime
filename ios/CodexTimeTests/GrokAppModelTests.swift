@@ -111,6 +111,8 @@ final class GrokAppModelTests: XCTestCase {
         XCTAssertFalse(model.isConnected)
         XCTAssertFalse(model.isAuthenticating)
         XCTAssertEqual(reloads, 1)
+        XCTAssertNil(model.connectionFailureStage)
+        XCTAssertNil(model.message)
         let cancellations = await client.cancelCount
         XCTAssertGreaterThanOrEqual(cancellations, 1)
     }
@@ -128,6 +130,8 @@ final class GrokAppModelTests: XCTestCase {
         XCTAssertEqual(model.snapshot?.updatedAt, cached.updatedAt)
         XCTAssertEqual(model.error, .network)
         XCTAssertTrue(model.isConnected)
+        XCTAssertNil(model.connectionFailureStage)
+        XCTAssertEqual(model.message, GrokClientError.network.errorDescription)
     }
 
     func testExpiredLoginKeepsOldValueButRequestsReconnection() async {
@@ -141,6 +145,7 @@ final class GrokAppModelTests: XCTestCase {
         XCTAssertTrue(model.requiresSignIn)
         XCTAssertFalse(model.isConnected)
         XCTAssertEqual(model.error, .loginExpired)
+        XCTAssertNil(model.connectionFailureStage)
     }
 
     func testCancelledReconnectClearsPreviousAccountValueAndDoesNotClaimConnected() async throws {
@@ -174,6 +179,9 @@ final class GrokAppModelTests: XCTestCase {
         XCTAssertTrue(model.requiresSignIn)
         XCTAssertFalse(model.isConnected)
         XCTAssertFalse(model.canRefresh)
+        XCTAssertEqual(model.connectionFailureStage, .approvalResult)
+        XCTAssertTrue(model.message?.hasPrefix("Grok 연결 승인을 마무리하지 못했습니다.") == true)
+        XCTAssertTrue(model.message?.contains(GrokClientError.network.errorDescription!) == true)
     }
 
     func testNewCredentialWithFailedFirstUsageDoesNotReusePreviousAccountValue() async throws {
@@ -189,6 +197,8 @@ final class GrokAppModelTests: XCTestCase {
         XCTAssertTrue(model.canRefresh)
         XCTAssertFalse(model.requiresSignIn)
         XCTAssertEqual(model.error, .usageUnavailable)
+        XCTAssertEqual(model.connectionFailureStage, .firstUsage)
+        XCTAssertTrue(model.message?.hasPrefix("Grok 인증은 완료됐지만 사용량을 조회하지 못했습니다.") == true)
     }
 
     func testDisconnectBlocksNewSignInUntilCredentialDeletionCompletes() async throws {
@@ -207,6 +217,141 @@ final class GrokAppModelTests: XCTestCase {
         await disconnecting.value
         XCTAssertFalse(model.isDisconnecting)
         XCTAssertTrue(model.canBeginSignIn)
+    }
+
+    func testApprovalPollingFailureDoesNotClaimTheAccountWasConnected() async throws {
+        let client = GrokAppClientStub(authenticated: false, snapshot: reading(at: now))
+        await client.setApprovalFailure(.network)
+        let model = makeModel(client)
+        model.beginSignIn()
+        try await waitUntil { !model.isAuthenticating }
+        XCTAssertEqual(model.connectionFailureStage, .approvalResult)
+        XCTAssertTrue(model.message?.hasPrefix("Grok 연결 승인을 마무리하지 못했습니다.") == true)
+        XCTAssertFalse(model.isConnected)
+        XCTAssertFalse(model.canRefresh)
+        XCTAssertNil(model.snapshot)
+        let signOuts = await client.signOutCount
+        XCTAssertEqual(signOuts, 0)
+    }
+
+    func testAuthenticatedFirstUsageFailureCanRefreshWithoutAnotherLogin() async throws {
+        let fresh = reading(at: now)
+        let client = GrokAppClientStub(authenticated: false, snapshot: fresh)
+        await client.setFirstAuthorizedUsageFailure(.network)
+        let model = makeModel(client)
+        model.beginSignIn()
+        try await waitUntil { !model.isAuthenticating }
+        XCTAssertEqual(model.connectionFailureStage, .firstUsage)
+        XCTAssertTrue(model.isConnected)
+        XCTAssertTrue(model.canRefresh)
+        XCTAssertFalse(model.requiresSignIn)
+        XCTAssertNil(model.snapshot)
+        XCTAssertTrue(model.message?.contains(GrokClientError.network.errorDescription!) == true)
+        await model.load()
+        await model.refreshIfNeeded()
+        let automaticFetches = await client.fetchCount
+        XCTAssertEqual(automaticFetches, 0, "A foreground return must retain the first-usage backoff")
+        XCTAssertEqual(model.connectionFailureStage, .firstUsage)
+        await model.refresh()
+        XCTAssertEqual(model.snapshot, fresh)
+        XCTAssertNil(model.error)
+        XCTAssertNil(model.connectionFailureStage)
+        XCTAssertNil(model.message)
+        let counts = await client.counts()
+        let signOuts = await client.signOutCount
+        XCTAssertEqual(counts.authorization, 1)
+        XCTAssertEqual(counts.usage, 1)
+        XCTAssertEqual(signOuts, 0, "Retrying usage must preserve the authenticated credential")
+    }
+
+    func testNewSignInClearsPreviousConnectionFailureStageBeforeSuccessfulCompletion() async throws {
+        let fresh = reading(at: now)
+        let client = GrokAppClientStub(authenticated: false, snapshot: fresh)
+        await client.setApprovalFailure(.network)
+        let model = makeModel(client)
+        model.beginSignIn()
+        try await waitUntil { !model.isAuthenticating }
+        XCTAssertEqual(model.connectionFailureStage, .approvalResult)
+        await client.setApprovalFailure(nil)
+        await client.setAuthorizationBlocked(true)
+        model.beginSignIn()
+        XCTAssertNil(model.connectionFailureStage)
+        XCTAssertNil(model.error)
+        try await waitUntil { await client.completeCount == 2 }
+        await client.finishAuthorization()
+        try await waitUntil { !model.isAuthenticating }
+        XCTAssertEqual(model.snapshot, fresh)
+        XCTAssertTrue(model.isConnected)
+        XCTAssertNil(model.connectionFailureStage)
+        XCTAssertNil(model.message)
+    }
+
+    func testDisconnectClearsTheFirstUsageFailureStage() async throws {
+        let client = GrokAppClientStub(authenticated: false, snapshot: reading(at: now))
+        await client.setFirstAuthorizedUsageFailure(.network)
+        let model = makeModel(client)
+        model.beginSignIn()
+        try await waitUntil { !model.isAuthenticating }
+        XCTAssertEqual(model.connectionFailureStage, .firstUsage)
+        await model.disconnect()
+        XCTAssertNil(model.connectionFailureStage)
+        XCTAssertNil(model.message)
+        XCTAssertFalse(model.isConnected)
+        XCTAssertNil(model.snapshot)
+    }
+
+    func testEnteringDemoClearsTheFirstUsageFailureStage() async throws {
+        let demo = GrokDemoFlag()
+        let client = GrokAppClientStub(authenticated: false, snapshot: reading(at: now))
+        await client.setFirstAuthorizedUsageFailure(.network)
+        let model = makeModel(client, isDemo: { demo.value })
+        model.beginSignIn()
+        try await waitUntil { !model.isAuthenticating }
+        XCTAssertEqual(model.connectionFailureStage, .firstUsage)
+        demo.value = true
+        await model.synchronizeDemoState()
+        XCTAssertNil(model.connectionFailureStage)
+        XCTAssertNil(model.message)
+        XCTAssertFalse(model.isConnected)
+        XCTAssertNil(model.snapshot)
+    }
+
+    func testFreshSharedCacheClearsFirstUsageFailureOnReturn() async throws {
+        let fresh = reading(at: now)
+        let cache = GrokSnapshotBox()
+        let client = GrokAppClientStub(authenticated: false, snapshot: fresh)
+        await client.setFirstAuthorizedUsageFailure(.network)
+        let fixedNow = now
+        let model = GrokAppModel(client: client, cachedSnapshot: { cache.value },
+            isDemoEnabled: { false }, now: { fixedNow }, reloadWidgets: {})
+        model.beginSignIn()
+        try await waitUntil { !model.isAuthenticating }
+        XCTAssertEqual(model.connectionFailureStage, .firstUsage)
+        cache.value = fresh
+        await model.load()
+        XCTAssertEqual(model.snapshot, fresh)
+        XCTAssertTrue(model.isConnected)
+        XCTAssertNil(model.connectionFailureStage)
+        XCTAssertNil(model.message)
+        let requests = await client.fetchCount
+        XCTAssertEqual(requests, 0)
+    }
+
+    func testOldSharedCacheDoesNotHideANewApprovalFailure() async throws {
+        let cached = reading(at: now.addingTimeInterval(-10))
+        let client = GrokAppClientStub(authenticated: true, snapshot: reading(at: now))
+        let model = makeModel(client, cached: cached)
+        await model.load()
+        await client.setAuthorizationRequestFailure(.busy, keepsExistingAuthentication: true)
+        model.beginSignIn()
+        try await waitUntil { !model.isAuthenticating }
+        XCTAssertEqual(model.connectionFailureStage, .approvalResult)
+        await model.load()
+        XCTAssertEqual(model.snapshot, cached)
+        XCTAssertTrue(model.isConnected)
+        XCTAssertEqual(model.connectionFailureStage, .approvalResult)
+        XCTAssertEqual(model.error, .busy)
+        XCTAssertTrue(model.message?.hasPrefix("Grok 연결 승인을 마무리하지 못했습니다.") == true)
     }
 
     private func reading(at date: Date, used: Double = 24) -> GrokUsageSnapshot {
@@ -244,6 +389,15 @@ private final class GrokDemoFlag: @unchecked Sendable {
     }
 }
 
+private final class GrokSnapshotBox: @unchecked Sendable {
+    private let lock = NSLock()
+    private var storedValue: GrokUsageSnapshot?
+    var value: GrokUsageSnapshot? {
+        get { lock.withLock { storedValue } }
+        set { lock.withLock { storedValue = newValue } }
+    }
+}
+
 private actor GrokAppClientStub: GrokAccountServicing {
     var authenticationCount = 0
     var authorizationCount = 0
@@ -257,6 +411,8 @@ private actor GrokAppClientStub: GrokAccountServicing {
     private var fetchFailure: GrokClientError?
     private var authorizationRequestFailure: GrokClientError?
     private var firstAuthorizedUsageFailure: GrokClientError?
+    private var approvalFailure: GrokClientError?
+    private var preservesAuthenticationOnAuthorizationFailure = false
     private var fetchBlocked = false
     private var authorizationBlocked = false
     private var signOutBlocked = false
@@ -274,8 +430,11 @@ private actor GrokAppClientStub: GrokAccountServicing {
     }
     func requestDeviceAuthorization() async throws -> GrokDeviceAuthorization {
         authorizationCount += 1
+        if let authorizationRequestFailure {
+            if !preservesAuthenticationOnAuthorizationFailure { authenticated = false }
+            throw authorizationRequestFailure
+        }
         authenticated = false
-        if let authorizationRequestFailure { throw authorizationRequestFailure }
         return GrokDeviceAuthorization(deviceCode: "synthetic-device-code", userCode: "TEST-CODE",
                                        verificationURL: URL(string: "https://auth.x.ai/activate")!,
                                        expiresAt: snapshot.updatedAt.addingTimeInterval(900), interval: 5)
@@ -286,6 +445,7 @@ private actor GrokAppClientStub: GrokAccountServicing {
             await withCheckedContinuation { authorizationContinuation = $0 }
         }
         finishedAuthorizationCount += 1
+        if let approvalFailure { throw approvalFailure }
         authenticated = true
         if let firstAuthorizedUsageFailure { throw firstAuthorizedUsageFailure }
         return snapshot
@@ -307,9 +467,13 @@ private actor GrokAppClientStub: GrokAccountServicing {
     func setFetchBlocked(_ value: Bool) { fetchBlocked = value }
     func setAuthorizationBlocked(_ value: Bool) { authorizationBlocked = value }
     func setFetchFailure(_ value: GrokClientError) { fetchFailure = value }
-    func setAuthorizationRequestFailure(_ value: GrokClientError) { authorizationRequestFailure = value }
+    func setAuthorizationRequestFailure(_ value: GrokClientError, keepsExistingAuthentication: Bool = false) {
+        authorizationRequestFailure = value
+        preservesAuthenticationOnAuthorizationFailure = keepsExistingAuthentication
+    }
     func setSignOutBlocked(_ value: Bool) { signOutBlocked = value }
     func setFirstAuthorizedUsageFailure(_ value: GrokClientError) { firstAuthorizedUsageFailure = value }
+    func setApprovalFailure(_ value: GrokClientError?) { approvalFailure = value }
     func finishSignOut() {
         signOutContinuation?.resume()
         signOutContinuation = nil
