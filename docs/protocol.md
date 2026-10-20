@@ -76,7 +76,7 @@ Codex의 직접 인증·조회와 Grok의 사용함/남음·주간 선택·위�
 
 ### 1.0(17) 내부 TestFlight: 아이폰 단독 직접 연결과 자동 조회
 
-이 절은 기존 웹 수동 확인을 대체할 수 있는 **1.0(17) 내부 TestFlight 기술 후보**의 계약이다. 2026-10-20 13:21:13 KST 업로드와 13:25 KST 기준 App Store Connect의 처리 완료·CodexTime Internal 그룹·초대1명·설치 집계 `–`를 확인했다. Apple 처리 확인 최신은1.0(17)이다. 이후 Claude 로그인·표시 성공 및 Grok 승인 후 앱 복귀 실패의 사용자 보고는 아래18 후속 절에서 구분하며 토큰 갱신·공식 웹 값·위젯의 독립 대조는 미확인이다. [검증·배포 근거](releases/2026-10-20-ios-direct-refresh.md)와 [제출 현황](app-store/submission.md)을 구분한다. 이 구현은 Mac·PC·Cursor·iCloud·개발자 서버를 경유하지 않는다. 이전 빌드13/16의 수동 웹 확인은 별도 대체 경로로 유지하며 과거 계약과 배포 이력은 보존한다.
+이 절은 기존 웹 수동 확인을 대체할 수 있는 **1.0(17) 내부 TestFlight 기술 후보**의 계약이다. 2026-10-20 13:21:13 KST 업로드와 13:25 KST 기준 App Store Connect의 처리 완료·CodexTime Internal 그룹·초대1명·설치 집계 `–`를 확인했다. 이는 빌드17 당시의 Apple 처리 이력이며 현재 최신 상태는 아래18 후속 절과 원장을 따른다. 이후 Claude 로그인·표시 성공 및 Grok 승인 후 앱 복귀 실패의 사용자 보고는 아래18 후속 절에서 구분하며 토큰 갱신·공식 웹 값·위젯의 독립 대조는 미확인이다. [검증·배포 근거](releases/2026-10-20-ios-direct-refresh.md)와 [제출 현황](app-store/submission.md)을 구분한다. 이 구현은 Mac·PC·Cursor·iCloud·개발자 서버를 경유하지 않는다. 이전 빌드13/16의 수동 웹 확인은 별도 대체 경로로 유지하며 과거 계약과 배포 이력은 보존한다.
 
 **Grok:** `GrokAccountClient`는 `POST https://auth.x.ai/oauth2/device/code`에서 기기 코드를 요청하고 사용자가 xAI 페이지에서 승인한 뒤 `POST https://auth.x.ai/oauth2/token`으로 토큰을 발급·갱신한다. [OpenClaw 문서](https://docs.openclaw.ai/providers/xai)에 소개된 공유 공개 클라이언트를 사용하므로 승인 화면에 Grok Build가 표시될 수 있다. CodexTime의 독립 앱 등록·공식 승인을 주장하지 않는다. 후보 요청 범위는 `openid offline_access grok-cli:access`다. 익명 기기 코드 요청이 이 범위로 수락됨은 확인했지만 실제 계정 billing 권한과 공식 웹의 같은 구독 한도·리셋 일치는 아직 확인하지 않았다.
 
@@ -92,9 +92,9 @@ Codex의 직접 인증·조회와 Grok의 사용함/남음·주간 선택·위�
 
 두 직접 transport는 고정 URL·method, 임시 URLSession, 쿠키·자격증명·디스크 캐시 없음, redirect 차단과 응답 크기 제한을 적용한다. 모델 호출·대화 조회·과거 세션 원문·원시 오류·원시 계정 응답 로그는 없다. 인증·구독 인터페이스 변경은 고정 연결 오류로 끝내며 쿠키·다른 저장소·더 넓은 scope를 자동 탐색하지 않는다. 이 계약은 실제 공급자 허용이나 실계정 E2E 성공의 증거가 아니다.
 
-### 1.0(18) 로컬 검증: Grok 승인 복귀 복구와 단계 구분
+### 1.0(18) 내부 TestFlight: Grok 승인 복귀 복구와 단계 구분
 
-빌드18은 **local_verified/passed**이며 시뮬레이터 빌드·실행, 합성·회귀 XCTest194개(실패0·건너뜀0), Release archive·로컬 App Store export·앱/위젯 Apple Distribution 서명 검증을 통과했다. 최종 GitHub CI·TestFlight 업로드·Apple 처리·실기기 수정 효과는 아직 미확인이다. 사용자는17에서 Claude 로그인·표시 성공과 Grok 공식 승인 성공 후 앱 연결 실패를 보고했다. Grok 오류 화면에 연결 버튼만 있고 연결됨·새로고침이 없다는 추가 보고로 사용할 인증이 저장·확인되기 전으로 범위를 좁혔지만 승인 대기·토큰 교환·검증·저장 중 실제 실패 원인은 미확정이다. Claude의 보고도 공식 값/리셋·위젯·장기 갱신·공식 타사 허용의 근거로 확대하지 않는다. [후속 기록](releases/2026-10-20-ios-direct-refresh.md)을 따른다.
+빌드18은 **external_processed/passed**이며 시뮬레이터 빌드·실행, 합성·회귀 XCTest194개(실패0·건너뜀0), Release archive·로컬 App Store export·앱/위젯 Apple Distribution 서명 검증을 통과했다. [세 플랫폼 최종 CI](https://github.com/sundaynighttt/codextime/actions/runs/39373349236)와 [PR22 main 병합](https://github.com/sundaynighttt/codextime/pull/22)을 확인했다. **2026-10-20 14:15:50.926 KST** TestFlight 업로드 성공과 **14:18 KST 기준** App Store Connect의 제출 준비 완료·CodexTime Internal 그룹·초대1명·설치 집계 `–`를 확인했다. Apple 처리 확인 최신은1.0(18)이며 이후 사용자는 TestFlight18에서 Grok 연결·사용량 표시 성공을 보고했다. 공식 숫자/리셋 대조·위젯·장기간 인증 갱신은 미확인이다. 사용자는17에서 Claude 로그인·표시 성공과 Grok 공식 승인 성공 후 앱 연결 실패를 보고했다. Grok 오류 화면에 연결 버튼만 있고 연결됨·새로고침이 없다는 추가 보고로 사용할 인증이 저장·확인되기 전으로 범위를 좁혔지만 승인 대기·토큰 교환·검증·저장 중 실제 실패 원인은 미확정이다. Claude17 로그인·표시 성공과 Grok18 연결·표시 성공의 사용자 보고를 구분하며 공식 값/리셋·위젯·장기 갱신·공식 타사 허용의 근거로 확대하지 않는다. 실제17 실패의 원인 로그는 확인하지 않았다. [후속 기록](releases/2026-10-20-ios-direct-refresh.md)을 따른다.
 
 현재 구현은 기기 코드 poll의 일시적인 URLSession 취소·시간 초과·연결 단절을 같은 승인 만료 시간과 연결 세대 안에서 재시도한다. 실제 Task 취소·승인 거부·만료·연결 세대 변경·예시 전환은 즉시 종료한다. 불확실한 refresh token 재사용은 허용하지 않는다. 토큰 응답의 `token_type`은 누락만 허용하고 제공된 잘못된 값은 거부한다. 만료는 유효한 `expires_in` 또는 access token의 `exp`에서 확인하며 누락·비정상 값을 임의 만료 시각으로 대체하지 않는다. UI는 인증 완료와 첫 사용량 실패를 나누어 안내하며 숫자 부재를 성공·0%로 바꾸지 않는다.
 
