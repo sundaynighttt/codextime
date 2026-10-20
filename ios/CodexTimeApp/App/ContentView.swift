@@ -4,13 +4,17 @@ import UIKit
 struct ContentView: View {
     let model: AppModel
     @StateObject private var webUsage = WebUsageCoordinator()
+    @State private var grok = GrokAppModel()
+    @State private var claude = ClaudeNativeAppModel()
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var hasLoaded = false
     @Environment(\.openURL) private var openURL
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var copiedUserCode: String?
     @State private var presentedSheet: SheetDestination?
 
     private enum SheetDestination: String, Identifiable {
-        case guide, grok, claude
+        case guide, nativeGrok, nativeClaude, grok, claude
         var id: String { rawValue }
     }
 
@@ -47,12 +51,40 @@ struct ContentView: View {
         .sheet(item: $presentedSheet) { destination in
             switch destination {
             case .guide: UsageGuideView()
+            case .nativeGrok: GrokConnectionView(model: grok, manualWebModel: webUsage.model(for: .grok))
+            case .nativeClaude: ClaudeNativeConnectionView(model: claude, manualWebModel: webUsage.model(for: .claude))
             case .grok: ProviderWebUsageView(model: webUsage.model(for: .grok))
             case .claude: ProviderWebUsageView(model: webUsage.model(for: .claude))
             }
         }
-        .task {
-            await model.load()
+        .task(id: scenePhase) {
+            guard scenePhase == .active,
+                  ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != "1" else { return }
+            if !hasLoaded {
+                hasLoaded = true
+                async let codexLoad: Void = model.load()
+                async let grokLoad: Void = grok.load()
+                async let claudeLoad: Void = claude.load()
+                _ = await (codexLoad, grokLoad, claudeLoad)
+            } else {
+                async let grokLoad: Void = grok.load()
+                async let codexRefresh: Void = refreshCodexIfNeeded(force: false)
+                async let claudeLoad: Void = claude.load()
+                _ = await (grokLoad, codexRefresh, claudeLoad)
+            }
+            while !Task.isCancelled {
+                do { try await Task.sleep(for: .seconds(600)) }
+                catch { return }
+                guard scenePhase == .active else { return }
+                await refreshConnectedProviders(force: false)
+            }
+        }
+        .onChange(of: currentSnapshot?.isDemo == true) { _, _ in
+            Task {
+                async let grokDemo: Void = grok.synchronizeDemoState()
+                async let claudeDemo: Void = claude.synchronizeDemoState()
+                _ = await (grokDemo, claudeDemo)
+            }
         }
     }
 
@@ -175,6 +207,42 @@ struct ContentView: View {
         return snapshot
     }
 
+    private var cardUpdateText: String {
+        if let snapshot = currentSnapshot {
+            return "Codex 업데이트 " + UsageFormatter.updateTime(snapshot.updatedAt)
+        }
+        if let snapshot = grok.snapshot {
+            return "Grok 업데이트 " + UsageFormatter.updateTime(snapshot.updatedAt)
+        }
+        if let snapshot = claude.snapshot {
+            return "Claude 업데이트 " + UsageFormatter.updateTime(snapshot.updatedAt)
+        }
+        return "서비스별로 계정을 연결하세요"
+    }
+
+    private func refreshConnectedProviders(force: Bool) async {
+        async let codexRefresh: Void = refreshCodexIfNeeded(force: force)
+        async let grokRefresh: Void = refreshGrokIfNeeded(force: force)
+        async let claudeRefresh: Void = refreshClaudeIfNeeded(force: force)
+        _ = await (codexRefresh, grokRefresh, claudeRefresh)
+    }
+
+    private func refreshCodexIfNeeded(force: Bool) async {
+        guard case let .connected(snapshot) = model.state else { return }
+        guard force || (snapshot.isDemo != true && Date().timeIntervalSince(snapshot.updatedAt) >= 600) else { return }
+        await model.refresh()
+    }
+
+    private func refreshGrokIfNeeded(force: Bool) async {
+        if force { await grok.refresh() }
+        else { await grok.refreshIfNeeded() }
+    }
+
+    private func refreshClaudeIfNeeded(force: Bool) async {
+        if force { await claude.refresh() }
+        else { await claude.refreshIfNeeded() }
+    }
+
     private var usageCard: some View {
         RoundedRectangle(cornerRadius: 16)
             .fill(Color(.secondarySystemGroupedBackground))
@@ -185,19 +253,19 @@ struct ContentView: View {
                 Text(currentSnapshot?.isDemo == true ? "예시 데이터" : "잔여 사용량")
                     .font(.subheadline.weight(.medium))
                 Spacer()
-                if currentSnapshot != nil {
+                if currentSnapshot != nil || grok.snapshot != nil || grok.isConnected || claude.snapshot != nil || claude.isConnected {
                     Button {
-                        Task { await model.refresh() }
+                        Task { await refreshConnectedProviders(force: true) }
                     } label: {
-                        if model.isRefreshing {
+                        if model.isRefreshing || grok.isRefreshing || claude.isRefreshing {
                             ProgressView()
                         } else {
                             Image(systemName: "arrow.clockwise")
                         }
                     }
                     .frame(width: 44, height: 44)
-                    .disabled(model.isRefreshing)
-                    .accessibilityLabel("Codex 사용량 새로고침")
+                    .disabled(model.isRefreshing || grok.isRefreshing || claude.isRefreshing)
+                    .accessibilityLabel("Codex·Grok·Claude 사용량 새로고침")
                     .accessibilityIdentifier("refresh-usage")
                 }
             }
@@ -205,11 +273,15 @@ struct ContentView: View {
             TimelineView(.periodic(from: .now, by: 60)) { context in
                 ProviderUsageColumns(snapshot: currentSnapshot, now: context.date,
                                      webReadings: webUsage.readings,
-                                     webMetricReadings: webUsage.metricReadings)
+                                     webMetricReadings: webUsage.metricReadings,
+                                     grokSnapshot: grok.snapshot,
+                                     grokRequiresSignIn: grok.requiresSignIn,
+                                     claudeSnapshot: claude.snapshot,
+                                     claudeRequiresSignIn: claude.requiresSignIn)
             }
                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
             Spacer(minLength: 0)
-            Text(currentSnapshot.map { "Codex 업데이트 " + UsageFormatter.updateTime($0.updatedAt) } ?? "서비스별로 계정을 연결하세요")
+            Text(cardUpdateText)
                 .font(.caption)
                 .foregroundStyle(.secondary)
               }
@@ -222,24 +294,43 @@ struct ContentView: View {
     private var webProviderControls: some View {
         VStack(spacing: 12) {
             HStack(spacing: 12) {
-                ForEach(WebUsageProvider.allCases) { provider in
-                    Button {
-                        presentedSheet = provider == .grok ? .grok : .claude
-                    } label: {
-                        Text(provider.name + (webUsage.readings[provider] == nil ? " 연결·확인" : " 다시 확인"))
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.bordered)
-                    .disabled(currentSnapshot?.isDemo == true)
-                    .accessibilityIdentifier("connect-" + provider.rawValue)
+                Button {
+                    presentedSheet = .nativeGrok
+                } label: {
+                    Text(grok.requiresSignIn ? "Grok 재연결" : grok.isConnected ? "Grok 계정" : "Grok 연결")
+                        .frame(maxWidth: .infinity)
                 }
+                .buttonStyle(.bordered)
+                .disabled(currentSnapshot?.isDemo == true)
+                .accessibilityIdentifier("connect-grok")
+                Button {
+                    presentedSheet = .nativeClaude
+                } label: {
+                    Text(claude.requiresSignIn ? "Claude 재연결" : claude.isConnected ? "Claude 계정" : "Claude 연결")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .disabled(currentSnapshot?.isDemo == true)
+                .accessibilityIdentifier("connect-claude")
             }
             Text(currentSnapshot?.isDemo == true
                  ? "예시를 끝내면 Grok·Claude 계정을 연결할 수 있습니다. 예시 모드에서는 웹 로그인이나 실제 사용량 확인을 시작하지 않습니다."
-                 : "Grok·Claude는 웹에서 직접 로그인한 뒤 사용량 숫자를 수동으로 확인합니다. Claude는 주간·세션을 각각 표시하며, 각 구간의 잔여율과 마지막 확인 시각을 구분합니다.")
+                 : "Grok은 연결 후 자동 조회합니다. Claude는 iPhone 단독 호환 연결을 시도할 수 있으며, 지원되지 않으면 웹에서 직접 확인합니다.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
+            if currentSnapshot?.isDemo != true, let message = grok.message {
+                Text(message)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .accessibilityIdentifier("grok-usage-message")
+            }
+            if currentSnapshot?.isDemo != true, let message = claude.message {
+                Text(message)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .accessibilityIdentifier("claude-usage-message")
+            }
             if currentSnapshot?.isDemo != true && !webUsage.readings.isEmpty {
                 DisclosureGroup("웹 사용량 관리") {
                     ForEach(WebUsageProvider.allCases) { provider in
