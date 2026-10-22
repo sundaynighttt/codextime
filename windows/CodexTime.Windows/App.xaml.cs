@@ -12,6 +12,13 @@ public partial class App : System.Windows.Application
     {
         base.OnStartup(e);
 
+        if (e.Args.Length == 2 && e.Args[0] == "--resource-fixture")
+        {
+            try { await ResourceSafetySelfTests.RunFixtureAsync(e.Args[1]); Shutdown(0); }
+            catch { Shutdown(1); }
+            return;
+        }
+
         if (e.Args.Length == 2 && e.Args[0] == "--provider-wal-fixture")
         {
             try { await ProviderClientSelfTests.RunWalFixtureAsync(e.Args[1]); Shutdown(0); }
@@ -32,6 +39,8 @@ public partial class App : System.Windows.Application
                 ProviderUiSelfTests.Run();
                 Console.WriteLine("Provider UI checks passed.");
                 await ProviderUiSelfTests.CheckRepeatedDetailsAsync();
+                await ResourceSafetySelfTests.RunAsync();
+                Console.WriteLine("CLI stream, cancellation, process cleanup and log retention checks passed.");
                 Shutdown(0);
             }
             catch (Exception error)

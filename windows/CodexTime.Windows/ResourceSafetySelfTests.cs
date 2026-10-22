@@ -227,7 +227,8 @@ public static class ResourceSafetySelfTests
             RedirectStandardInput = true, RedirectStandardOutput = true, RedirectStandardError = true
         };
         if (string.Equals(Path.GetFileNameWithoutExtension(Environment.ProcessPath), "dotnet", StringComparison.OrdinalIgnoreCase))
-            start.ArgumentList.Add(typeof(ResourceSafetySelfTests).Assembly.Location);
+            start.ArgumentList.Add(Path.Combine(AppContext.BaseDirectory,
+                typeof(ResourceSafetySelfTests).Assembly.GetName().Name + ".dll"));
         start.ArgumentList.Add("--resource-fixture");
         start.ArgumentList.Add(mode);
         start.Environment[FixtureDirectoryVariable] = directory;
