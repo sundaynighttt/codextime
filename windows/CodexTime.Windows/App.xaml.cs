@@ -31,6 +31,7 @@ public partial class App : System.Windows.Application
                 Console.WriteLine("Provider lifecycle checks passed (7 scenarios).");
                 ProviderUiSelfTests.Run();
                 Console.WriteLine("Provider UI checks passed.");
+                await ProviderUiSelfTests.CheckRepeatedDetailsAsync();
                 Shutdown(0);
             }
             catch (Exception error)
@@ -58,6 +59,7 @@ public partial class App : System.Windows.Application
 
         try
         {
+            AppLog.Write("startup");
             _controller = new UsageController();
             await _controller.StartAsync();
         }

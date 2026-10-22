@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 using Button = System.Windows.Controls.Button;
 using CheckBox = System.Windows.Controls.CheckBox;
 
@@ -10,6 +11,35 @@ namespace CodexTime.WinApp;
 /// <summary>UI-only synthetic checks; no controller, disk settings, login, or usage requests.</summary>
 public static class ProviderUiSelfTests
 {
+    // The legacy installed prototype repeatedly bound an immutable percentage
+    // TwoWay, raising XamlParseException during layout. Exercise the real detail
+    // surface repeatedly with read-only snapshot values, including layout work.
+    public static async Task CheckRepeatedDetailsAsync()
+    {
+        var states = WindowsPreview.ExampleStates();
+        var details = new DetailsWindow();
+        try
+        {
+            details.UpdateProviders(states);
+            var root = WindowsPreview.LayoutContent(details, 400, 650);
+            var expectedElements = Descendants(root).Count();
+            await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+            var before = GC.GetTotalMemory(forceFullCollection: true);
+            for (var iteration = 0; iteration < 500; iteration++)
+            {
+                details.UpdateProviders(states);
+                WindowsPreview.LayoutContent(details, 400, 650);
+                Check(Descendants(root).Count() == expectedElements, "detail elements do not accumulate");
+                if (iteration % 25 == 0) await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+            }
+            await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+            var growth = GC.GetTotalMemory(forceFullCollection: true) - before;
+            Check(growth < 32 * 1024 * 1024, "repeated detail layout retains less than 32 MiB");
+            Console.WriteLine($"Repeated detail layout: 500 updates; retained growth {growth / 1024} KiB.");
+        }
+        finally { details.Close(); }
+    }
+
     public static void Run()
     {
         var states = WindowsPreview.ExampleStates();
