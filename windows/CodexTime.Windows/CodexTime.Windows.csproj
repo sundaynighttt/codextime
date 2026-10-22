@@ -10,7 +10,7 @@
     <ApplicationIcon>Assets\CodexTime.ico</ApplicationIcon>
     <AssemblyName>CodexTime</AssemblyName>
     <RootNamespace>CodexTime.WinApp</RootNamespace>
-    <Version>0.4.0</Version>
+    <Version>0.4.1</Version>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
     <PublishTrimmed>false</PublishTrimmed>

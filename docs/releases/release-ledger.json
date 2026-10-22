@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "project": "codextime",
-  "updatedAt": "2026-10-20",
+  "updatedAt": "2026-10-22",
   "pointers": [
     {
       "key": "latest_candidate",
@@ -27,6 +27,11 @@
       "key": "latest_windows_release",
       "label": "Windows 공개 미리보기 최신",
       "releaseId": "windows-040"
+    },
+    {
+      "key": "latest_windows_local",
+      "label": "Windows 로컬 메모리 수정·설치",
+      "releaseId": "windows-041-local"
     }
   ],
   "releases": [
@@ -398,11 +403,10 @@
       "date": "2026-10-19",
       "stage": "abandoned",
       "status": "abandoned",
-      "summary": "별도 브랜치에서 macOS 0.3.1(2026101907)을 재사용한 중단·미배포 iCloud 후보; Mac102/shared20 tests·ad-hoc 패키징 통과, Developer ID export 프로비저닝 대기 후 종료, 공개 v0.3.1과 다른 산출물이며 정식 서명 배포·설치·실제 전송 없음",
+      "summary": "별도 브랜치에서 macOS 0.3.1(2026101907)을 재사용한 중단·미배포 iCloud 후보; Mac102/shared20 tests·ad-hoc 패키징 통과, Developer ID export 프로비저닝 대기 후 종료, 공개 v0.3.1과 다른 산출물이며 정식 서명 배포·설치·실제 전송 없음; bdef8de 중간 참조는 기존 문서에 보존하며 현재 체크아웃·원격에서 미확인",
       "evidence": [
         "docs/releases/2026-10-19-private-icloud-sync.md",
-        "git:f98bb6d",
-        "git:bdef8de"
+        "git:f98bb6d"
       ]
     },
     {
@@ -413,11 +417,10 @@
       "date": "2026-10-19",
       "stage": "failed",
       "status": "historical",
-      "summary": "중단·미업로드 iCloud 후보:24 tests·시뮬레이터 통과, 앱/위젯 CloudKit 프로필 불일치로 두 Release archive 실패; TestFlight·실제 동기화 없음",
+      "summary": "중단·미업로드 iCloud 후보:24 tests·시뮬레이터 통과, 앱/위젯 CloudKit 프로필 불일치로 두 Release archive 실패; TestFlight·실제 동기화 없음; bdef8de 중간 참조는 기존 문서에 보존하며 현재 체크아웃·원격에서 미확인",
       "evidence": [
         "docs/releases/2026-10-19-private-icloud-sync.md",
-        "git:f98bb6d",
-        "git:bdef8de"
+        "git:f98bb6d"
       ]
     },
     {
@@ -551,6 +554,20 @@
         "https://github.com/sundaynighttt/codextime/pull/24",
         "https://github.com/sundaynighttt/codextime/actions/runs/39376903290",
         "https://appstoreconnect.apple.com/apps/6805935440/distribution/reviewsubmissions/details/5b793f23-ae1c-43b2-a174-58e6d1f64287"
+      ]
+    },
+    {
+      "id": "windows-041-local",
+      "sequence": 35,
+      "version": "windows-0.4.1-local",
+      "date": "2026-10-22",
+      "stage": "installed_smoke",
+      "status": "active",
+      "summary": "구형 설치본의 읽기 전용 바인딩 오류 폭주 조사; CLI 읽기·로그 상한 추가, 합성 회귀·설치 해시·로그 축소 확인; 공개 릴리스 및 장시간 실계정 검증 전",
+      "evidence": [
+        "docs/releases/2026-10-22-windows-v0.4.1.md",
+        "windows/CodexTime.Windows/ResourceSafetySelfTests.cs",
+        "git:d3d0547"
       ]
     }
   ]

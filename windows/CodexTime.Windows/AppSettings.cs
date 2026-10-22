@@ -95,7 +95,9 @@ public static class StartupManager
 
 public static class AppLog
 {
-    private static readonly object Gate = new();
+    private static readonly RollingFileLog Log = new(Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "CodexTime", "codextime.log"));
 
     // Exception text can contain CLI output, account information or request data.
     public static void Write(Exception exception) => Write("operation_failed");
@@ -104,16 +106,7 @@ public static class AppLog
     {
         try
         {
-            var directory = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "CodexTime");
-            Directory.CreateDirectory(directory);
-            lock (Gate)
-            {
-                File.AppendAllText(
-                    Path.Combine(directory, "codextime.log"),
-                    $"[{DateTimeOffset.Now:O}] {message}{Environment.NewLine}");
-            }
+            Log.Write(message);
         }
         catch
         {

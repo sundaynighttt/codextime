@@ -7,9 +7,13 @@ public sealed class CodexAppServerClient
 {
     private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(12);
 
-    public async Task<RateLimitReport> FetchAsync(CancellationToken cancellationToken = default)
+    public Task<RateLimitReport> FetchAsync(CancellationToken cancellationToken = default) =>
+        FetchAsync(CreateStartInfo(ResolveCodexPath()), RequestTimeout, cancellationToken);
+
+    internal async Task<RateLimitReport> FetchAsync(ProcessStartInfo startInfo, TimeSpan requestTimeout,
+        CancellationToken cancellationToken = default)
     {
-        var startInfo = CreateStartInfo(ResolveCodexPath());
+        cancellationToken.ThrowIfCancellationRequested();
         using var process = new Process { StartInfo = startInfo };
         if (!process.Start())
         {
@@ -17,12 +21,13 @@ public sealed class CodexAppServerClient
         }
 
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        timeout.CancelAfter(RequestTimeout);
+        timeout.CancelAfter(requestTimeout);
         var stderrTask = DiscardErrorsAsync(process.StandardError, timeout.Token);
+        var output = new BoundedLineReader(process.StandardOutput, 262_144);
         try
         {
             await process.StandardInput.WriteLineAsync(
-                "{\"id\":1,\"method\":\"initialize\",\"params\":{\"clientInfo\":{\"name\":\"codextime-windows\",\"version\":\"0.4.0\"}}}".AsMemory(), timeout.Token);
+                "{\"id\":1,\"method\":\"initialize\",\"params\":{\"clientInfo\":{\"name\":\"codextime-windows\",\"version\":\"0.4.1\"}}}".AsMemory(), timeout.Token);
             await process.StandardInput.WriteLineAsync("{\"method\":\"initialized\"}".AsMemory(), timeout.Token);
             await process.StandardInput.WriteLineAsync("{\"id\":2,\"method\":\"account/rateLimits/read\"}".AsMemory(), timeout.Token);
             await process.StandardInput.FlushAsync(timeout.Token);
@@ -32,19 +37,21 @@ public sealed class CodexAppServerClient
                 string? line;
                 try
                 {
-                    line = await process.StandardOutput.ReadLineAsync(timeout.Token);
+                    line = await output.ReadLineAsync(timeout.Token);
                 }
                 catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
                 {
                     throw new TimeoutException("Codex 사용량 조회 시간이 초과됐습니다.");
+                }
+                catch (InvalidDataException)
+                {
+                    throw new ProviderQueryException(ProviderFailure.InvalidResponse);
                 }
 
                 if (line is null)
                 {
                     throw new ProviderQueryException(ProviderFailure.QueryFailed);
                 }
-
-                if (line.Length > 262_144) throw new ProviderQueryException(ProviderFailure.InvalidResponse);
 
                 var report = RateLimitParser.ParseResponseLine(line);
                 if (report is not null)
